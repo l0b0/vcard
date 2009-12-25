@@ -62,7 +62,9 @@ MSG_EMPTY_VCARD = 'vCard is empty'
 MSG_INVALID_LINE_SEPARATOR = 'Invalid line ending; should be CRLF (\\r\\n)'
 
 class VCardFormatError(Exception):
-    """Thrown by VCard if the text given is not a valid according to vCard 3.0"""
+    """
+    Thrown by VCard if the text given is not a valid according to vCard 3.0
+    """
     def __init__(self, message, line_number = None, property_name = None):
         """
         vCard format error
@@ -313,9 +315,10 @@ def get_vcard_property(property_line):
     prop['name'] = property_name_and_params.pop(0)
 
     # Validate
-    if not prop['name'] in ALL_PROPERTIES and not re.match(
+    if not prop['name'].upper() in ALL_PROPERTIES and not re.match(
         '^X-[' + ID_CHARS + ']+$',
-        prop['name']):
+        prop['name'],
+        re.IGNORECASE):
         raise VCardFormatError(
             MSG_INVALID_PROPERTY_NAME + ': %s' % prop['name'])
 
@@ -344,7 +347,7 @@ def get_vcard_properties(lines):
 
     for mandatory_property in MANDATORY_PROPERTIES:
         if mandatory_property not in [
-            prop['name'] for prop in properties]:
+            prop['name'].upper() for prop in properties]:
             raise VCardFormatError(
                 MSG_MISSING_PROPERTY + ': %s' % mandatory_property,
                 property_name = mandatory_property)
