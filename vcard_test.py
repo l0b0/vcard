@@ -11,10 +11,15 @@ import unittest
 
 import vcard
 
+# pylint: disable-msg=C0301
 # Invalid vCards
 VCARD_EMPTY = ''
 VCARD_MISSING_PROPERTIES = 'BEGIN:VCARD\r\nEND:VCARD\r\n'
+VCARD_MISSING_START = 'VERSION:3.0\r\nN:Doe;John;Ottoman;Mr;\r\nFN:John Ottoman Doe\r\nEND:VCARD\r\n'
+VCARD_MISSING_END = 'BEGIN:VCARD\r\nVERSION:3.0\r\nN:Doe;John;Ottoman;Mr;\r\nFN:John Ottoman Doe\r\n'
 VCARD_MISSING_VERSION = u'BEGIN:VCARD\r\nN:Doe;John;Ottoman;Mr;Jr\r\nFN:John Ottoman Doe\r\nEND:VCARD\r\n'
+VCARD_MISSING_N = 'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nEND:VCARD\r\n'
+VCARD_MISSING_FN = 'BEGIN:VCARD\r\nVERSION:3.0\r\nN:Doe;John;;Mr;\r\nEND:VCARD\r\n'
 
 # Simple vCards
 VCARD_MINIMAL = 'BEGIN:VCARD\r\nVERSION:3.0\r\nN:Doe;John;;Mr;\r\nFN:John Doe\r\nEND:VCARD\r\n'
@@ -25,6 +30,7 @@ VCARDS_RFC_2426 = [u"""BEGIN:vCard\r\nVERSION:3.0\r\nFN:Frank Dawson\r\nORG:Lotu
 VCARD_WIKIPEDIA = u"""BEGIN:VCARD\r\nVERSION:3.0\r\nN:Gump;Forrest\r\nFN:Forrest Gump\r\nORG:Bubba Gump Shrimp Co.\r\nTITLE:Shrimp Man\r\nTEL;TYPE=WORK,VOICE:(111) 555-1212\r\nTEL;TYPE=HOME,VOICE:(404) 555-1212\r\nADR;TYPE=WORK:;;100 Waters Edge;Baytown;LA;30314;United States of America\r\nLABEL;TYPE=WORK:100 Waters Edge\\nBaytown, LA 30314\\nUnited States of America\r\nADR;TYPE=HOME:;;42 Plantation St.;Baytown;LA;30314;United States of America\r\nLABEL;TYPE=HOME:42 Plantation St.\\nBaytown, LA 30314\\nUnited States of America\r\nEMAIL;TYPE=PREF,INTERNET:forrestgump@example.com\r\nREV:20080424T195243Z\r\nEND:VCARD\r\n"""
 
 VCARD_ASPAASS_NO = u"""BEGIN:VCARD\r\nVERSION:3.0\r\nPROFILE:VCARD\r\nCLASS:PUBLIC\r\nSOURCE:http\\://aspaass.no/Aspaas Sykler.vcf\r\nN:Aspaas Sykler\r\nFN:Aspaas Sykler\r\nORG:Aspaas Sykler\r\nURL;TYPE=WORK:http\\://aspaass.no/\r\nEMAIL;TYPE=INTERNET;TYPE=PREF;TYPE=WORK:aspaass@online.no\r\nTEL;TYPE=VOICE;TYPE=PREF;TYPE=MSG;TYPE=WORK:+4733187525\r\nTEL;TYPE=FAX;TYPE=WORK:+4733183703\r\nADR;TYPE=INTL;TYPE=POSTAL;TYPE=PARCEL;TYPE=WORK:;;Nansetgata 74;Larvik;Vest\r\n fold;3269;NORWAY\r\nLABEL;TYPE=INTL;TYPE=POSTAL;TYPE=PARCEL;TYPE=WORK:Nansetgata 74\\n3269 Larvi\r\n k\\nNORWAY\r\nPHOTO;VALUE=uri:http\\://aspaass.no/include/image/butikk.jpg\r\nNOTE:Åpningstider mandag til fredag 9-18; lørdag 9-16\r\nTZ:+01\\:00\r\nGEO:59.06116,10.03712\r\nLOGO;VALUE=uri:http\\://aspaass.no/include/image/logo.png\r\nCATEGORIES:business,Norwegian\r\nEND:VCARD\r\n"""
+# pylint: enable-msg=C0301
 
 class SmallVCards(unittest.TestCase):
     """Test small vCards"""
@@ -36,13 +42,65 @@ class SmallVCards(unittest.TestCase):
         except vcard.VCardFormatError as error:
             self.assertEquals(error.message, vcard.MSG_EMPTY_VCARD)
 
-    def test_start_end(self):
+    def test_missing_properties(self):
         """Only BEGIN and END"""
         try:
             result = vcard.VCard(VCARD_MISSING_PROPERTIES)
             self.fail('Invalid vCard created')
         except vcard.VCardFormatError as error:
-            self.assertEquals(error.message[:len(vcard.MSG_MISSING_PROPERTY)], vcard.MSG_MISSING_PROPERTY)
+            self.assertEquals(
+                error.message[:len(vcard.MSG_MISSING_PROPERTY)],
+                vcard.MSG_MISSING_PROPERTY)
+
+    def test_missing_start(self):
+        """Missing BEGIN"""
+        try:
+            result = vcard.VCard(VCARD_MISSING_START)
+            self.fail('Invalid vCard created')
+        except vcard.VCardFormatError as error:
+            self.assertEquals(
+                error.message[:len(vcard.MSG_MISSING_PROPERTY)],
+                vcard.MSG_MISSING_PROPERTY)
+
+    def test_missing_end(self):
+        """Missing END"""
+        try:
+            result = vcard.VCard(VCARD_MISSING_END)
+            self.fail('Invalid vCard created')
+        except vcard.VCardFormatError as error:
+            self.assertEquals(
+                error.message[:len(vcard.MSG_MISSING_PROPERTY)],
+                vcard.MSG_MISSING_PROPERTY)
+
+    def test_missing_version(self):
+        """Missing VERSION"""
+        try:
+            result = vcard.VCard(VCARD_MISSING_VERSION)
+            self.fail('Invalid vCard created')
+        except vcard.VCardFormatError as error:
+            self.assertEquals(
+                error.message[:len(vcard.MSG_MISSING_PROPERTY)],
+                vcard.MSG_MISSING_PROPERTY)
+
+    def test_missing_n(self):
+        """Missing N"""
+        try:
+            result = vcard.VCard(VCARD_MISSING_N)
+            self.fail('Invalid vCard created')
+        except vcard.VCardFormatError as error:
+            self.assertEquals(
+                error.message[:len(vcard.MSG_MISSING_PROPERTY)],
+                vcard.MSG_MISSING_PROPERTY)
+
+    def test_missing_fn(self):
+        """Missing FN"""
+        try:
+            result = vcard.VCard(VCARD_MISSING_FN)
+            self.fail('Invalid vCard created')
+        except vcard.VCardFormatError as error:
+            self.assertEquals(
+                error.message[:len(vcard.MSG_MISSING_PROPERTY)],
+                vcard.MSG_MISSING_PROPERTY)
 
     def test_minimal(self):
         """Minimal valid vCard"""

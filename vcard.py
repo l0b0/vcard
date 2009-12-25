@@ -31,7 +31,7 @@ SAFE_CHARS = WSP_CHARS + u'\u0021' + u'\u0023-\u002B' + u'\u002D-\u0039' + \
 VALUE_CHARS = WSP_CHARS + VCHAR_CHARS + NON_ASCII_CHARS
 
 # Known property names (RFC 2426 page 4)
-MANDATORY_PROPERTIES = ['FN', 'N', 'VERSION']
+MANDATORY_PROPERTIES = ['BEGIN', 'END', 'FN', 'N', 'VERSION']
 PREDEFINED_PROPERTIES = ['BEGIN', 'END', 'NAME', 'PROFILE', 'SOURCE']
 OTHER_PROPERTIES = [
     'ADR', 'AGENT', 'BDAY', 'CATEGORIES', 'CLASS', 'EMAIL', 'GEO', 'KEY',
@@ -342,7 +342,7 @@ def get_vcard_properties(lines):
     for property_line in lines:
         properties.append(get_vcard_property(property_line))
 
-    for mandatory_property in ('VERSION', 'N', 'FN'):
+    for mandatory_property in MANDATORY_PROPERTIES:
         if mandatory_property not in [
             prop['name'] for prop in properties]:
             raise VCardFormatError(
