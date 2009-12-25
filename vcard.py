@@ -1,18 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Validates vCards v3.0 according to RFC 2426"""
+"""vCards v3.0 (RFC 2426) class and parsing + validating functions"""
 
 __author__ = 'Victor Engmark'
 __email__ = 'victor.engmark@gmail.com'
-__url__ = 'http://l0b0.wordpress.com/2009/12/24/vcard-parser-and-validator/'
+__url__ = 'http://vcard-module.sourceforge.net/'
 __copyright__ = 'Copyright (C) 2009 Victor Engmark'
 __license__ = 'GPLv3'
-__todo__ = [
-    'Detect unescaped characters',
-    'Work with encodings',
-    '"Only text or non-standard parameters allowed" (page 36) for X-*',
-    'Embedded vCards'
-    'vCard 2.1: All literal property names are valid as upper, lower, or mixed case.']
 
 import re
 import warnings
