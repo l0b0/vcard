@@ -63,19 +63,20 @@ VCARD_LINE_MAX_LENGTH = 75 # RFC 2426 page 6
 # Error literals
 MSG_CONTINUATION_AT_START = 'Continuation line at start of vCard'
 MSG_DOT_AT_LINE_START = 'Dot at start of line without group name'
-MSG_MISSING_GROUP = 'Missing group'
+MSG_EMPTY_LINE = 'Empty line found'
+MSG_EMPTY_VCARD = 'vCard is empty'
 MSG_MISMATCH_GROUP = 'Group mismatch'
+MSG_MISSING_GROUP = 'Missing group'
+MSG_MISSING_PROPERTY = 'Mandatory property missing'
+MSG_MISSING_PARAM_VALUE = 'Parameter value missing'
+MSG_MISSING_VALUE_STRING = 'Missing value string'
 MSG_INVALID_FIRST_LINE = 'Invalid first line'
 MSG_INVALID_LAST_LINE = 'Invalid last line'
-MSG_INVALID_VALUE = 'Invalid value'
-MSG_INVALID_PARAM_NAME = 'Invalid parameter name'
-MSG_INVALID_SUBVALUE = 'Invalid subvalue'
-MSG_EMPTY_LINE = 'Empty line found'
-MSG_VALUE_STRING_MISSING = 'Missing value string'
-MSG_INVALID_PROPERTY_NAME = 'Invalid property name'
-MSG_MISSING_PROPERTY = 'Mandatory property missing'
-MSG_EMPTY_VCARD = 'vCard is empty'
 MSG_INVALID_LINE_SEPARATOR = 'Invalid line ending; should be CRLF (\\r\\n)'
+MSG_INVALID_PARAM_NAME = 'Invalid parameter name'
+MSG_INVALID_PROPERTY_NAME = 'Invalid property name'
+MSG_INVALID_SUBVALUE = 'Invalid subvalue'
+MSG_INVALID_VALUE = 'Invalid value'
 
 class VCardFormatError(Exception):
     """
@@ -106,6 +107,7 @@ class VCardFormatError(Exception):
                 msg += 'File'
             elif key == 'line':
                 msg += 'Line number'
+                value += 1
             elif key == 'property':
                 msg += 'Property'
             else:
@@ -161,15 +163,20 @@ def unfold_vcard_lines(lines):
     property_lines = []
     for index in range(len(lines)):
         line = lines[index]
-        if len(line) > VCARD_LINE_MAX_LENGTH:
-            warnings.warn('Long line at line %i' % index)
+        if not line.endswith(CRLF_CHARS):
+            raise VCardFormatError(
+                MSG_INVALID_LINE_SEPARATOR,
+                {'line': index})
+        if len(line) > VCARD_LINE_MAX_LENGTH + len(CRLF_CHARS):
+            warnings.warn('Long line in vCard: %s' % line.encode('utf-8'))
 
         if line.startswith(' '):
             if index == 0:
                 raise VCardFormatError(MSG_CONTINUATION_AT_START, {'line': 0})
             elif len(lines[index - 1]) < VCARD_LINE_MAX_LENGTH:
                 warnings.warn('Short folded line at line %i' % (index - 1))
-            property_lines[-1] += line[1:]
+            property_lines[-1] = property_lines[-1][:-len(CRLF_CHARS)] + \
+                                 line[1:]
         else:
             property_lines.append(line)
 
@@ -252,7 +259,11 @@ def get_vcard_property_param(param_string):
     @param param_string: Single parameter and values
     @return: Dictionary with a parameter name and values
     """
-    parameter_name, values_string = split_unescaped(param_string, '=')
+    try:
+        parameter_name, values_string = split_unescaped(param_string, '=')
+    except ValueError as error:
+        raise VCardFormatError(MSG_MISSING_PARAM_VALUE + ': %s' % error)
+
     values = get_vcard_property_param_values(values_string)
 
     # Validate
@@ -332,7 +343,7 @@ def get_vcard_property(property_line):
     property_parts = split_unescaped(property_line, ':')
     if len(property_parts) < 2:
         raise VCardFormatError(
-            MSG_VALUE_STRING_MISSING + ': %s' % property_line)
+            MSG_MISSING_VALUE_STRING + ': %s' % property_line)
     elif len(property_parts) > 2:
         # Merge - Colon doesn't have to be escaped in values
         property_parts[1] = ':'.join(property_parts[1:])
@@ -403,22 +414,13 @@ class VCard():
         """
         if text == '':
             raise VCardFormatError(MSG_EMPTY_VCARD, {'line': 0})
-        self.text = text
 
-        full_lines = self.text.splitlines(True)
-        for index in range(len(full_lines)):
-            full_line = full_lines[index]
-            if not full_line.endswith(CRLF_CHARS):
-                raise VCardFormatError(
-                    MSG_INVALID_LINE_SEPARATOR,
-                    {'line': index})
+        self.text = text
 
         lines = unfold_vcard_lines(self.text.splitlines(True))
 
         # Groups
         self.group = get_vcard_group(lines)
-
-        # Cleanup
         lines = remove_vcard_groups(lines, self.group)
 
         # Properties
@@ -445,24 +447,22 @@ def validate_file(filename, verbose = False):
             line = contents[index]
             vcard_text += line
 
-            if line == CRLF_CHARS or index == len(contents) - 1:
+            if line == CRLF_CHARS:
                 try:
                     vcard = VCard(vcard_text)
+                    vcard_text = ''
                 except VCardFormatError as error:
                     raise VCardFormatError(
                         error.message,
                         dict(error.context.items() + [['path', filename]]))
 
-                vcard_text = ''
     except VCardFormatError as error:
         result += unicode(error.__str__())
 
-    if vcard_text != '':
-        if result != '':
-            result += '\n'
+    if vcard_text != '' and result == '':
         result += 'Could not process entire %s - %i lines remain' % (
             filename,
-            len(vcard_text))
+            len(vcard_text.splitlines()))
 
     if result == '':
         return None
@@ -507,7 +507,7 @@ def main(argv = None):
     for filename in args:
         result = validate_file(filename, verbose)
         if result is not None:
-            print(result.encode('utf-8'))
+            print(result.encode('utf-8') + '\n')
 
 if __name__ == '__main__':
     sys.exit(main())
