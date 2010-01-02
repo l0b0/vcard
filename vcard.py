@@ -1,6 +1,19 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-"""vCards v3.0 (RFC 2426) class and parsing + validating functions"""
+"""vCards v3.0 (RFC 2426) class and parsing + validating functions
+
+Default syntax:
+
+./vcard.py [options] -|file...
+
+Options:
+-v,--verbose    Verbose mode
+
+Example:
+
+./vcard.py *.vcf
+Validate all .vcf files in the current directory
+"""
 
 __author__ = 'Victor Engmark'
 __email__ = 'victor.engmark@gmail.com'
@@ -8,7 +21,10 @@ __url__ = 'http://vcard-module.sourceforge.net/'
 __copyright__ = 'Copyright (C) 2009 Victor Engmark'
 __license__ = 'GPLv3'
 
+import codecs
+import getopt
 import re
+import sys
 import warnings
 
 # Literals, RFC 2426 pages 27, 28
@@ -65,25 +81,38 @@ class VCardFormatError(Exception):
     """
     Thrown by VCard if the text given is not a valid according to vCard 3.0
     """
-    def __init__(self, message, line_number = None, property_name = None):
+    def __init__(
+        self,
+        message,
+        context = {}):
         """
         vCard format error
         @param message: Error message
-        @param property_name: Property of the line (if applicable)
-        @param line_number: Line in the vCard where the error happened (if
-        applicable)
+        @param context: Dictionary with context information
         """
         Exception.__init__(self)
         self.message = message
-        self.line_number = line_number
-        self.property_name = property_name
+        self.context = context
 
     def __str__(self):
+        """
+        Outputs error with ordered context info
+        """
         msg = 'vCard format error: %s' % self.message
-        if self.line_number is not None:
-            msg += '\nLine number: %i' % self.line_number
-        if self.property_name is not None:
-            msg += '\nProperty: %s' % self.property_name
+
+        for key, value in self.context.items():
+            msg += '\n'
+            if key == 'path':
+                msg += 'File'
+            elif key == 'line':
+                msg += 'Line number'
+            elif key == 'property':
+                msg += 'Property'
+            else:
+                msg += key
+
+            msg += ': ' + unicode(value)
+
         return msg
 
 def find_unescaped(text, char, escape_char = '\\'):
@@ -137,7 +166,7 @@ def unfold_vcard_lines(lines):
 
         if line.startswith(' '):
             if index == 0:
-                raise VCardFormatError(MSG_CONTINUATION_AT_START, 0)
+                raise VCardFormatError(MSG_CONTINUATION_AT_START, {'line': 0})
             elif len(lines[index - 1]) < VCARD_LINE_MAX_LENGTH:
                 warnings.warn('Short folded line at line %i' % (index - 1))
             property_lines[-1] += line[1:]
@@ -168,13 +197,13 @@ def get_vcard_group(lines):
             line = lines[index]
             next_match = group_re.match(line)
             if not next_match:
-                raise VCardFormatError(MSG_MISSING_GROUP, index)
+                raise VCardFormatError(MSG_MISSING_GROUP, {'line': index})
             if next_match.group(1) != group:
                 raise VCardFormatError(
                     MSG_MISMATCH_GROUP + ': %s != %s' % (
                         next_match.group(1),
                         group),
-                    index)
+                    {'line': index})
     else:
         # Make sure there are no groups elsewhere
         for index in range(len(lines)):
@@ -183,7 +212,7 @@ def get_vcard_group(lines):
                     MSG_MISMATCH_GROUP + ': %s != %s' % (
                         next_match.group(1),
                         group),
-                    index)
+                    {'line': index})
 
     return group
 
@@ -278,6 +307,10 @@ def get_vcard_property_values(values_string):
     @return: List of values (RFC 2426 page 12)
     """
     values = []
+
+    # Strip line ending
+    values_string = values_string[:-len(CRLF_CHARS)]
+
     subvalue_strings = split_unescaped(values_string, ';')
     for sub in subvalue_strings:
         values.append(get_vcard_property_subvalues(sub))
@@ -296,9 +329,6 @@ def get_vcard_property(property_line):
     """
     prop = {}
 
-    # Split property and values
-    if not property_line:
-        raise VCardFormatError(MSG_EMPTY_LINE)
     property_parts = split_unescaped(property_line, ':')
     if len(property_parts) < 2:
         raise VCardFormatError(
@@ -329,7 +359,9 @@ def get_vcard_property(property_line):
         prop['values'] = get_vcard_property_values(values_string)
     except VCardFormatError as error:
         # Add parameter name to error
-        raise VCardFormatError(error.message, property_name = prop['name'])
+        raise VCardFormatError(
+            error.message,
+            dict(error.context.items() + [['property', prop['name']]]))
 
     return prop
 
@@ -342,15 +374,22 @@ def get_vcard_properties(lines):
     printed vCards look like the original.
     """
     properties = []
-    for property_line in lines:
-        properties.append(get_vcard_property(property_line))
+    for index in range(len(lines)):
+        property_line = lines[index]
+        if property_line != CRLF_CHARS:
+            try:
+                properties.append(get_vcard_property(property_line))
+            except VCardFormatError as error:
+                raise VCardFormatError(
+                    error.message,
+                    dict(error.context.items() + [['line', index]]))
 
     for mandatory_property in MANDATORY_PROPERTIES:
         if mandatory_property not in [
             prop['name'].upper() for prop in properties]:
             raise VCardFormatError(
                 MSG_MISSING_PROPERTY + ': %s' % mandatory_property,
-                property_name = mandatory_property)
+                {'property': mandatory_property})
 
     return properties
 
@@ -363,16 +402,18 @@ class VCard():
         @param text: String containing a single vCard
         """
         if text == '':
-            raise VCardFormatError(MSG_EMPTY_VCARD, 0)
+            raise VCardFormatError(MSG_EMPTY_VCARD, {'line': 0})
         self.text = text
 
         full_lines = self.text.splitlines(True)
         for index in range(len(full_lines)):
             full_line = full_lines[index]
             if not full_line.endswith(CRLF_CHARS):
-                raise VCardFormatError(MSG_INVALID_LINE_SEPARATOR, index)
+                raise VCardFormatError(
+                    MSG_INVALID_LINE_SEPARATOR,
+                    {'line': index})
 
-        lines = unfold_vcard_lines(self.text.splitlines())
+        lines = unfold_vcard_lines(self.text.splitlines(True))
 
         # Groups
         self.group = get_vcard_group(lines)
@@ -381,7 +422,92 @@ class VCard():
         lines = remove_vcard_groups(lines, self.group)
 
         # Properties
+        self.properties = get_vcard_properties(lines)
+
+def validate_file(filename, verbose = False):
+    """
+    Create object for each vCard in a file, and show the error output
+    @param filename: Path to file
+    @param verbose: Verbose mode
+    @return: Debugging output from creating vCards
+    """
+    if filename == '-':
+        file_pointer = sys.stdin
+    else:
+        file_pointer = codecs.open(filename, 'r', 'utf-8')
+
+    contents = file_pointer.read().splitlines(True)
+
+    vcard_text = ''
+    result = ''
+    try:
+        for index in range(len(contents)):
+            line = contents[index]
+            vcard_text += line
+
+            if line == CRLF_CHARS or index == len(contents) - 1:
+                try:
+                    vcard = VCard(vcard_text)
+                except VCardFormatError as error:
+                    raise VCardFormatError(
+                        error.message,
+                        dict(error.context.items() + [['path', filename]]))
+
+                vcard_text = ''
+    except VCardFormatError as error:
+        result += unicode(error.__str__())
+
+    if vcard_text != '':
+        if result != '':
+            result += '\n'
+        result += 'Could not process entire %s - %i lines remain' % (
+            filename,
+            len(vcard_text))
+
+    if result == '':
+        return None
+    return result
+
+class Usage(Exception):
+    """Raise in case of invalid parameters"""
+    def __init__(self, msg):
+        self.msg = msg
+
+def main(argv = None):
+    """Argument handling"""
+
+    if argv is None:
+        argv = sys.argv
+
+    # Defaults
+    verbose = False
+
+    try:
         try:
-            self.properties = get_vcard_properties(lines)
-        except VCardFormatError:
-            raise
+            opts, args = getopt.getopt(
+                argv[1:],
+                'v',
+                ['verbose'])
+        except getopt.GetoptError, err:
+            raise Usage(err.msg)
+
+        for option, value in opts:
+            if option in ('-v', '--verbose'):
+                verbose = True
+            else:
+                raise Usage('Unhandled option %s' % option)
+
+        if not args:
+            raise Usage(__doc__)
+
+    except Usage, err:
+        sys.stderr.write(err.msg + '\n')
+        return 2
+
+    for filename in args:
+        result = validate_file(filename, verbose)
+        if result is not None:
+            print(result.encode('utf-8'))
+
+if __name__ == '__main__':
+    sys.exit(main())
