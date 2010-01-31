@@ -77,6 +77,7 @@ MSG_INVALID_SUBVALUE = 'Invalid subvalue'
 MSG_INVALID_VALUE = 'Invalid value'
 MSG_INVALID_VALUE_COUNT = 'Invalid value count'
 MSG_MISMATCH_GROUP = 'Group mismatch'
+MSG_MISMATCH_PARAM = 'Parameter mismatch'
 MSG_MISSING_GROUP = 'Missing group'
 MSG_MISSING_PARAM = 'Parameter missing'
 MSG_MISSING_PARAM_VALUE = 'Parameter value missing'
@@ -391,11 +392,17 @@ def validate_vcard_property(prop):
         if not 'parameters' in prop:
             raise VCardFormatError(MSG_MISSING_PARAM, {})
         for parameter_name, parameter_values in prop['parameters'].items():
-            if parameter_name.upper() == 'ENCODING' and \
-                   parameter_values != set(['b']):
-                raise VCardFormatError(
-                    MSG_INVALID_PARAM_VALUE + ': %s' % parameter_values,
-                    {})
+            if parameter_name.upper() == 'ENCODING':
+                if parameter_values != set(['b']):
+                    raise VCardFormatError(
+                        MSG_INVALID_PARAM_VALUE + ': %s' % parameter_values,
+                        {})
+                if 'VALUE' in prop['parameters']:
+                    raise VCardFormatError(
+                        MSG_MISMATCH_PARAM  + ': %s and %s' % (
+                            'ENCODING',
+                            'VALUE'),
+                        {})
             elif parameter_name.upper() == 'TYPE' and \
                    'ENCODING' not in prop['parameters']:
                 raise VCardFormatError(
@@ -406,6 +413,30 @@ def validate_vcard_property(prop):
                 raise VCardFormatError(
                     MSG_INVALID_PARAM_VALUE + ': %s' % parameter_values,
                     {})
+            elif parameter_name.upper() not in ['ENCODING', 'TYPE', 'VALUE']:
+                raise VCardFormatError(
+                    MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
+                    {})
+
+    elif property_name == 'BDAY':
+        if 'parameters' in prop:
+            raise VCardFormatError(
+                MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
+                {})
+        if len(prop['values']) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (!= 1)' % len(prop['values']),
+                {})
+        if len(prop['values'][0]) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (!= 1)' % \
+                len(prop['values'][0]),
+                {})
+        # TODO: Complete ISO 8601 date validation
+        if not re.match(r'^\d{4}-\d{2}-\d{2}$', prop['values'][0][0]):
+            warnings.warn(
+                'Possible invalid date: %s' % prop['values'][0][0].encode('utf-8'))
+
 
 def get_vcard_property(property_line):
     """
