@@ -71,12 +71,14 @@ MSG_INVALID_FIRST_LINE = 'Invalid first line'
 MSG_INVALID_LAST_LINE = 'Invalid last line'
 MSG_INVALID_LINE_SEPARATOR = 'Invalid line ending; should be CRLF (\\r\\n)'
 MSG_INVALID_PARAM_NAME = 'Invalid parameter name'
+MSG_INVALID_PARAM_VALUE = 'Invalid parameter value'
 MSG_INVALID_PROPERTY_NAME = 'Invalid property name'
 MSG_INVALID_SUBVALUE = 'Invalid subvalue'
 MSG_INVALID_VALUE = 'Invalid value'
 MSG_INVALID_VALUE_COUNT = 'Invalid value count'
 MSG_MISMATCH_GROUP = 'Group mismatch'
 MSG_MISSING_GROUP = 'Missing group'
+MSG_MISSING_PARAM = 'Parameter missing'
 MSG_MISSING_PARAM_VALUE = 'Parameter value missing'
 MSG_MISSING_PROPERTY = 'Mandatory property missing'
 MSG_MISSING_VALUE_STRING = 'Missing value string'
@@ -342,14 +344,15 @@ def get_vcard_property_values(values_string):
 def validate_vcard_property(prop):
     """
     Checks any property according to
-    <http://tools.ietf.org/html/rfc2426#section-3>. Verbose to allow for easy
-    change.
+    <http://tools.ietf.org/html/rfc2426#section-3> and
+    <http://tools.ietf.org/html/rfc2426#section-4>. Checks are grouped by
+    property to allow easy overview rather than a short function.
 
     @param property: Formatted property
     """
-    name = prop['name'].upper()
+    property_name = prop['name'].upper()
 
-    if name == 'FN':
+    if property_name == 'FN':
         # <http://tools.ietf.org/html/rfc2426#section-3.1.1>
         if 'parameters' in prop:
             raise VCardFormatError(
@@ -361,12 +364,48 @@ def validate_vcard_property(prop):
                 {})
         # TODO: X.520 Common Name validation
 
-    elif name == 'N':
+    elif property_name == 'N':
         # <http://tools.ietf.org/html/rfc2426#section-3.1.2>
+        if 'parameters' in prop:
+            raise VCardFormatError(
+                MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
+                {})
         if len(prop['values']) != 5:
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (!= 5)' % len(prop['values']),
                 {})
+
+    elif property_name == 'NICKNAME':
+        # <http://tools.ietf.org/html/rfc2426#section-3.1.3>
+        if 'parameters' in prop:
+            raise VCardFormatError(
+                MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
+                {})
+        if len(prop['values']) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (!= 1)' % len(prop['values']),
+                {})
+
+    elif property_name == 'PHOTO':
+        # <http://tools.ietf.org/html/rfc2426#section-3.1.4>
+        if not 'parameters' in prop:
+            raise VCardFormatError(MSG_MISSING_PARAM, {})
+        for parameter_name, parameter_values in prop['parameters'].items():
+            if parameter_name.upper() == 'ENCODING' and \
+                   parameter_values != set(['b']):
+                raise VCardFormatError(
+                    MSG_INVALID_PARAM_VALUE + ': %s' % parameter_values,
+                    {})
+            elif parameter_name.upper() == 'TYPE' and \
+                   'ENCODING' not in prop['parameters']:
+                raise VCardFormatError(
+                    MSG_MISSING_PARAM + ': %s' % 'ENCODING',
+                    {})
+            elif parameter_name.upper() == 'VALUE' and \
+                 parameter_values != set(['uri']):
+                raise VCardFormatError(
+                    MSG_INVALID_PARAM_VALUE + ': %s' % parameter_values,
+                    {})
 
 def get_vcard_property(property_line):
     """
