@@ -67,11 +67,6 @@ MSG_CONTINUATION_AT_START = 'Continuation line at start of vCard'
 MSG_DOT_AT_LINE_START = 'Dot at start of line without group name'
 MSG_EMPTY_LINE = 'Empty line found'
 MSG_EMPTY_VCARD = 'vCard is empty'
-MSG_MISMATCH_GROUP = 'Group mismatch'
-MSG_MISSING_GROUP = 'Missing group'
-MSG_MISSING_PROPERTY = 'Mandatory property missing'
-MSG_MISSING_PARAM_VALUE = 'Parameter value missing'
-MSG_MISSING_VALUE_STRING = 'Missing value string'
 MSG_INVALID_FIRST_LINE = 'Invalid first line'
 MSG_INVALID_LAST_LINE = 'Invalid last line'
 MSG_INVALID_LINE_SEPARATOR = 'Invalid line ending; should be CRLF (\\r\\n)'
@@ -79,17 +74,23 @@ MSG_INVALID_PARAM_NAME = 'Invalid parameter name'
 MSG_INVALID_PROPERTY_NAME = 'Invalid property name'
 MSG_INVALID_SUBVALUE = 'Invalid subvalue'
 MSG_INVALID_VALUE = 'Invalid value'
+MSG_INVALID_VALUE_COUNT = 'Invalid value count'
+MSG_MISMATCH_GROUP = 'Group mismatch'
+MSG_MISSING_GROUP = 'Missing group'
+MSG_MISSING_PARAM_VALUE = 'Parameter value missing'
+MSG_MISSING_PROPERTY = 'Mandatory property missing'
+MSG_MISSING_VALUE_STRING = 'Missing value string'
+MSG_NON_EMPTY_PARAM = 'Property should not have parameters'
 
 class VCardFormatError(Exception):
-    """
-    Thrown by VCard if the text given is not a valid according to vCard 3.0
-    """
+    """Thrown if the text given is not a valid according to RFC 2426."""
     def __init__(
         self,
         message,
-        context = {}):
+        context):
         """
-        vCard format error
+        vCard format error.
+
         @param message: Error message
         @param context: Dictionary with context information
         """
@@ -98,9 +99,7 @@ class VCardFormatError(Exception):
         self.context = context
 
     def __str__(self):
-        """
-        Outputs error with ordered context info
-        """
+        """Outputs error with ordered context info."""
         msg = 'vCard format error: %s' % self.message
 
         for key, value in self.context.items():
@@ -121,7 +120,8 @@ class VCardFormatError(Exception):
 
 def find_unescaped(text, char, escape_char = '\\'):
     """
-    Find occurrence of an unescaped character
+    Find occurrence of an unescaped character.
+
     @param text: String
     @param char: Character to find
     @param escape_char: Escape character
@@ -140,7 +140,8 @@ def find_unescaped(text, char, escape_char = '\\'):
 
 def split_unescaped(text, separator, escape_char = '\\\\'):
     """
-    Find strings separated by an unescaped character
+    Find strings separated by an unescaped character.
+
     @param text: String
     @param separator: Separator
     @param escape_char: Escape character
@@ -159,6 +160,7 @@ def split_unescaped(text, separator, escape_char = '\\\\'):
 def unfold_vcard_lines(lines):
     """
     Unsplit lines in vCard, warning about short lines. RFC 2426 page 8.
+
     @param lines: List of potentially folded vCard lines
     @return: List of lines, one per property
     """
@@ -187,6 +189,7 @@ def unfold_vcard_lines(lines):
 def get_vcard_group(lines):
     """
     Get & validate group. RFC 2426 pages 28, 29.
+
     @param lines: List of unfolded vCard lines
     @return: Group name if one exists, None otherwise
     """
@@ -200,7 +203,7 @@ def get_vcard_group(lines):
 
         # Validate
         if len(group) == 0:
-            raise VCardFormatError(MSG_DOT_AT_LINE_START)
+            raise VCardFormatError(MSG_DOT_AT_LINE_START, {})
 
         for index in range(len(lines)):
             line = lines[index]
@@ -228,6 +231,7 @@ def get_vcard_group(lines):
 def remove_vcard_groups(lines, group):
     """
     Remove groups from vCard. RFC 2426 pages 28, 29.
+
     @param lines: List of unfolded vCard lines
     @return: Lines without groups and dot separator
     """
@@ -239,6 +243,7 @@ def remove_vcard_groups(lines, group):
 def get_vcard_property_param_values(values_string):
     """
     Get the parameter values. RFC 2426 page 29.
+
     @param text: Comma separated values
     @return: Set of values. Assumes that sequence doesn't matter and that
     duplicate values can be discarded, even though RFC 2426 doesn't explicitly
@@ -251,34 +256,38 @@ def get_vcard_property_param_values(values_string):
         if not re.match(
             '^[' + SAFE_CHARS + ']+$|^"[' + QSAFE_CHARS + ']+"$',
             value):
-            raise VCardFormatError(MSG_INVALID_VALUE + ': %s' % value)
+            raise VCardFormatError(MSG_INVALID_VALUE + ': %s' % value, {})
 
     return values
 
 def get_vcard_property_param(param_string):
     """
     Get the parameter name and value(s). RFC 2426 page 29.
+
     @param param_string: Single parameter and values
     @return: Dictionary with a parameter name and values
     """
     try:
         parameter_name, values_string = split_unescaped(param_string, '=')
     except ValueError as error:
-        raise VCardFormatError(MSG_MISSING_PARAM_VALUE + ': %s' % error)
+        raise VCardFormatError(MSG_MISSING_PARAM_VALUE + ': %s' % error, {})
 
     values = get_vcard_property_param_values(values_string)
 
     # Validate
     if not re.match('^[' + ID_CHARS + ']+$', parameter_name):
-        raise VCardFormatError(MSG_INVALID_PARAM_NAME + ': %s' % parameter_name)
+        raise VCardFormatError(
+            MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
+            {})
 
     return {'name': parameter_name, 'values': values}
 
 def get_vcard_property_params(params_string):
     """
     Get the parameters and their values. RFC 2426 page 28.
+
     @param params_string: Part of a vCard line between the first semicolon
-    and the first colon
+    and the first colon.
     @return: Dictionary of parameters. Assumes that
     TYPE=WORK;TYPE=WORK,VOICE === TYPE=VOICE,WORK === TYPE=VOICE;TYPE=WORK.
     """
@@ -298,24 +307,24 @@ def get_vcard_property_params(params_string):
 
 def get_vcard_property_subvalues(value_string):
     """
-    Get the parts of the value
+    Get the parts of the value.
+
     @param value_string: Single value string
     @return: List of values (RFC 2426 page 9)
     """
     subvalues = split_unescaped(value_string, ',')
 
-    # Validate
+    # Validate string
     for subvalue in subvalues:
         if not re.match('^[' + VALUE_CHARS + ']*$', subvalue):
-            raise VCardFormatError(MSG_INVALID_SUBVALUE + ': %s' % subvalue)
-
-        # TODO: Min / max for specific properties
+            raise VCardFormatError(MSG_INVALID_SUBVALUE + ': %s' % subvalue, {})
 
     return subvalues
 
 def get_vcard_property_values(values_string):
     """
-    Get the property values
+    Get the property values.
+
     @param values_string: Multiple value string
     @return: List of values (RFC 2426 page 12)
     """
@@ -328,15 +337,41 @@ def get_vcard_property_values(values_string):
     for sub in subvalue_strings:
         values.append(get_vcard_property_subvalues(sub))
 
-    # Validate
-    for value in values:
-        pass # TODO, need to know how many values different properties can have
-
     return values
+
+def validate_vcard_property(prop):
+    """
+    Checks any property according to
+    <http://tools.ietf.org/html/rfc2426#section-3>. Verbose to allow for easy
+    change.
+
+    @param property: Formatted property
+    """
+    name = prop['name'].upper()
+
+    if name == 'FN':
+        # <http://tools.ietf.org/html/rfc2426#section-3.1.1>
+        if 'parameters' in prop:
+            raise VCardFormatError(
+                MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
+                {})
+        if len(prop['values']) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (!= 1)' % len(prop['values']),
+                {})
+        # TODO: X.520 Common Name validation
+
+    elif name == 'N':
+        # <http://tools.ietf.org/html/rfc2426#section-3.1.2>
+        if len(prop['values']) != 5:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (!= 5)' % len(prop['values']),
+                {})
 
 def get_vcard_property(property_line):
     """
-    Get a single property
+    Get a single property.
+
     @param property_line: Single unfolded vCard line
     @return: Dictionary with name, parameters and values
     """
@@ -345,7 +380,8 @@ def get_vcard_property(property_line):
     property_parts = split_unescaped(property_line, ':')
     if len(property_parts) < 2:
         raise VCardFormatError(
-            MSG_MISSING_VALUE_STRING + ': %s' % property_line)
+            MSG_MISSING_VALUE_STRING + ': %s' % property_line,
+            {})
     elif len(property_parts) > 2:
         # Merge - Colon doesn't have to be escaped in values
         property_parts[1] = ':'.join(property_parts[1:])
@@ -357,34 +393,38 @@ def get_vcard_property(property_line):
 
     prop['name'] = property_name_and_params.pop(0)
 
-    # Validate
+    # String validation
     if not prop['name'].upper() in ALL_PROPERTIES and not re.match(
         '^X-[' + ID_CHARS + ']+$',
         prop['name'],
         re.IGNORECASE):
         raise VCardFormatError(
-            MSG_INVALID_PROPERTY_NAME + ': %s' % prop['name'])
+            MSG_INVALID_PROPERTY_NAME + ': %s' % prop['name'],
+            {})
 
     try:
         if len(property_name_and_params) != 0:
             prop['parameters'] = get_vcard_property_params(
                 property_name_and_params.pop(0))
         prop['values'] = get_vcard_property_values(values_string)
+
+        # Validate
+        validate_vcard_property(prop)
     except VCardFormatError as error:
         # Add parameter name to error
-        raise VCardFormatError(
-            error.message,
-            dict(error.context.items() + [['property', prop['name']]]))
+        error.context['property'] = prop['name']
+        raise VCardFormatError(error.message, error.context)
 
     return prop
 
 def get_vcard_properties(lines):
     """
     Get the properties for each line. RFC 2426 pages 28, 29.
+
     @param properties: List of unfolded vCard lines
     @return: List of properties, for simplicity. AFAIK sequence doesn't matter
-    and duplicates add no information, but ignoring this to make sure
-    printed vCards look like the original.
+    and duplicates add no information, but ignoring this to make sure vCard
+    output looks like the original.
     """
     properties = []
     for index in range(len(lines)):
@@ -393,9 +433,8 @@ def get_vcard_properties(lines):
             try:
                 properties.append(get_vcard_property(property_line))
             except VCardFormatError as error:
-                raise VCardFormatError(
-                    error.message,
-                    dict(error.context.items() + [['line', index]]))
+                error.context['line'] = index
+                raise VCardFormatError(error.message, error.context)
 
     for mandatory_property in MANDATORY_PROPERTIES:
         if mandatory_property not in [
@@ -407,11 +446,12 @@ def get_vcard_properties(lines):
     return properties
 
 class VCard():
-    """Container for structured and unstructured vCard contents"""
+    """Container for structured and unstructured vCard contents."""
     def __init__(self, text):
         """
         Create vCard object from text string. Includes text (the entire
-        unprocessed vCard), group (optional prefix on each line) and properties
+        unprocessed vCard), group (optional prefix on each line) and properties.
+
         @param text: String containing a single vCard
         """
         if text == '':
@@ -430,7 +470,8 @@ class VCard():
 
 def validate_file(filename, verbose = False):
     """
-    Create object for each vCard in a file, and show the error output
+    Create object for each vCard in a file, and show the error output.
+
     @param filename: Path to file
     @param verbose: Verbose mode
     @return: Debugging output from creating vCards
@@ -453,10 +494,11 @@ def validate_file(filename, verbose = False):
                 try:
                     vcard = VCard(vcard_text)
                     vcard_text = ''
+                    if verbose:
+                        print(vcard)
                 except VCardFormatError as error:
-                    raise VCardFormatError(
-                        error.message,
-                        dict(error.context.items() + [['path', filename]]))
+                    error.context['path'] = filename
+                    raise VCardFormatError(error.message, error.context)
 
     except VCardFormatError as error:
         result += unicode(error.__str__())
@@ -471,12 +513,12 @@ def validate_file(filename, verbose = False):
     return result
 
 class Usage(Exception):
-    """Raise in case of invalid parameters"""
+    """Raise in case of invalid parameters."""
     def __init__(self, msg):
         self.msg = msg
 
 def main(argv = None):
-    """Argument handling"""
+    """Argument handling."""
 
     if argv is None:
         argv = sys.argv
@@ -493,11 +535,12 @@ def main(argv = None):
         except getopt.GetoptError, err:
             raise Usage(err.msg)
 
-        for option, value in opts:
-            if option in ('-v', '--verbose'):
-                verbose = True
-            else:
-                raise Usage('Unhandled option %s' % option)
+        if len(opts) != 0:
+            for option in opts[0]:
+                if option in ('-v', '--verbose'):
+                    verbose = True
+                else:
+                    raise Usage('Unhandled option %s' % option)
 
         if not args:
             raise Usage(__doc__)
