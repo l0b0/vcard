@@ -435,7 +435,8 @@ def validate_vcard_property(prop):
         # TODO: Complete ISO 8601 date validation
         if not re.match(r'^\d{4}-\d{2}-\d{2}$', prop['values'][0][0]):
             warnings.warn(
-                'Possible invalid date: %s' % prop['values'][0][0].encode('utf-8'))
+                'Possible invalid date: %s' % \
+                prop['values'][0][0].encode('utf-8'))
 
 
 def get_vcard_property(property_line):
