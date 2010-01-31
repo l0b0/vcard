@@ -1,13 +1,21 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Test suite for vcard module"""
+"""Test suite for vcard module
+
+Default syntax:
+
+./vcard_test.py
+
+Run all unit tests
+"""
 __author__ = 'Victor Engmark'
 __email__ = 'victor.engmark@gmail.com'
-__url__ = 'http://l0b0.wordpress.com/2009/12/24/vcard-parser-and-validator/'
-__copyright__ = 'Copyright (C) 2009 Victor Engmark'
+__url__ = 'http://vcard-module.sourceforge.net/'
+__copyright__ = 'Copyright (C) 2009-2010 Victor Engmark'
 __license__ = 'GPLv3'
 
 import unittest
+import warnings
 
 import vcard
 
@@ -65,10 +73,11 @@ class TestVCards(unittest.TestCase):
                     vcard.MSG_MISSING_PROPERTY)
 
     def test_valid(self):
-        """Valid vCards"""
+        """Valid (but not necessarily sane) vCards"""
         for vcard_title, vcard_text in VCARDS_VALID.items():
             try:
-                vc_obj = vcard.VCard(vcard_text)
+                with warnings.catch_warnings(record=True) as warn:
+                    vc_obj = vcard.VCard(vcard_text)
                 self.assertNotEqual(vc_obj, None)
             except vcard.VCardFormatError as error:
                 self.fail(
@@ -83,7 +92,8 @@ class TestVCards(unittest.TestCase):
         """
         for vcard_title, vcard_text in VCARDS_REFERENCE.items():
             try:
-                vc_obj = vcard.VCard(vcard_text)
+                with warnings.catch_warnings(record=True) as warn:
+                    vc_obj = vcard.VCard(vcard_text)
                 self.assertNotEqual(vc_obj, None)
             except vcard.VCardFormatError as error:
                 pass

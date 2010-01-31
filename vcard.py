@@ -18,7 +18,7 @@ Validate all .vcf files in the current directory
 __author__ = 'Victor Engmark'
 __email__ = 'victor.engmark@gmail.com'
 __url__ = 'http://vcard-module.sourceforge.net/'
-__copyright__ = 'Copyright (C) 2009 Victor Engmark'
+__copyright__ = 'Copyright (C) 2009-2010 Victor Engmark'
 __license__ = 'GPLv3'
 
 import codecs
@@ -53,7 +53,9 @@ OTHER_PROPERTIES = [
     'ADR', 'AGENT', 'BDAY', 'CATEGORIES', 'CLASS', 'EMAIL', 'GEO', 'KEY',
     'LABEL', 'LOGO', 'MAILER', 'NICKNAME', 'NOTE', 'ORG', 'PHOTO', 'PRODID',
     'REV', 'ROLE', 'SORT-STRING', 'SOUND', 'TEL', 'TITLE', 'TZ', 'UID', 'URL']
-ALL_PROPERTIES = MANDATORY_PROPERTIES + PREDEFINED_PROPERTIES + OTHER_PROPERTIES
+ALL_PROPERTIES = list( # Remove duplicates
+    set(
+        MANDATORY_PROPERTIES + PREDEFINED_PROPERTIES + OTHER_PROPERTIES))
 
 # IDs for group, name, iana-token, x-name, param-name (RFC 2426 page 29)
 ID_CHARS = ALPHA_CHARS + DIGIT_CHARS + '-'
