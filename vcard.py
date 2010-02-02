@@ -505,6 +505,40 @@ def validate_vcard_property(prop):
                         MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
                         {})
 
+    elif property_name == 'LABEL':
+        if len(prop['values']) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    prop['values']),
+                {})
+        if 'parameters' in prop:
+            for parameter_name, parameter_values in prop['parameters'].items():
+                if parameter_name.upper() == 'TYPE':
+                    for parameter_subvalue in parameter_values:
+                        if parameter_subvalue not in [
+                            'dom',
+                            'intl',
+                            'postal',
+                            'parcel',
+                            'home',
+                            'work',
+                            'pref']:
+                            raise VCardFormatError(
+                                MSG_INVALID_PARAM_VALUE + \
+                                ': %s' % parameter_subvalue,
+                                {})
+                    if parameter_values == set([
+                        'intl',
+                        'postal',
+                        'parcel',
+                        'work']):
+                        warnings.warn(
+                            WARN_DEFAULT_ADR_TYPE + ': %s' % prop['values'])
+                else:
+                    raise VCardFormatError(
+                        MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
+                        {})
+
 # pylint: enable-msg=R0912
 
 def get_vcard_property(property_line):
