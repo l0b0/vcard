@@ -76,7 +76,7 @@ class TestVCards(unittest.TestCase):
         """Valid (but not necessarily sane) vCards"""
         for vcard_title, vcard_text in VCARDS_VALID.items():
             try:
-                with warnings.catch_warnings(record=True) as warn:
+                with warnings.catch_warnings(record=True):
                     vc_obj = vcard.VCard(vcard_text)
                 self.assertNotEqual(vc_obj, None)
             except vcard.VCardFormatError as error:
@@ -90,12 +90,12 @@ class TestVCards(unittest.TestCase):
         Skipping because RFC vCards are not valid :/
         <http://l0b0.wordpress.com/2009/12/25/vcard-parser-and-validator/>
         """
-        for vcard_title, vcard_text in VCARDS_REFERENCE.items():
+        for vcard_text in VCARDS_REFERENCE.values():
             try:
-                with warnings.catch_warnings(record=True) as warn:
+                with warnings.catch_warnings(record=True):
                     vc_obj = vcard.VCard(vcard_text)
                 self.assertNotEqual(vc_obj, None)
-            except vcard.VCardFormatError as error:
+            except vcard.VCardFormatError:
                 pass
                 #self.fail(
                 #    'Valid vCard "%s" not created' % vcard_title + '\n' + \

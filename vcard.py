@@ -85,6 +85,21 @@ MSG_MISSING_PROPERTY = 'Mandatory property missing'
 MSG_MISSING_VALUE_STRING = 'Missing value string'
 MSG_NON_EMPTY_PARAM = 'Property should not have parameters'
 
+# Warning literals
+WARN_MULTIPLE_NAMES = "Possible split name (replace space with comma)"
+
+# pylint: disable-msg=R0913,W0613,W0622,W0231
+def _show_warning(
+    message,
+    category = UserWarning,
+    filename = '',
+    lineno = -1,
+    file = sys.stderr,
+    line = None):
+    """Custom simple warning."""
+    file.write(str(message) + '\n')
+# pylint: enable-msg=R0913,W0613,W0622,W0231
+
 class VCardFormatError(Exception):
     """Thrown if the text given is not a valid according to RFC 2426."""
     def __init__(
@@ -342,6 +357,7 @@ def get_vcard_property_values(values_string):
 
     return values
 
+# pylint: disable-msg=R0912
 def validate_vcard_property(prop):
     """
     Checks any property according to
@@ -375,6 +391,17 @@ def validate_vcard_property(prop):
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (!= 5)' % len(prop['values']),
                 {})
+        # Should names be split?
+        for names in prop['values']:
+            # TODO: Smart method to detect names which should not be split even
+            # if there's a space in them, like surname prefixes ("van Gogh") or
+            # company names. It's probably not enough to count the number of
+            # capitalized words.
+            warnings.showwarning = _show_warning
+            for name in names:
+                if name.find(SP_CHARS) != -1:
+                    warnings.warn(
+                        WARN_MULTIPLE_NAMES + ': %s' % name.encode('utf-8'))
 
     elif property_name == 'NICKNAME':
         # <http://tools.ietf.org/html/rfc2426#section-3.1.3>
@@ -438,6 +465,7 @@ def validate_vcard_property(prop):
                 'Possible invalid date: %s' % \
                 prop['values'][0][0].encode('utf-8'))
 
+# pylint: enable-msg=R0912
 
 def get_vcard_property(property_line):
     """
@@ -516,9 +544,10 @@ def get_vcard_properties(lines):
 
     return properties
 
+# pylint: disable-msg=R0903
 class VCard():
     """Container for structured and unstructured vCard contents."""
-    def __init__(self, text):
+    def __init__(self, text, filename = None):
         """
         Create vCard object from text string. Includes text (the entire
         unprocessed vCard), group (optional prefix on each line) and properties.
@@ -530,6 +559,8 @@ class VCard():
 
         self.text = text
 
+        self.filename = file
+
         lines = unfold_vcard_lines(self.text.splitlines(True))
 
         # Groups
@@ -538,6 +569,10 @@ class VCard():
 
         # Properties
         self.properties = get_vcard_properties(lines)
+
+    def __str__(self):
+        return self.text
+# pylint: enable-msg=R0903
 
 def validate_file(filename, verbose = False):
     """
@@ -563,7 +598,7 @@ def validate_file(filename, verbose = False):
 
             if line == CRLF_CHARS:
                 try:
-                    vcard = VCard(vcard_text)
+                    vcard = VCard(vcard_text, filename)
                     vcard_text = ''
                     if verbose:
                         print(vcard)
@@ -583,10 +618,12 @@ def validate_file(filename, verbose = False):
         return None
     return result
 
+# pylint: disable-msg=W0231
 class Usage(Exception):
     """Raise in case of invalid parameters."""
     def __init__(self, msg):
         self.msg = msg
+# pylint: enable-msg=W0231
 
 def main(argv = None):
     """Argument handling."""
