@@ -86,7 +86,9 @@ MSG_MISSING_VALUE_STRING = 'Missing value string'
 MSG_NON_EMPTY_PARAM = 'Property should not have parameters'
 
 # Warning literals
-WARN_MULTIPLE_NAMES = "Possible split name (replace space with comma)"
+WARN_MULTIPLE_NAMES = 'Possible split name (replace space with comma)'
+WARN_INVALID_DATE = 'Possible invalid date'
+WARN_DEFAULT_ADR_TYPE = 'Using default address TYPE; can be removed'
 
 # pylint: disable-msg=R0913,W0613,W0622,W0231
 def _show_warning(
@@ -377,7 +379,7 @@ def validate_vcard_property(prop):
                 {})
         if len(prop['values']) != 1:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (!= 1)' % len(prop['values']),
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(prop['values']),
                 {})
         # TODO: X.520 Common Name validation
 
@@ -389,7 +391,7 @@ def validate_vcard_property(prop):
                 {})
         if len(prop['values']) != 5:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (!= 5)' % len(prop['values']),
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 5)' % len(prop['values']),
                 {})
         # Should names be split?
         for names in prop['values']:
@@ -411,7 +413,7 @@ def validate_vcard_property(prop):
                 {})
         if len(prop['values']) != 1:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (!= 1)' % len(prop['values']),
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(prop['values']),
                 {})
 
     elif property_name == 'PHOTO':
@@ -444,26 +446,64 @@ def validate_vcard_property(prop):
                 raise VCardFormatError(
                     MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
                     {})
+            # TODO: Check that binary streams correspond to actual images?
 
     elif property_name == 'BDAY':
+        # <http://tools.ietf.org/html/rfc2426#section-3.1.5>
         if 'parameters' in prop:
             raise VCardFormatError(
                 MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
                 {})
         if len(prop['values']) != 1:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (!= 1)' % len(prop['values']),
+                MSG_INVALID_VALUE_COUNT + \
+                ': %d (expected 1)' % len(prop['values']),
                 {})
         if len(prop['values'][0]) != 1:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (!= 1)' % \
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % \
                 len(prop['values'][0]),
                 {})
         # TODO: Complete ISO 8601 date validation
         if not re.match(r'^\d{4}-\d{2}-\d{2}$', prop['values'][0][0]):
             warnings.warn(
-                'Possible invalid date: %s' % \
-                prop['values'][0][0].encode('utf-8'))
+                WARN_INVALID_DATE + \
+                ': %s' % prop['values'][0][0].encode('utf-8'))
+
+    elif property_name == 'ADR':
+        # <http://tools.ietf.org/html/rfc2426#section-3.2.1>
+        if len(prop['values']) != 7:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 7)' % len(
+                    prop['values']),
+                {})
+        if 'parameters' in prop:
+            for parameter_name, parameter_values in prop['parameters'].items():
+                if parameter_name.upper() == 'TYPE':
+                    for parameter_subvalue in parameter_values:
+                        if parameter_subvalue not in [
+                            'dom',
+                            'intl',
+                            'postal',
+                            'parcel',
+                            'home',
+                            'work',
+                            'pref']:
+                            raise VCardFormatError(
+                                MSG_INVALID_PARAM_VALUE + \
+                                ': %s' % parameter_subvalue,
+                                {})
+                    if parameter_values == set([
+                        'intl',
+                        'postal',
+                        'parcel',
+                        'work']):
+                        warnings.warn(
+                            WARN_DEFAULT_ADR_TYPE + ': %s' % prop['values'])
+                else:
+                    raise VCardFormatError(
+                        MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
+                        {})
 
 # pylint: enable-msg=R0912
 
@@ -511,7 +551,7 @@ def get_vcard_property(property_line):
         validate_vcard_property(prop)
     except VCardFormatError as error:
         # Add parameter name to error
-        error.context['property'] = prop['name']
+        error.context['property'] = property_line
         raise VCardFormatError(error.message, error.context)
 
     return prop
