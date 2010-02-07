@@ -86,9 +86,10 @@ MSG_MISSING_VALUE_STRING = 'Missing value string'
 MSG_NON_EMPTY_PARAM = 'Property should not have parameters'
 
 # Warning literals
-WARN_MULTIPLE_NAMES = 'Possible split name (replace space with comma)'
-WARN_INVALID_DATE = 'Possible invalid date'
 WARN_DEFAULT_TYPE_VALUE = 'Using default TYPE value; can be removed'
+WARN_INVALID_DATE = 'Possible invalid date'
+WARN_INVALID_EMAIL_TYPE = 'Possible invalid email TYPE'
+WARN_MULTIPLE_NAMES = 'Possible split name (replace space with comma)'
 
 # pylint: disable-msg=R0913,W0613,W0622,W0231
 def _show_warning(
@@ -573,7 +574,40 @@ def validate_vcard_property(prop):
                                 {})
                     if set([value.lower() for value in parameter_values]) == set(['voice']):
                         warnings.warn(
-                            WARN_DEFAULT_TYPE_VALUE + ': %s' % prop['parameters'])#prop['values'])
+                            WARN_DEFAULT_TYPE_VALUE + ': %s' % prop['values'])
+                else:
+                    raise VCardFormatError(
+                        MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
+                        {})
+
+    elif property_name == 'EMAIL':
+        # <http://tools.ietf.org/html/rfc2426#section-3.3.2>
+        if len(prop['values']) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    prop['values']),
+                {})
+        if 'parameters' in prop:
+            for parameter_name, parameter_values in prop['parameters'].items():
+                if parameter_name.upper() == 'TYPE':
+                    for parameter_subvalue in parameter_values:
+                        if parameter_subvalue.lower() not in [
+                            'internet',
+                            'x400',
+                            'pref',
+                            'dom', # IANA registered address types?
+                            'intl',
+                            'postal',
+                            'parcel',
+                            'home',
+                            'work']:
+                            warnings.warn(
+                                WARN_INVALID_EMAIL_TYPE + \
+                                ': %s' % parameter_subvalue)
+                    if set([value.lower() for value in parameter_values]) == \
+                           set(['internet']):
+                        warnings.warn(
+                            WARN_DEFAULT_TYPE_VALUE + ': %s' % prop['values'])
                 else:
                     raise VCardFormatError(
                         MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
