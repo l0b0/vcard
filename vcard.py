@@ -88,7 +88,7 @@ MSG_NON_EMPTY_PARAM = 'Property should not have parameters'
 # Warning literals
 WARN_MULTIPLE_NAMES = 'Possible split name (replace space with comma)'
 WARN_INVALID_DATE = 'Possible invalid date'
-WARN_DEFAULT_ADR_TYPE = 'Using default address TYPE; can be removed'
+WARN_DEFAULT_TYPE_VALUE = 'Using default TYPE value; can be removed'
 
 # pylint: disable-msg=R0913,W0613,W0622,W0231
 def _show_warning(
@@ -317,11 +317,12 @@ def get_vcard_property_params(params_string):
 
     for param_string in split_unescaped(params_string, ';'):
         param = get_vcard_property_param(param_string)
-        if param['name'] not in params:
-            params[param['name']] = param['values']
+        param_name = param['name'].upper() # To be able to merge TYPE & type
+        if param_name not in params:
+            params[param_name] = param['values']
         else:
             # Merge
-            params[param['name']] = params[param['name']] + param['values']
+            params[param_name] = params[param_name].union(param['values'])
 
     return params
 
@@ -506,6 +507,7 @@ def validate_vcard_property(prop):
                         {})
 
     elif property_name == 'LABEL':
+        # <http://tools.ietf.org/html/rfc2426#section-3.2.2>
         if len(prop['values']) != 1:
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
@@ -533,7 +535,45 @@ def validate_vcard_property(prop):
                         'parcel',
                         'work']):
                         warnings.warn(
-                            WARN_DEFAULT_ADR_TYPE + ': %s' % prop['values'])
+                            WARN_DEFAULT_TYPE_VALUE + ': %s' % prop['values'])
+                else:
+                    raise VCardFormatError(
+                        MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
+                        {})
+
+    elif property_name == 'TEL':
+        # <http://tools.ietf.org/html/rfc2426#section-3.3.1>
+        if len(prop['values']) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    prop['values']),
+                {})
+        if 'parameters' in prop:
+            for parameter_name, parameter_values in prop['parameters'].items():
+                if parameter_name.upper() == 'TYPE':
+                    for parameter_subvalue in parameter_values:
+                        if parameter_subvalue.lower() not in [
+                            'home',
+                            'msg',
+                            'work',
+                            'pref',
+                            'voice',
+                            'fax',
+                            'cell',
+                            'video',
+                            'pager',
+                            'bbs',
+                            'modem',
+                            'car',
+                            'isdn',
+                            'pcs']:
+                            raise VCardFormatError(
+                                MSG_INVALID_PARAM_VALUE + \
+                                ': %s' % parameter_subvalue,
+                                {})
+                    if set([value.lower() for value in parameter_values]) == set(['voice']):
+                        warnings.warn(
+                            WARN_DEFAULT_TYPE_VALUE + ': %s' % prop['parameters'])#prop['values'])
                 else:
                     raise VCardFormatError(
                         MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
@@ -578,7 +618,7 @@ def get_vcard_property(property_line):
     try:
         if len(property_name_and_params) != 0:
             prop['parameters'] = get_vcard_property_params(
-                property_name_and_params.pop(0))
+                ';'.join(property_name_and_params))
         prop['values'] = get_vcard_property_values(values_string)
 
         # Validate
