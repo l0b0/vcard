@@ -361,7 +361,7 @@ def get_vcard_property_values(values_string):
 
     return values
 
-# pylint: disable-msg=R0912
+# pylint: disable-msg=R0912,R0915
 def validate_vcard_property(prop):
     """
     Checks any property according to
@@ -381,9 +381,9 @@ def validate_vcard_property(prop):
                 {})
         if len(prop['values']) != 1:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(prop['values']),
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    prop['values']),
                 {})
-        # TODO: X.520 Common Name validation
 
     elif property_name == 'N':
         # <http://tools.ietf.org/html/rfc2426#section-3.1.2>
@@ -393,17 +393,18 @@ def validate_vcard_property(prop):
                 {})
         if len(prop['values']) != 5:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (expected 5)' % len(prop['values']),
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 5)' % len(
+                    prop['values']),
                 {})
         # Should names be split?
         for names in prop['values']:
-            # TODO: Smart method to detect names which should not be split even
-            # if there's a space in them, like surname prefixes ("van Gogh") or
-            # company names. It's probably not enough to count the number of
-            # capitalized words.
             warnings.showwarning = _show_warning
             for name in names:
-                if name.find(SP_CHARS) != -1:
+                if name.find(SP_CHARS) != -1 and \
+                       ''.join([''.join(names) \
+                                for names in prop['values']]) != name:
+                    # Space in name
+                    # Not just a single name
                     warnings.warn(
                         WARN_MULTIPLE_NAMES + ': %s' % name.encode('utf-8'))
 
@@ -415,7 +416,8 @@ def validate_vcard_property(prop):
                 {})
         if len(prop['values']) != 1:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(prop['values']),
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    prop['values']),
                 {})
 
     elif property_name == 'PHOTO':
@@ -448,7 +450,6 @@ def validate_vcard_property(prop):
                 raise VCardFormatError(
                     MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
                     {})
-            # TODO: Check that binary streams correspond to actual images?
 
     elif property_name == 'BDAY':
         # <http://tools.ietf.org/html/rfc2426#section-3.1.5>
@@ -466,7 +467,6 @@ def validate_vcard_property(prop):
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % \
                 len(prop['values'][0]),
                 {})
-        # TODO: Complete ISO 8601 date validation
         if not re.match(r'^\d{4}-\d{2}-\d{2}$', prop['values'][0][0]):
             warnings.warn(
                 WARN_INVALID_DATE + \
@@ -501,7 +501,7 @@ def validate_vcard_property(prop):
                         'parcel',
                         'work']):
                         warnings.warn(
-                            WARN_DEFAULT_ADR_TYPE + ': %s' % prop['values'])
+                            WARN_DEFAULT_TYPE_VALUE + ': %s' % prop['values'])
                 else:
                     raise VCardFormatError(
                         MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
@@ -572,7 +572,8 @@ def validate_vcard_property(prop):
                                 MSG_INVALID_PARAM_VALUE + \
                                 ': %s' % parameter_subvalue,
                                 {})
-                    if set([value.lower() for value in parameter_values]) == set(['voice']):
+                    if set([value.lower() for value in parameter_values]) == \
+                           set(['voice']):
                         warnings.warn(
                             WARN_DEFAULT_TYPE_VALUE + ': %s' % prop['values'])
                 else:
@@ -613,7 +614,19 @@ def validate_vcard_property(prop):
                         MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
                         {})
 
-# pylint: enable-msg=R0912
+    elif property_name == 'MAILER':
+        # <http://tools.ietf.org/html/rfc2426#section-3.3.3>
+        if 'parameters' in prop:
+            raise VCardFormatError(
+                MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
+                {})
+        if len(prop['values']) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    prop['values']),
+                {})
+
+# pylint: enable-msg=R0912,R0915
 
 def get_vcard_property(property_line):
     """
