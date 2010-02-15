@@ -200,6 +200,8 @@ def unfold_vcard_lines(lines):
                 raise VCardFormatError(MSG_CONTINUATION_AT_START, {'line': 0})
             elif len(lines[index - 1]) < VCARD_LINE_MAX_LENGTH:
                 warnings.warn('Short folded line at line %i' % (index - 1))
+            elif line == SP_CHARS + CRLF_CHARS:
+                warnings.warn('Empty folded line at line %i' % index)
             property_lines[-1] = property_lines[-1][:-len(CRLF_CHARS)] + \
                                  line[1:]
         else:
