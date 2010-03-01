@@ -15,12 +15,6 @@ Example:
 Validate all .vcf files in the current directory
 """
 
-__author__ = 'Victor Engmark'
-__email__ = 'victor.engmark@gmail.com'
-__url__ = 'http://vcard-module.sourceforge.net/'
-__copyright__ = 'Copyright (C) 2009-2010 Victor Engmark'
-__license__ = 'GPLv3'
-
 import codecs
 import getopt
 import re
@@ -121,23 +115,23 @@ class VCardFormatError(Exception):
 
     def __str__(self):
         """Outputs error with ordered context info."""
-        msg = 'vCard format error: %s' % self.message
+        message = 'vCard format error: %s' % self.message
 
         for key, value in self.context.items():
-            msg += '\n'
+            message += '\n'
             if key == 'path':
-                msg += 'File'
+                message += 'File'
             elif key == 'line':
-                msg += 'Line number'
+                message += 'Line number'
                 value += 1
             elif key == 'property':
-                msg += 'Property'
+                message += 'Property'
             else:
-                msg += key
+                message += key
 
-            msg += ': ' + unicode(value)
+            message += ': ' + unicode(value)
 
-        return msg
+        return message
 
 def find_unescaped(text, char, escape_char = '\\'):
     """
@@ -722,7 +716,7 @@ class VCard():
 
         self.text = text
 
-        self.filename = file
+        self.filename = filename
 
         lines = unfold_vcard_lines(self.text.splitlines(True))
 
@@ -784,8 +778,8 @@ def validate_file(filename, verbose = False):
 # pylint: disable-msg=W0231
 class Usage(Exception):
     """Raise in case of invalid parameters."""
-    def __init__(self, msg):
-        self.msg = msg
+    def __init__(self, message):
+        self.message = message
 # pylint: enable-msg=W0231
 
 def main(argv = None):
@@ -804,7 +798,7 @@ def main(argv = None):
                 'v',
                 ['verbose'])
         except getopt.GetoptError, err:
-            raise Usage(err.msg)
+            raise Usage(err.message)
 
         if len(opts) != 0:
             for option in opts[0]:
@@ -817,7 +811,7 @@ def main(argv = None):
             raise Usage(__doc__)
 
     except Usage, err:
-        sys.stderr.write(err.msg + '\n')
+        sys.stderr.write(err.message + '\n')
         return 2
 
     for filename in args:

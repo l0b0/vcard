@@ -8,12 +8,6 @@ Default syntax:
 
 Run all unit tests
 """
-__author__ = 'Victor Engmark'
-__email__ = 'victor.engmark@gmail.com'
-__url__ = 'http://vcard-module.sourceforge.net/'
-__copyright__ = 'Copyright (C) 2009-2010 Victor Engmark'
-__license__ = 'GPLv3'
-
 import unittest
 import warnings
 
