@@ -1,10 +1,11 @@
 #!/usr/bin/env python
+"""vCard Module setup"""
 
 from setuptools import setup
 
 setup(
     name='vCard-module',
-    version='0.5.2',
+    version='0.5.3',
     description='vCard validator, class and utility functions',
     author='Victor Engmark',
     author_email='victor.engmark@gmail.com',

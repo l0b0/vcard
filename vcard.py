@@ -121,8 +121,11 @@ class VCardFormatError(Exception):
             message += '\n'
             if key == 'path':
                 message += 'File'
-            elif key == 'line':
-                message += 'Line number'
+            elif key == 'file_line':
+                message += 'File line number'
+                value += 1
+            elif key == 'vcard_line':
+                message += 'vCard line number'
                 value += 1
             elif key == 'property':
                 message += 'Property'
@@ -185,13 +188,15 @@ def unfold_vcard_lines(lines):
         if not line.endswith(CRLF_CHARS):
             raise VCardFormatError(
                 MSG_INVALID_LINE_SEPARATOR,
-                {'line': index})
+                {'file_line': index})
         if len(line) > VCARD_LINE_MAX_LENGTH + len(CRLF_CHARS):
             warnings.warn('Long line in vCard: %s' % line.encode('utf-8'))
 
         if line.startswith(' '):
             if index == 0:
-                raise VCardFormatError(MSG_CONTINUATION_AT_START, {'line': 0})
+                raise VCardFormatError(
+                    MSG_CONTINUATION_AT_START,
+                    {'file_line': 0})
             elif len(lines[index - 1]) < VCARD_LINE_MAX_LENGTH:
                 warnings.warn('Short folded line at line %i' % (index - 1))
             elif line == SP_CHARS + CRLF_CHARS:
@@ -226,13 +231,13 @@ def get_vcard_group(lines):
             line = lines[index]
             next_match = group_re.match(line)
             if not next_match:
-                raise VCardFormatError(MSG_MISSING_GROUP, {'line': index})
+                raise VCardFormatError(MSG_MISSING_GROUP, {'file_line': index})
             if next_match.group(1) != group:
                 raise VCardFormatError(
                     MSG_MISMATCH_GROUP + ': %s != %s' % (
                         next_match.group(1),
                         group),
-                    {'line': index})
+                    {'file_line': index})
     else:
         # Make sure there are no groups elsewhere
         for index in range(len(lines)):
@@ -241,7 +246,7 @@ def get_vcard_group(lines):
                     MSG_MISMATCH_GROUP + ': %s != %s' % (
                         next_match.group(1),
                         group),
-                    {'line': index})
+                    {'file_line': index})
 
     return group
 
@@ -689,7 +694,7 @@ def get_vcard_properties(lines):
             try:
                 properties.append(get_vcard_property(property_line))
             except VCardFormatError as error:
-                error.context['line'] = index
+                error.context['vcard_line'] = index
                 raise VCardFormatError(error.message, error.context)
 
     for mandatory_property in MANDATORY_PROPERTIES:
@@ -712,7 +717,9 @@ class VCard():
         @param text: String containing a single vCard
         """
         if text == '':
-            raise VCardFormatError(MSG_EMPTY_VCARD, {'line': 0})
+            raise VCardFormatError(
+                MSG_EMPTY_VCARD,
+                {'vcard_line': 0, 'file_line': 0})
 
         self.text = text
 
@@ -761,6 +768,7 @@ def validate_file(filename, verbose = False):
                         print(vcard)
                 except VCardFormatError as error:
                     error.context['path'] = filename
+                    error.context['file_line'] = index
                     raise VCardFormatError(error.message, error.context)
 
     except VCardFormatError as error:
