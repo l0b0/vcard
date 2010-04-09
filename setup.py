@@ -11,7 +11,7 @@ setup(
     author_email='victor.engmark@gmail.com',
     url='http://vcard-module.sourceforge.net/',
     py_modules=['vcard'],
-    install_requires = ['iso8601'],
+    install_requires = ['isodate'],
     test_suite = 'tests.vcard_test',
     classifiers=[
         'Development Status :: 3 - Alpha',

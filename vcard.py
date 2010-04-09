@@ -21,6 +21,9 @@ import re
 import sys
 import warnings
 
+# Third party modules
+import isodate
+
 # Literals, RFC 2426 pages 27, 28
 ALPHA_CHARS = u'\u0041-\u005A\u0061-\u007A'
 CHAR_CHARS = u'\u0001-\u007F'
@@ -139,6 +142,125 @@ class VCardFormatError(Exception):
 
         return message
 
+
+def valid_date(text):
+    """
+    Based on http://tools.ietf.org/html/rfc2425#section-5.8.4 and the fact
+    that it specifies a subset of ISO 8601.
+
+    @param text: String
+    @return: True if the string is a valid RFC 2425 date, False otherwise
+
+    Examples:
+    >>> valid_date('20000101')
+    True
+    >>> valid_date('2000-01-01')
+    True
+    >>> valid_date('2000:01:01')
+    False
+    >>> valid_date('2000101')
+    False
+    >>> valid_date('20080229') # Leap year
+    True
+    >>> valid_date('20100229') # Not a leap year
+    False
+    >>> valid_date('19000229') # Not a leap year (divisible by 100)
+    False
+    >>> valid_date('20000229') # Leap year (divisible by 400)
+    True
+    >>> valid_date('aaaa-bb-cc')
+    False
+    """
+    if re.match(r'^\d{4}-?\d{2}-?\d{2}$', text) is None:
+        return False
+
+    try:
+        isodate.parse_date(text)
+    except (isodate.ISO8601Error, ValueError):
+        return False
+
+    return True
+
+def valid_time(text):
+    """
+    Based on http://tools.ietf.org/html/rfc2425#section-5.8.4 and the fact
+    that it specifies a subset of ISO 8601.
+
+    @param text: String
+    @return: True if the string is a valid RFC 2425 time, False otherwise
+
+    Examples:
+    >>> valid_time('00:00:00')
+    True
+    >>> valid_time('000000')
+    True
+    >>> valid_time('01:02:03Z')
+    True
+    >>> valid_time('01:02:03Z+01:00') # ISO 8601, but not RFC 2425
+    False
+    >>> valid_time('01:02:03+01:30')
+    True
+    """
+    time_timezone = re.match(r'^(\d{2}:?\d{2}:?\d{2}(?:,\d+)?)(.*)$', text)
+    if time_timezone is None:
+        return False
+
+    time_str, timezone_str = time_timezone.groups()
+    try:
+        isodate.parse_time(time_str)
+    except (isodate.ISO8601Error, ValueError):
+        return False
+    
+    if timezone_str == '':
+        return True
+
+    return valid_time_zone(timezone_str)
+
+def valid_time_zone(text):
+    """
+    Based on http://tools.ietf.org/html/rfc2425#section-5.8.4 and the fact
+    that it specifies a subset of ISO 8601.
+
+    @param text: String
+    @return: True if the string is a valid RFC 2425 time zone, False otherwise
+
+    Examples:
+    >>> valid_time_zone('Z')
+    True
+    >>> valid_time_zone('+01:00')
+    True
+    >>> valid_time_zone('-12:30')
+    True
+    >>> valid_time_zone('+23:59')
+    True
+    >>> valid_time_zone('-0001')
+    True
+    >>> valid_time_zone('-00:30')
+    True
+    >>> valid_time_zone('+00:30')
+    True
+    >>> valid_time_zone('Z+01:00') # ISO 8601, but not RFC 2425
+    False
+    >>> valid_time_zone('+1:00') # Hour must be two digits
+    False
+    >>> valid_time_zone('0100') # Must have a sign
+    False
+    >>> valid_time_zone('01') # Must have minutes
+    False
+    >>> valid_time_zone('01:') # Must have minutes
+    False
+    >>> valid_time_zone('01:1') # Minute must be two digits
+    False
+    """
+    if not re.match(r'^(Z|[+-]\d{2}:?\d{2})$', text):
+        return False
+
+    try:
+        isodate.parse_tzinfo(text.replace('+', 'Z+').replace('-', 'Z-'))
+    except ISO8601Error, ValueError:
+        return False
+
+    return True
 
 def find_unescaped(text, char, escape_char = '\\'):
     """
