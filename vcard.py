@@ -71,6 +71,7 @@ MSG_INVALID_PARAM_NAME = 'Invalid parameter name'
 MSG_INVALID_PARAM_VALUE = 'Invalid parameter value'
 MSG_INVALID_PROPERTY_NAME = 'Invalid property name'
 MSG_INVALID_SUBVALUE = 'Invalid subvalue'
+MSG_INVALID_SUBVALUE_COUNT = 'Invalid subvalue count'
 MSG_INVALID_VALUE = 'Invalid value'
 MSG_INVALID_VALUE_COUNT = 'Invalid value count'
 MSG_MISMATCH_GROUP = 'Group mismatch'
@@ -257,7 +258,7 @@ def valid_time_zone(text):
 
     try:
         isodate.parse_tzinfo(text.replace('+', 'Z+').replace('-', 'Z-'))
-    except ISO8601Error, ValueError:
+    except (isodate.ISO8601Error, ValueError):
         return False
 
     return True
@@ -601,7 +602,7 @@ def validate_vcard_property(prop):
                 {})
         if len(prop['values'][0]) != 1:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values'][0]),
                 {})
         if not valid_date(prop['values'][0][0]):
@@ -776,7 +777,7 @@ def validate_vcard_property(prop):
                 {})
         if len(prop['values'][0]) != 1:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values'][0]),
                 {})
         value = prop['values'][0][0]

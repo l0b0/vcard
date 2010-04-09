@@ -1,0 +1,22 @@
+BEGIN:VCARD
+VERSION:3.0
+PROFILE:VCARD
+CLASS:PUBLIC
+SOURCE:http://aspaass.no/Aspaas Sykler.vcf
+N:Aspaas Sykler;;;;
+FN:Aspaas Sykler
+ORG:Aspaas Sykler
+URL;TYPE=WORK:http\://aspaass.no/
+EMAIL;TYPE=INTERNET;TYPE=PREF;TYPE=WORK:aspaass@online.no
+TEL;TYPE=VOICE;TYPE=PREF;TYPE=MSG;TYPE=WORK:+4733187525
+TEL;TYPE=FAX;TYPE=WORK:+4733183703
+ADR:;;Nansetgata 74;Larvik;Vestfold;3269;Norway
+LABEL:Nansetgata 74\n3269 Larvik\nNorway
+PHOTO;VALUE=uri:http\://aspaass.no/include/image/butikk.jpg
+NOTE:Åpningstider mandag til fredag 9-18; lørdag 9-16
+TZ:+01:00
+GEO:59.06116,10.03712
+LOGO;VALUE=uri:http\://aspaass.no/include/image/logo.png
+CATEGORIES:business,Norwegian
+END:VCARD
+

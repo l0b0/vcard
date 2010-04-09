@@ -10,75 +10,69 @@ Default syntax:
 import codecs
 import doctest
 import os
-import sys
 import unittest
 import urllib
 import warnings
 
 import vcard
 
+def get_vcard_file(path):
+    """
+    Get the vCard contents locally or remotely.
+
+    @param filename: File relative to current directory or a URL
+    @return: Text in the given file
+    """
+    if path.startswith('http'):
+        filename = urllib.urlretrieve(path)[0]
+    else:
+        filename = os.path.join(os.path.dirname(__file__), path)
+
+    with codecs.open(filename, 'r', 'utf-8') as fp:
+        contents = fp.read()
+
+    return contents
+
 # pylint: disable-msg=C0301
 # Invalid vCards
 VCARD_EMPTY = ''
 VCARDS_MISSING = {
-    'properties': 'BEGIN:VCARD\r\nEND:VCARD\r\n',
-    'start': 'VERSION:3.0\r\nN:Doe;John;Ottoman;Mr;\r\nFN:John Ottoman Doe\r\nEND:VCARD\r\n',
-    'end': 'BEGIN:VCARD\r\nVERSION:3.0\r\nN:Doe;John;Ottoman;Mr;\r\nFN:John Ottoman Doe\r\n',
-    'version': 'BEGIN:VCARD\r\nN:Doe;John;Ottoman;Mr;Jr\r\nFN:John Ottoman Doe\r\nEND:VCARD\r\n',
-    'n': 'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:John Doe\r\nEND:VCARD\r\n',
-    'fn': 'BEGIN:VCARD\r\nVERSION:3.0\r\nN:Doe;John;;Mr;\r\nEND:VCARD\r\n'}
+    'properties': get_vcard_file('missing_properties.vcf'),
+    'start': get_vcard_file('missing_start.vcf'),
+    'end': get_vcard_file('missing_end.vcf'),
+    'version': get_vcard_file('missing_version.vcf'),
+    'n': get_vcard_file('missing_n.vcf'),
+    'fn': get_vcard_file('missing_fn.vcf'),
+    }
 VCARDS_INVALID_PROPERTY_NAME = {
-    'foobar': 'BEGIN:VCARD\r\nVERSION:3.0\r\nFOO:bar\r\nN:Doe;John;;Mr;\r\nFN:John Doe\r\nEND:VCARD\r\n'}
+    'foo': get_vcard_file('invalid_property_foo.vcf'),
+    }
 VCARDS_INVALID_PARAM = {
     }
 VCARDS_INVALID_PARAM_VALUE = {
     }
 VCARDS_INVALID_VALUE = {
-    'http://en.wikipedia.org/wiki/VCard': u"""BEGIN:VCARD\r\nVERSION:3.0\r\nN:Gump;Forrest\r\nFN:Forrest Gump\r\nORG:Bubba Gump Shrimp Co.\r\nTITLE:Shrimp Man\r\nTEL;TYPE=WORK,VOICE:(111) 555-1212\r\nTEL;TYPE=HOME,VOICE:(404) 555-1212\r\nADR;TYPE=WORK:;;100 Waters Edge;Baytown;LA;30314;United States of America\r\nLABEL;TYPE=WORK:100 Waters Edge\\nBaytown, LA 30314\\nUnited States of America\r\nADR;TYPE=HOME:;;42 Plantation St.;Baytown;LA;30314;United States of America\r\nLABEL;TYPE=HOME:42 Plantation St.\\nBaytown, LA 30314\\nUnited States of America\r\nEMAIL;TYPE=PREF,INTERNET:forrestgump@example.com\r\nREV:20080424T195243Z\r\nEND:VCARD\r\n""",
-    'http://microformats.org/tests/hcard/01-tantek-basic.vcf': u"""BEGIN:VCARD\r\nFN;CHARSET=UTF-8:Tantek Çelik\r\nN;CHARSET=UTF-8:Çelik;Tantek;;;\r\nNAME:01-tantek-basic\r\nORG;CHARSET=UTF-8:Technorati\r\nPRODID:$PRODID$\r\nSOURCE:http://microformats.org/test/hcard/01-tantek-basic.html\r\nURL:http://tantek.com/\r\nVERSION:3.0\r\nEND:VCARD\r\n""",
+    'http://en.wikipedia.org/wiki/VCard':
+        get_vcard_file('invalid_value_wp.vcf'),
+    'http://microformats.org/tests/hcard/01-tantek-basic.vcf':
+        get_vcard_file('01-tantek-basic.vcf'),
     }
-
-# Valid vCards
-minimal_file = codecs.open(
-    os.path.join(os.path.dirname(__file__), 'minimal.vcf'),
-    'r',
-    'utf-8').read()
-
-scrambled_case_file = codecs.open(
-    os.path.join(os.path.dirname(__file__), 'scrambled_case.vcf'),
-    'r',
-    'utf-8').read()
-
-aspaass_filename = urllib.urlretrieve(
-    'http://aspaass.no/kontakt/Aspaas%20Sykler.vcf',
-    os.path.join(os.path.dirname(__file__), 'Aspaas Sykler.vcf'))[0]
-aspaass_file = codecs.open(aspaass_filename, 'r', 'utf-8').read()
-
-troywolf_filename = urllib.urlretrieve(
-    'http://www.troywolf.com/articles/php/class_vcard/vcard_example.php',
-    os.path.join(os.path.dirname(__file__), 'troywolf.vcf'))[0]
-troywolf_file = codecs.open(troywolf_filename, 'r', 'utf-8').read()
 
 VCARDS_VALID = {
-    'minimal': minimal_file,
-    'scrambled case': scrambled_case_file,
-    'Aspaas Sykler': aspaass_file,
-    'Troy Wolf': troywolf_file,
+    'minimal': get_vcard_file('minimal.vcf'),
+    'scrambled case': get_vcard_file('scrambled_case.vcf'),
+    'Aspaas Sykler': get_vcard_file(
+        'http://aspaass.no/kontakt/Aspaas%20Sykler.vcf'),
+    'Troy Wolf': get_vcard_file(
+        'http://www.troywolf.com/articles/php/class_vcard/vcard_example.php'),
+    'Tantek Çelik': get_vcard_file(
+        'http://h2vx.com/vcf/tantek.com/%23contact'),
     }
 
-rfc_2426_a_file = codecs.open(
-    os.path.join(os.path.dirname(__file__), 'rfc_2426_a.vcf'),
-    'r',
-    'utf-8').read()
-
-rfc_2426_b_file = codecs.open(
-    os.path.join(os.path.dirname(__file__), 'rfc_2426_b.vcf'),
-    'r',
-    'utf-8').read()
-
 VCARDS_REFERENCE = {
-    'http://tools.ietf.org/html/rfc2426 1': rfc_2426_a_file,
-    'http://tools.ietf.org/html/rfc2426 2': rfc_2426_b_file}
+    'http://tools.ietf.org/html/rfc2426 1': get_vcard_file('rfc_2426_a.vcf'),
+    'http://tools.ietf.org/html/rfc2426 2': get_vcard_file('rfc_2426_b.vcf'),
+    }
 
 # pylint: enable-msg=C0301
 
@@ -133,9 +127,7 @@ class TestVCards(unittest.TestCase):
                 #    error.message)
 
     def test_doc(self):
-        """
-        Documentation tests
-        """
+        """Documentation tests"""
         doctest.testmod(vcard)
 
 def main():
