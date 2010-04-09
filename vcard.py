@@ -166,7 +166,6 @@ def validate_date(text):
     that it specifies a subset of ISO 8601.
 
     @param text: String
-    @return: True if the string is a valid RFC 2425 date, False otherwise
 
     Examples:
     >>> validate_date('20000101')
@@ -530,7 +529,6 @@ def validate_language_tag(language):
     langval, as defined by RFC 1766 <http://tools.ietf.org/html/rfc1766>
 
     @param language: String
-    @return: True if the language is valid, False otherwise
 
     Examples:
     >>> validate_language_tag('en')
@@ -557,7 +555,6 @@ def validate_language_tag(language):
 def validate_x_name(name):
     """
     @param parameter: Single parameter name
-    @return: True if the name is a valid x-name, False otherwise
     """
     if re.match('^X-[' + ID_CHARS + ']+$', name, re.IGNORECASE) is None:
         raise VCardFormatError(
@@ -591,7 +588,7 @@ def validate_text_parameter(parameter):
             raise VCardFormatError(
                 MSG_INVALID_PARAM_VALUE + ': %s' % param_values,
                 {})
-        return validate_param_value(param_values[0])
+        validate_param_value(param_values[0])
 
 
 # pylint: disable-msg=R0912,R0915
@@ -699,10 +696,7 @@ def validate_vcard_property(prop):
                     MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
                         prop['values'][0]),
                     {})
-            if not validate_date(prop['values'][0][0]):
-                warnings.warn(
-                    WARN_INVALID_DATE + \
-                    ': %s' % prop['values'][0][0].encode('utf-8'))
+            validate_date(prop['values'][0][0])
     
         elif property_name == 'ADR':
             # <http://tools.ietf.org/html/rfc2426#section-3.2.1>

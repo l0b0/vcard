@@ -26,7 +26,7 @@ def _get_vcard_file(path):
     @return: Text in the given file
     """
     if path.startswith('http'):
-        filename = urllib.urlretrieve(path, 'temp.vcf')[0]
+        filename = urllib.urlretrieve(path)[0]
     else:
         filename = os.path.join(os.path.dirname(__file__), path)
 
