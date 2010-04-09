@@ -85,6 +85,7 @@ WARN_INVALID_DATE = 'Possible invalid date'
 WARN_INVALID_EMAIL_TYPE = 'Possible invalid email TYPE'
 WARN_MULTIPLE_NAMES = 'Possible split name (replace space with comma)'
 
+
 # pylint: disable-msg=R0913,W0613,W0622,W0231
 def _show_warning(
     message,
@@ -96,6 +97,7 @@ def _show_warning(
     """Custom simple warning."""
     file.write(str(message) + '\n')
 # pylint: enable-msg=R0913,W0613,W0622,W0231
+
 
 class VCardFormatError(Exception):
     """Thrown if the text given is not a valid according to RFC 2426."""
@@ -112,6 +114,7 @@ class VCardFormatError(Exception):
         Exception.__init__(self)
         self.message = message
         self.context = context
+
 
     def __str__(self):
         """Outputs error with ordered context info."""
@@ -136,6 +139,7 @@ class VCardFormatError(Exception):
 
         return message
 
+
 def find_unescaped(text, char, escape_char = '\\'):
     """
     Find occurrence of an unescaped character.
@@ -156,6 +160,7 @@ def find_unescaped(text, char, escape_char = '\\'):
         return None
     return char_match.start(1)
 
+
 def split_unescaped(text, separator, escape_char = '\\\\'):
     """
     Find strings separated by an unescaped character.
@@ -174,6 +179,7 @@ def split_unescaped(text, separator, escape_char = '\\\\'):
         else:
             result.append(text)
             return result
+
 
 def unfold_vcard_lines(lines):
     """
@@ -207,6 +213,7 @@ def unfold_vcard_lines(lines):
             property_lines.append(line)
 
     return property_lines
+
 
 def get_vcard_group(lines):
     """
@@ -250,6 +257,7 @@ def get_vcard_group(lines):
 
     return group
 
+
 def remove_vcard_groups(lines, group):
     """
     Remove groups from vCard. RFC 2426 pages 28, 29.
@@ -261,6 +269,7 @@ def remove_vcard_groups(lines, group):
         for index in range(len(lines)):
             lines[index] = lines[index][len(group):]
     return lines
+
 
 def get_vcard_property_param_values(values_string):
     """
@@ -281,6 +290,7 @@ def get_vcard_property_param_values(values_string):
             raise VCardFormatError(MSG_INVALID_VALUE + ': %s' % value, {})
 
     return values
+
 
 def get_vcard_property_param(param_string):
     """
@@ -303,6 +313,7 @@ def get_vcard_property_param(param_string):
             {})
 
     return {'name': parameter_name, 'values': values}
+
 
 def get_vcard_property_params(params_string):
     """
@@ -328,6 +339,7 @@ def get_vcard_property_params(params_string):
 
     return params
 
+
 def get_vcard_property_subvalues(value_string):
     """
     Get the parts of the value.
@@ -343,6 +355,7 @@ def get_vcard_property_subvalues(value_string):
             raise VCardFormatError(MSG_INVALID_SUBVALUE + ': %s' % subvalue, {})
 
     return subvalues
+
 
 def get_vcard_property_values(values_string):
     """
@@ -361,6 +374,7 @@ def get_vcard_property_values(values_string):
         values.append(get_vcard_property_subvalues(sub))
 
     return values
+
 
 # pylint: disable-msg=R0912,R0915
 def validate_vcard_property(prop):
@@ -460,13 +474,13 @@ def validate_vcard_property(prop):
                 {})
         if len(prop['values']) != 1:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + \
-                ': %d (expected 1)' % len(prop['values']),
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    prop['values']),
                 {})
         if len(prop['values'][0]) != 1:
             raise VCardFormatError(
-                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % \
-                len(prop['values'][0]),
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    prop['values'][0]),
                 {})
         if not re.match(r'^\d{4}-\d{2}-\d{2}$', prop['values'][0][0]):
             warnings.warn(
@@ -627,7 +641,30 @@ def validate_vcard_property(prop):
                     prop['values']),
                 {})
 
+    elif property_name == 'TZ':
+        # <http://tools.ietf.org/html/rfc2426#section-3.4.1>
+        if 'parameters' in prop:
+            raise VCardFormatError(
+                MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
+                {})
+        if len(prop['values']) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    prop['values']),
+                {})
+        if len(prop['values'][0]) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    prop['values'][0]),
+                {})
+        value = prop['values'][0][0]
+        if not re.match(r'^[+-]?\d{2}:\d{2}$', value):
+            raise VCardFormatError(MSG_INVALID_VALUE + ': %s' % value, {})
+        hours, minutes = [int(val) for val in value.split(':')]
+        if hours < -23 or hours > 23 or minutes < 0 or minutes > 59:
+            raise VCardFormatError(MSG_INVALID_VALUE + ': %s' % value, {})
 # pylint: enable-msg=R0912,R0915
+
 
 def get_vcard_property(property_line):
     """
@@ -678,6 +715,7 @@ def get_vcard_property(property_line):
 
     return prop
 
+
 def get_vcard_properties(lines):
     """
     Get the properties for each line. RFC 2426 pages 28, 29.
@@ -705,6 +743,7 @@ def get_vcard_properties(lines):
                 {'property': mandatory_property})
 
     return properties
+
 
 # pylint: disable-msg=R0903
 class VCard():
@@ -737,6 +776,7 @@ class VCard():
     def __str__(self):
         return self.text
 # pylint: enable-msg=R0903
+
 
 def validate_file(filename, verbose = False):
     """
@@ -783,12 +823,14 @@ def validate_file(filename, verbose = False):
         return None
     return result
 
+
 # pylint: disable-msg=W0231
 class Usage(Exception):
     """Raise in case of invalid parameters."""
     def __init__(self, message):
         self.message = message
 # pylint: enable-msg=W0231
+
 
 def main(argv = None):
     """Argument handling."""
@@ -826,6 +868,7 @@ def main(argv = None):
         result = validate_file(filename, verbose)
         if result is not None:
             print(result.encode('utf-8') + '\n')
+
 
 if __name__ == '__main__':
     sys.exit(main())
