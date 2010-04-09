@@ -604,7 +604,7 @@ def validate_vcard_property(prop):
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values'][0]),
                 {})
-        if not re.match(r'^\d{4}-\d{2}-\d{2}$', prop['values'][0][0]):
+        if not valid_date(prop['values'][0][0]):
             warnings.warn(
                 WARN_INVALID_DATE + \
                 ': %s' % prop['values'][0][0].encode('utf-8'))
@@ -780,10 +780,7 @@ def validate_vcard_property(prop):
                     prop['values'][0]),
                 {})
         value = prop['values'][0][0]
-        if not re.match(r'^[+-]?\d{2}:\d{2}$', value):
-            raise VCardFormatError(MSG_INVALID_VALUE + ': %s' % value, {})
-        hours, minutes = [int(val) for val in value.split(':')]
-        if hours < -23 or hours > 23 or minutes < 0 or minutes > 59:
+        if not valid_time_zone(value):
             raise VCardFormatError(MSG_INVALID_VALUE + ': %s' % value, {})
 # pylint: enable-msg=R0912,R0915
 
