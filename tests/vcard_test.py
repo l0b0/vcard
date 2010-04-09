@@ -7,6 +7,7 @@ Default syntax:
 ./vcard_test.py
     Run all unit tests
 """
+
 import codecs
 import doctest
 import os
@@ -16,7 +17,8 @@ import warnings
 
 import vcard
 
-def get_vcard_file(path):
+
+def _get_vcard_file(path):
     """
     Get the vCard contents locally or remotely.
 
@@ -24,57 +26,61 @@ def get_vcard_file(path):
     @return: Text in the given file
     """
     if path.startswith('http'):
-        filename = urllib.urlretrieve(path)[0]
+        filename = urllib.urlretrieve(path, 'temp.vcf')[0]
     else:
         filename = os.path.join(os.path.dirname(__file__), path)
 
-    with codecs.open(filename, 'r', 'utf-8') as fp:
-        contents = fp.read()
+    with codecs.open(filename, 'r', 'utf-8') as file_pointer:
+        contents = file_pointer.read()
 
     return contents
+
 
 # pylint: disable-msg=C0301
 # Invalid vCards
 VCARD_EMPTY = ''
 VCARDS_MISSING = {
-    'properties': get_vcard_file('missing_properties.vcf'),
-    'start': get_vcard_file('missing_start.vcf'),
-    'end': get_vcard_file('missing_end.vcf'),
-    'version': get_vcard_file('missing_version.vcf'),
-    'n': get_vcard_file('missing_n.vcf'),
-    'fn': get_vcard_file('missing_fn.vcf'),
+    'properties': _get_vcard_file('missing_properties.vcf'),
+    'start': _get_vcard_file('missing_start.vcf'),
+    'end': _get_vcard_file('missing_end.vcf'),
+    'version': _get_vcard_file('missing_version.vcf'),
+    'n': _get_vcard_file('missing_n.vcf'),
+    'fn': _get_vcard_file('missing_fn.vcf'),
     }
 VCARDS_INVALID_PROPERTY_NAME = {
-    'foo': get_vcard_file('invalid_property_foo.vcf'),
+    'foo': _get_vcard_file('invalid_property_foo.vcf'),
     }
 VCARDS_INVALID_PARAM = {
     }
 VCARDS_INVALID_PARAM_VALUE = {
     }
+VCARDS_INVALID_X_NAME = {
+    'Tantek Çelik': _get_vcard_file(
+        'http://h2vx.com/vcf/tantek.com/%23contact'),
+    }
 VCARDS_INVALID_VALUE = {
     'http://en.wikipedia.org/wiki/VCard':
-        get_vcard_file('invalid_value_wp.vcf'),
+        _get_vcard_file('invalid_value_wp.vcf'),
     'http://microformats.org/tests/hcard/01-tantek-basic.vcf':
-        get_vcard_file('01-tantek-basic.vcf'),
+        _get_vcard_file('01-tantek-basic.vcf'),
     }
 
 VCARDS_VALID = {
-    'minimal': get_vcard_file('minimal.vcf'),
-    'scrambled case': get_vcard_file('scrambled_case.vcf'),
-    'Aspaas Sykler': get_vcard_file(
+    'minimal': _get_vcard_file('minimal.vcf'),
+    'scrambled case': _get_vcard_file('scrambled_case.vcf'),
+    'Aspaas Sykler': _get_vcard_file(
         'http://aspaass.no/kontakt/Aspaas%20Sykler.vcf'),
-    'Troy Wolf': get_vcard_file(
+    'Troy Wolf': _get_vcard_file(
         'http://www.troywolf.com/articles/php/class_vcard/vcard_example.php'),
-    'Tantek Çelik': get_vcard_file(
-        'http://h2vx.com/vcf/tantek.com/%23contact'),
     }
 
 VCARDS_REFERENCE = {
-    'http://tools.ietf.org/html/rfc2426 1': get_vcard_file('rfc_2426_a.vcf'),
-    'http://tools.ietf.org/html/rfc2426 2': get_vcard_file('rfc_2426_b.vcf'),
+    'http://tools.ietf.org/html/rfc2426 1': _get_vcard_file('rfc_2426_a.vcf'),
+    'http://tools.ietf.org/html/rfc2426 2': _get_vcard_file('rfc_2426_b.vcf'),
     }
 
 # pylint: enable-msg=C0301
+
 
 class TestVCards(unittest.TestCase):
     """Test small vCards"""
@@ -86,16 +92,17 @@ class TestVCards(unittest.TestCase):
         except vcard.VCardFormatError as error:
             self.assertEquals(error.message, vcard.MSG_EMPTY_VCARD)
 
-    def test_missing(self):
+
+    def test_failing(self):
         """vCards missing a mandatory property"""
-        for vcard_title, vcard_text in VCARDS_MISSING.items():
+        for vcard_title, vcard_text in \
+        VCARDS_MISSING.items() + VCARDS_INVALID_X_NAME.items():
             try:
                 vcard.VCard(vcard_text)
                 self.fail('Invalid vCard "%s" created' % vcard_title)
-            except vcard.VCardFormatError as error:
-                self.assertEquals(
-                    error.message[:len(vcard.MSG_MISSING_PROPERTY)],
-                    vcard.MSG_MISSING_PROPERTY)
+            except vcard.VCardFormatError:
+                pass
+
 
     def test_valid(self):
         """Valid (but not necessarily sane) vCards"""
@@ -106,8 +113,10 @@ class TestVCards(unittest.TestCase):
                 self.assertNotEqual(vc_obj, None)
             except vcard.VCardFormatError as error:
                 self.fail(
-                    'Valid vCard "%s" not created' % vcard_title + '\n' + \
+                    'Valid vCard "%s" not created' % \
+                    vcard_title + '\n' + \
                     error.message)
+
 
     def test_rfc_2426_examples(self):
         """
@@ -126,13 +135,16 @@ class TestVCards(unittest.TestCase):
                 #    'Valid vCard "%s" not created' % vcard_title + '\n' + \
                 #    error.message)
 
+
     def test_doc(self):
         """Documentation tests"""
         doctest.testmod(vcard)
 
+
 def main():
     """Command line options checkpoint"""
     unittest.main()
+
 
 if __name__ == '__main__':
     main()

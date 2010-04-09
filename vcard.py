@@ -65,6 +65,7 @@ MSG_DOT_AT_LINE_START = 'Dot at start of line without group name'
 MSG_EMPTY_LINE = 'Empty line found'
 MSG_EMPTY_VCARD = 'vCard is empty'
 MSG_INVALID_FIRST_LINE = 'Invalid first line'
+MSG_INVALID_LANGUAGE_VALUE = 'Invalid language'
 MSG_INVALID_LAST_LINE = 'Invalid last line'
 MSG_INVALID_LINE_SEPARATOR = 'Invalid line ending; should be CRLF (\\r\\n)'
 MSG_INVALID_PARAM_NAME = 'Invalid parameter name'
@@ -74,6 +75,7 @@ MSG_INVALID_SUBVALUE = 'Invalid subvalue'
 MSG_INVALID_SUBVALUE_COUNT = 'Invalid subvalue count'
 MSG_INVALID_VALUE = 'Invalid value'
 MSG_INVALID_VALUE_COUNT = 'Invalid value count'
+MSG_INVALID_X_NAME = 'Invalid X-name'
 MSG_MISMATCH_GROUP = 'Group mismatch'
 MSG_MISMATCH_PARAM = 'Parameter mismatch'
 MSG_MISSING_GROUP = 'Missing group'
@@ -116,7 +118,7 @@ class VCardFormatError(Exception):
         @param context: Dictionary with context information
         """
         Exception.__init__(self)
-        self.message = message
+        self.message = str(message)
         self.context = context
 
 
@@ -139,9 +141,9 @@ class VCardFormatError(Exception):
             else:
                 message += key
 
-            message += ': ' + unicode(value)
+            message += ': ' + value
 
-        return message
+        return str(message)
 
 
 def valid_date(text):
@@ -394,7 +396,7 @@ def remove_vcard_groups(lines, group):
     return lines
 
 
-def get_vcard_property_param_values(values_string):
+def get_vcard_property_parameter_values(values_string):
     """
     Get the parameter values. RFC 2426 page 29.
 
@@ -427,7 +429,7 @@ def get_vcard_property_param(param_string):
     except ValueError as error:
         raise VCardFormatError(MSG_MISSING_PARAM_VALUE + ': %s' % error, {})
 
-    values = get_vcard_property_param_values(values_string)
+    values = get_vcard_property_parameter_values(values_string)
 
     # Validate
     if not re.match('^[' + ID_CHARS + ']+$', parameter_name):
@@ -453,12 +455,13 @@ def get_vcard_property_params(params_string):
 
     for param_string in split_unescaped(params_string, ';'):
         param = get_vcard_property_param(param_string)
-        param_name = param['name'].upper() # To be able to merge TYPE & type
-        if param_name not in params:
-            params[param_name] = param['values']
+        parameter_name = param['name'].upper() # To be able to merge TYPE & type
+        if parameter_name not in params:
+            params[parameter_name] = param['values']
         else:
             # Merge
-            params[param_name] = params[param_name].union(param['values'])
+            params[parameter_name] = params[parameter_name].union(
+                param['values'])
 
     return params
 
@@ -499,6 +502,75 @@ def get_vcard_property_values(values_string):
     return values
 
 
+def validate_language_tag(language):
+    """
+    langval, as defined by RFC 1766 <http://tools.ietf.org/html/rfc1766>
+
+    @param language: String
+    @return: True if the language is valid, False otherwise
+
+    Examples:
+    >>> validate_language_tag('en')
+
+    >>> validate_language_tag('-US') # Need primary tag
+    Traceback (most recent call last):
+    VCardFormatError: vCard format error: Invalid language: -us
+    >>> validate_language_tag('en-') # Can't end with dash
+    Traceback (most recent call last):
+    VCardFormatError: vCard format error: Invalid language: en-
+    >>> validate_language_tag('en-US')
+
+    """
+    language = language.lower() # Case insensitive
+
+    if re.match('^([a-z]{1,8})(-[a-z]{1,8})*$', language) is None:
+        raise VCardFormatError(
+            MSG_INVALID_LANGUAGE_VALUE + ': %s' % language,
+            {})
+
+    # TODO: Extend to validate according to referenced ISO/RFC standards
+
+
+def validate_x_name(name):
+    """
+    @param parameter: Single parameter name
+    @return: True if the name is a valid x-name, False otherwise
+    """
+    if re.match('^X-[' + ID_CHARS + ']+$', name, re.IGNORECASE) is None:
+        raise VCardFormatError(
+            MSG_INVALID_X_NAME + ': %s' % name,
+            {})
+
+
+def validate_text_parameter(parameter):
+    """
+    text-param, as described on page 35
+    <http://tools.ietf.org/html/rfc2426#section-4>
+
+    @param parameter: Single parameter, as returned by get_vcard_property_param
+    """
+    parameter_name = parameter[0].upper()
+    parameter_values = parameter[1]
+
+    if parameter_name == 'VALUE' and parameter_values != set(['ptext']):
+        raise VCardFormatError(
+            MSG_INVALID_PARAM_VALUE + ': %s' % parameter_values,
+            {})
+    elif parameter_name == 'LANGUAGE':
+        if len(parameter_values) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_PARAM_VALUE + ': %s' % parameter_values,
+                {})
+        validate_language_tag(parameter_values[0])
+    else:
+        validate_x_name(parameter_name)
+        if len(parameter_values) != 1:
+            raise VCardFormatError(
+                MSG_INVALID_PARAM_VALUE + ': %s' % parameter_values,
+                {})
+        return validate_param_value(parameter_values[0])
+
+
 # pylint: disable-msg=R0912,R0915
 def validate_vcard_property(prop):
     """
@@ -514,26 +586,34 @@ def validate_vcard_property(prop):
     if property_name == 'FN':
         # <http://tools.ietf.org/html/rfc2426#section-3.1.1>
         if 'parameters' in prop:
-            raise VCardFormatError(
-                MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
-                {})
+            for parameter in prop['parameters'].items():
+                try:
+                    validate_text_parameter(parameter)
+                except VCardFormatError as error:
+                    # Add property name to error
+                    error.context['property'] = property_name
+                    raise VCardFormatError(error.message, error.context)
         if len(prop['values']) != 1:
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values']),
-                {})
+                {'property': property_name})
 
     elif property_name == 'N':
         # <http://tools.ietf.org/html/rfc2426#section-3.1.2>
         if 'parameters' in prop:
-            raise VCardFormatError(
-                MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
-                {})
+            for parameter in prop['parameters'].items():
+                try:
+                    validate_text_parameter(parameter)
+                except VCardFormatError as error:
+                    # Add property name to error
+                    error.context['property'] = property_name
+                    raise VCardFormatError(error.message, error.context)
         if len(prop['values']) != 5:
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 5)' % len(
                     prop['values']),
-                {})
+                {'property': property_name})
         # Should names be split?
         for names in prop['values']:
             warnings.showwarning = _show_warning
@@ -551,12 +631,12 @@ def validate_vcard_property(prop):
         if 'parameters' in prop:
             raise VCardFormatError(
                 MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
-                {})
+                {'property': property_name})
         if len(prop['values']) != 1:
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values']),
-                {})
+                {'property': property_name})
 
     elif property_name == 'PHOTO':
         # <http://tools.ietf.org/html/rfc2426#section-3.1.4>
@@ -567,44 +647,44 @@ def validate_vcard_property(prop):
                 if parameter_values != set(['b']):
                     raise VCardFormatError(
                         MSG_INVALID_PARAM_VALUE + ': %s' % parameter_values,
-                        {})
+                        {'property': property_name})
                 if 'VALUE' in prop['parameters']:
                     raise VCardFormatError(
                         MSG_MISMATCH_PARAM  + ': %s and %s' % (
                             'ENCODING',
                             'VALUE'),
-                        {})
+                        {'property': property_name})
             elif parameter_name.upper() == 'TYPE' and \
                    'ENCODING' not in prop['parameters']:
                 raise VCardFormatError(
                     MSG_MISSING_PARAM + ': %s' % 'ENCODING',
-                    {})
+                    {'property': property_name})
             elif parameter_name.upper() == 'VALUE' and \
                  parameter_values != set(['uri']):
                 raise VCardFormatError(
                     MSG_INVALID_PARAM_VALUE + ': %s' % parameter_values,
-                    {})
+                    {'property': property_name})
             elif parameter_name.upper() not in ['ENCODING', 'TYPE', 'VALUE']:
                 raise VCardFormatError(
                     MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
-                    {})
+                    {'property': property_name})
 
     elif property_name == 'BDAY':
         # <http://tools.ietf.org/html/rfc2426#section-3.1.5>
         if 'parameters' in prop:
             raise VCardFormatError(
                 MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
-                {})
+                {'property': property_name})
         if len(prop['values']) != 1:
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values']),
-                {})
+                {'property': property_name})
         if len(prop['values'][0]) != 1:
             raise VCardFormatError(
                 MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values'][0]),
-                {})
+                {'property': property_name})
         if not valid_date(prop['values'][0][0]):
             warnings.warn(
                 WARN_INVALID_DATE + \
@@ -616,7 +696,7 @@ def validate_vcard_property(prop):
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 7)' % len(
                     prop['values']),
-                {})
+                {'property': property_name})
         if 'parameters' in prop:
             for parameter_name, parameter_values in prop['parameters'].items():
                 if parameter_name.upper() == 'TYPE':
@@ -632,7 +712,7 @@ def validate_vcard_property(prop):
                             raise VCardFormatError(
                                 MSG_INVALID_PARAM_VALUE + \
                                 ': %s' % parameter_subvalue,
-                                {})
+                                {'property': property_name})
                     if parameter_values == set([
                         'intl',
                         'postal',
@@ -643,7 +723,7 @@ def validate_vcard_property(prop):
                 else:
                     raise VCardFormatError(
                         MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
-                        {})
+                        {'property': property_name})
 
     elif property_name == 'LABEL':
         # <http://tools.ietf.org/html/rfc2426#section-3.2.2>
@@ -651,7 +731,7 @@ def validate_vcard_property(prop):
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values']),
-                {})
+                {'property': property_name})
         if 'parameters' in prop:
             for parameter_name, parameter_values in prop['parameters'].items():
                 if parameter_name.upper() == 'TYPE':
@@ -667,7 +747,7 @@ def validate_vcard_property(prop):
                             raise VCardFormatError(
                                 MSG_INVALID_PARAM_VALUE + \
                                 ': %s' % parameter_subvalue,
-                                {})
+                                {'property': property_name})
                     if parameter_values == set([
                         'intl',
                         'postal',
@@ -678,7 +758,7 @@ def validate_vcard_property(prop):
                 else:
                     raise VCardFormatError(
                         MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
-                        {})
+                        {'property': property_name})
 
     elif property_name == 'TEL':
         # <http://tools.ietf.org/html/rfc2426#section-3.3.1>
@@ -686,7 +766,7 @@ def validate_vcard_property(prop):
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values']),
-                {})
+                {'property': property_name})
         if 'parameters' in prop:
             for parameter_name, parameter_values in prop['parameters'].items():
                 if parameter_name.upper() == 'TYPE':
@@ -709,7 +789,7 @@ def validate_vcard_property(prop):
                             raise VCardFormatError(
                                 MSG_INVALID_PARAM_VALUE + \
                                 ': %s' % parameter_subvalue,
-                                {})
+                                {'property': property_name})
                     if set([value.lower() for value in parameter_values]) == \
                            set(['voice']):
                         warnings.warn(
@@ -717,7 +797,7 @@ def validate_vcard_property(prop):
                 else:
                     raise VCardFormatError(
                         MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
-                        {})
+                        {'property': property_name})
 
     elif property_name == 'EMAIL':
         # <http://tools.ietf.org/html/rfc2426#section-3.3.2>
@@ -725,7 +805,7 @@ def validate_vcard_property(prop):
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values']),
-                {})
+                {'property': property_name})
         if 'parameters' in prop:
             for parameter_name, parameter_values in prop['parameters'].items():
                 if parameter_name.upper() == 'TYPE':
@@ -750,39 +830,40 @@ def validate_vcard_property(prop):
                 else:
                     raise VCardFormatError(
                         MSG_INVALID_PARAM_NAME + ': %s' % parameter_name,
-                        {})
+                        {'property': property_name})
 
     elif property_name == 'MAILER':
         # <http://tools.ietf.org/html/rfc2426#section-3.3.3>
         if 'parameters' in prop:
             raise VCardFormatError(
                 MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
-                {})
+                {'property': property_name})
         if len(prop['values']) != 1:
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values']),
-                {})
+                {'property': property_name})
 
     elif property_name == 'TZ':
         # <http://tools.ietf.org/html/rfc2426#section-3.4.1>
         if 'parameters' in prop:
             raise VCardFormatError(
                 MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
-                {})
+                {'property': property_name})
         if len(prop['values']) != 1:
             raise VCardFormatError(
                 MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values']),
-                {})
+                {'property': property_name})
         if len(prop['values'][0]) != 1:
             raise VCardFormatError(
                 MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
                     prop['values'][0]),
-                {})
+                {'property': property_name})
         value = prop['values'][0][0]
         if not valid_time_zone(value):
-            raise VCardFormatError(MSG_INVALID_VALUE + ': %s' % value, {})
+            raise VCardFormatError(
+                MSG_INVALID_VALUE + ': %s' % value, {'property': property_name})
 # pylint: enable-msg=R0912,R0915
 
 
