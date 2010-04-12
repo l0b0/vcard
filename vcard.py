@@ -664,6 +664,9 @@ def validate_float(text):
     >>> validate_float('12.')
     Traceback (most recent call last):
     VCardFormatError: Invalid subvalue, expected float value: 12.
+    >>> validate_float('.12')
+    Traceback (most recent call last):
+    VCardFormatError: Invalid subvalue, expected float value: .12
     >>> validate_float('foo')
     Traceback (most recent call last):
     VCardFormatError: Invalid subvalue, expected float value: foo
