@@ -119,7 +119,7 @@ class VCardFormatError(Exception):
 
         @param message: Error message
         @param context: Dictionary with context information
-        
+
         Examples:
         >>> raise VCardFormatError('test', {})
         Traceback (most recent call last):
@@ -271,7 +271,7 @@ def validate_time(text):
         isodate.parse_time(time_str)
     except (isodate.ISO8601Error, ValueError):
         raise VCardFormatError(MSG_INVALID_TIME + ': %s' % text, {})
-    
+
     if timezone_str == '':
         return
 
@@ -651,6 +651,40 @@ def validate_text_parameter(parameter):
         validate_param_value(param_values[0])
 
 
+def validate_geo(text):
+    """
+    GEO property value, as described on page 31
+    <http://tools.ietf.org/html/rfc2426#section-4>
+
+    Examples:
+    >>> validate_geo('12;67')
+    >>> validate_geo('59.06116;10.03712')
+    >>> validate_geo('59.;10.')
+    Traceback (most recent call last):
+    VCardFormatError: Invalid parameter value, expected float value: 59.
+    >>> validate_geo('12.345,67.890')
+    Traceback (most recent call last):
+    VCardFormatError: Invalid parameter value, expected two semicolon-separated values: 12.345,67.890
+    >>> validate_geo('123.456')
+    Traceback (most recent call last):
+    VCardFormatError: Invalid parameter value, expected two semicolon-separated values: 123.456
+    >>> validate_geo('12,345;67,890')
+    Traceback (most recent call last):
+    VCardFormatError: Invalid parameter value, expected float value: 12,345
+    """
+    values = text.split(';')
+    if len(values) != 2:
+        raise VCardFormatError(
+            MSG_INVALID_PARAM_VALUE + \
+            ', expected two semicolon-separated values: %s' % text,
+            {})
+    for value in values:
+        if re.match(r'^[+-]?\d+(\.\d+)?$', value) is None:
+            raise VCardFormatError(
+                MSG_INVALID_PARAM_VALUE + ', expected float value: %s' % value,
+                {})
+
+
 # pylint: disable-msg=R0912,R0915
 def validate_vcard_property(prop):
     """
@@ -674,7 +708,7 @@ def validate_vcard_property(prop):
                     MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                         prop['values']),
                     {})
-    
+
         elif property_name == 'N':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.2>
             if 'parameters' in prop:
@@ -696,7 +730,7 @@ def validate_vcard_property(prop):
                         # Not just a single name
                         warnings.warn(
                             WARN_MULTIPLE_NAMES + ': %s' % name.encode('utf-8'))
-    
+
         elif property_name == 'NICKNAME':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.3>
             if 'parameters' in prop:
@@ -707,7 +741,7 @@ def validate_vcard_property(prop):
                     MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                         prop['values']),
                     {})
-    
+
         elif property_name == 'PHOTO':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.4>
             if not 'parameters' in prop:
@@ -738,7 +772,7 @@ def validate_vcard_property(prop):
                     raise VCardFormatError(
                         MSG_INVALID_PARAM_NAME + ': %s' % param_name,
                         {})
-    
+
         elif property_name == 'BDAY':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.5>
             if 'parameters' in prop:
@@ -756,7 +790,7 @@ def validate_vcard_property(prop):
                         prop['values'][0]),
                     {})
             validate_date(prop['values'][0][0])
-    
+
         elif property_name == 'ADR':
             # <http://tools.ietf.org/html/rfc2426#section-3.2.1>
             if len(prop['values']) != 7:
@@ -790,7 +824,7 @@ def validate_vcard_property(prop):
                                 ': %s' % prop['values'])
                     else:
                         validate_text_parameter(parameter)
-    
+
         elif property_name == 'LABEL':
             # <http://tools.ietf.org/html/rfc2426#section-3.2.2>
             if len(prop['values']) != 1:
@@ -824,7 +858,7 @@ def validate_vcard_property(prop):
                                 prop['values'])
                     else:
                         validate_text_parameter(parameter)
-    
+
         elif property_name == 'TEL':
             # <http://tools.ietf.org/html/rfc2426#section-3.3.1>
             if len(prop['values']) != 1:
@@ -864,7 +898,7 @@ def validate_vcard_property(prop):
                         raise VCardFormatError(
                             MSG_INVALID_PARAM_NAME + ': %s' % param_name,
                             {})
-    
+
         elif property_name == 'EMAIL':
             # <http://tools.ietf.org/html/rfc2426#section-3.3.2>
             if len(prop['values']) != 1:
@@ -898,7 +932,7 @@ def validate_vcard_property(prop):
                         raise VCardFormatError(
                             MSG_INVALID_PARAM_NAME + ': %s' % param_name,
                             {})
-    
+
         elif property_name == 'MAILER':
             # <http://tools.ietf.org/html/rfc2426#section-3.3.3>
             if 'parameters' in prop:
@@ -910,7 +944,7 @@ def validate_vcard_property(prop):
                     MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
                         prop['values']),
                     {})
-    
+
         elif property_name == 'TZ':
             # <http://tools.ietf.org/html/rfc2426#section-3.4.1>
             if 'parameters' in prop:
@@ -929,6 +963,25 @@ def validate_vcard_property(prop):
                     {})
             value = prop['values'][0][0]
             validate_time_zone(value)
+
+        elif property_name == 'GEO':
+            # <http://tools.ietf.org/html/rfc2426#section-3.4.2>
+            if 'parameters' in prop:
+                raise VCardFormatError(
+                    MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
+                    {})
+            if len(prop['values']) != 1:
+                raise VCardFormatError(
+                    MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                        prop['values']),
+                    {})
+            if len(prop['values'][0]) != 1:
+                raise VCardFormatError(
+                    MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
+                        prop['values'][0]),
+                    {})
+            value = prop['values'][0][0]
+            validate_geo(value)
     except VCardFormatError as error:
         error.context['property'] = property_name
         raise VCardFormatError(error.message, error.context)
