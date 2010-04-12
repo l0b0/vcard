@@ -155,7 +155,7 @@ class VCardFormatError(Exception):
             else:
                 message += key
 
-            message += ': ' + value
+            message += ': ' + str(value)
 
         return message
 
@@ -651,38 +651,36 @@ def validate_text_parameter(parameter):
         validate_param_value(param_values[0])
 
 
-def validate_geo(text):
+def validate_float(text):
     """
-    GEO property value, as described on page 31
-    <http://tools.ietf.org/html/rfc2426#section-4>
+    float value, as described on page 10 of RFC 2425
+    <http://tools.ietf.org/html/rfc2425#section-5.8.4>
 
     Examples:
-    >>> validate_geo('12;67')
-    >>> validate_geo('59.06116;10.03712')
-    >>> validate_geo('59.;10.')
+    >>> validate_float('12')
+    >>> validate_float('12.345')
+    >>> validate_float('+12.345')
+    >>> validate_float('-12.345')
+    >>> validate_float('12.')
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value, expected float value: 59.
-    >>> validate_geo('12.345,67.890')
+    VCardFormatError: Invalid subvalue, expected float value: 12.
+    >>> validate_float('foo')
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value, expected two semicolon-separated values: 12.345,67.890
-    >>> validate_geo('123.456')
+    VCardFormatError: Invalid subvalue, expected float value: foo
+    >>> validate_float('++12.345')
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value, expected two semicolon-separated values: 123.456
-    >>> validate_geo('12,345;67,890')
+    VCardFormatError: Invalid subvalue, expected float value: ++12.345
+    >>> validate_float('--12.345')
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value, expected float value: 12,345
+    VCardFormatError: Invalid subvalue, expected float value: --12.345
+    >>> validate_float('12.34.5')
+    Traceback (most recent call last):
+    VCardFormatError: Invalid subvalue, expected float value: 12.34.5
     """
-    values = text.split(';')
-    if len(values) != 2:
+    if re.match(r'^[+-]?\d+(\.\d+)?$', text) is None:
         raise VCardFormatError(
-            MSG_INVALID_PARAM_VALUE + \
-            ', expected two semicolon-separated values: %s' % text,
+            MSG_INVALID_SUBVALUE + ', expected float value: %s' % text,
             {})
-    for value in values:
-        if re.match(r'^[+-]?\d+(\.\d+)?$', value) is None:
-            raise VCardFormatError(
-                MSG_INVALID_PARAM_VALUE + ', expected float value: %s' % value,
-                {})
 
 
 # pylint: disable-msg=R0912,R0915
@@ -970,18 +968,18 @@ def validate_vcard_property(prop):
                 raise VCardFormatError(
                     MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
                     {})
-            if len(prop['values']) != 1:
+            if len(prop['values']) != 2:
                 raise VCardFormatError(
-                    MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                    MSG_INVALID_VALUE_COUNT + ': %d (expected 2)' % len(
                         prop['values']),
                     {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
-                        prop['values'][0]),
-                    {})
-            value = prop['values'][0][0]
-            validate_geo(value)
+            for value in prop['values']:
+                if len(value) != 1:
+                    raise VCardFormatError(
+                        MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
+                            prop['values'][0]),
+                        {})
+                validate_float(value[0])
     except VCardFormatError as error:
         error.context['property'] = property_name
         raise VCardFormatError(error.message, error.context)
