@@ -61,8 +61,8 @@ VCARDS_INVALID_X_NAME = {
 VCARDS_INVALID_VALUE = {
     'http://en.wikipedia.org/wiki/VCard':
         _get_vcard_file('invalid_value_wp.vcf'),
-    'http://microformats.org/tests/hcard/01-tantek-basic.vcf':
-        _get_vcard_file('01-tantek-basic.vcf'),
+    '01-tantek-basic':
+        _get_vcard_file('http://microformats.org/tests/hcard/01-tantek-basic.vcf'),
     }
 
 VCARDS_VALID = {
