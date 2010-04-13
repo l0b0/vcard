@@ -16,7 +16,8 @@ import urllib
 import warnings
 
 import vcard
-
+from vcard_defs import MSG_EMPTY_VCARD
+from vcard_validators import VCardFormatError
 
 def _get_vcard_file(path):
     """
@@ -89,8 +90,8 @@ class TestVCards(unittest.TestCase):
         try:
             vcard.VCard(VCARD_EMPTY)
             self.fail('Invalid vCard created')
-        except vcard.VCardFormatError as error:
-            self.assertEquals(error.message, vcard.MSG_EMPTY_VCARD)
+        except VCardFormatError as error:
+            self.assertEquals(error.message, MSG_EMPTY_VCARD)
 
 
     def test_failing(self):
@@ -100,7 +101,7 @@ class TestVCards(unittest.TestCase):
             try:
                 vcard.VCard(vcard_text)
                 self.fail('Invalid vCard "%s" created' % vcard_title)
-            except vcard.VCardFormatError:
+            except VCardFormatError:
                 pass
 
 
@@ -111,7 +112,7 @@ class TestVCards(unittest.TestCase):
                 with warnings.catch_warnings(record=True):
                     vc_obj = vcard.VCard(vcard_text)
                 self.assertNotEqual(vc_obj, None)
-            except vcard.VCardFormatError as error:
+            except VCardFormatError as error:
                 self.fail(
                     'Valid vCard "%s" not created' % \
                     vcard_title + '\n' + \
@@ -129,7 +130,7 @@ class TestVCards(unittest.TestCase):
                 with warnings.catch_warnings(record=True):
                     vc_obj = vcard.VCard(vcard_text)
                 self.assertNotEqual(vc_obj, None)
-            except vcard.VCardFormatError:
+            except VCardFormatError:
                 pass
                 #self.fail(
                 #    'Valid vCard "%s" not created' % vcard_title + '\n' + \
@@ -138,7 +139,7 @@ class TestVCards(unittest.TestCase):
 
     def test_doc(self):
         """Documentation tests"""
-        doctest.testmod(vcard)
+        self.assertEquals(doctest.testmod(vcard)[0], 0)
 
 
 def main():
