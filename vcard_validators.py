@@ -51,6 +51,20 @@ def _show_warning(
 # pylint: enable-msg=R0913,W0613,W0622
 
 
+def _stringify(text):
+    """
+    Get the text as a string representation
+    
+    @param text: Something convertible to str
+    @return: Printable string
+    """
+    if isinstance(text, unicode):
+        text = text.encode('utf-8')
+    if not isinstance(text, str):
+        text = str(text)
+    return text
+
+
 class VCardFormatError(Exception):
     """Thrown if the text given is not a valid according to RFC 2426."""
     def __init__(self, message, context):
@@ -69,11 +83,12 @@ class VCardFormatError(Exception):
         VCardFormatError: with path
         File: /home/user/test.vcf
         >>> raise VCardFormatError('Error with lots of context', {
-            'File': '/home/user/test.vcf',
-            'File line': 120,
-            'vCard line': 5,
-            'Property': 'ADR',
-            'Property line': 2})
+        ... 'File': '/home/user/test.vcf',
+        ... 'File line': 120,
+        ... 'vCard line': 5,
+        ... 'Property': 'ADR',
+        ... 'Property line': 2,
+        ... 'String': 'too;few;values;êéè'})
         Traceback (most recent call last):
         VCardFormatError: Error with lots of context
         File: /home/user/test.vcf
@@ -81,6 +96,20 @@ class VCardFormatError(Exception):
         vCard line: 5
         Property: ADR
         Property line: 2
+        String: too;few;values;êéè
+        >>> try:
+        ...     raise VCardFormatError('test', {'Property': 'ADR'})
+        ... except VCardFormatError as error:
+        ...     error.context['File'] = '/home/user/test.vcf'
+        ...     raise VCardFormatError(error.message, error.context)
+        Traceback (most recent call last):
+        VCardFormatError: test
+        File: /home/user/test.vcf
+        Property: ADR
+        >>> raise VCardFormatError('Cöntexte randomisé', {'foo': QSAFE_CHARS[-1]*2})
+        Traceback (most recent call last):
+        VCardFormatError: Cöntexte randomisé
+        foo: ÿÿ
         """
         Exception.__init__(self)
         self.message = message
@@ -88,8 +117,12 @@ class VCardFormatError(Exception):
 
 
     def __str__(self):
-        """Outputs error with ordered context info."""
-        message = self.message.encode('utf-8')
+        """
+        Outputs error with ordered context info.
+        
+        @return: Printable error message
+        """
+        message = self.message
 
         # Sort context information
         keys = [
@@ -97,10 +130,17 @@ class VCardFormatError(Exception):
             'File line',
             'vCard line',
             'Property',
-            'Property line']
+            'Property line',
+            'String']
         for key in keys:
             if key in self.context:
-                message += '\n' + key + ': ' + str(self.context.pop(key))
+                message += '\n' + _stringify(key) + ': ' + \
+                _stringify(self.context.pop(key))
+        
+        # Output other context strings any old way
+        for key in self.context.keys():
+            message += '\n' + _stringify(key) + ': ' + \
+            _stringify(self.context.pop(key))
 
         return message
 
@@ -117,29 +157,34 @@ def validate_date(text):
     >>> validate_date('2000-01-01')
     >>> validate_date('2000:01:01') # Wrong separator
     Traceback (most recent call last):
-    VCardFormatError: Invalid date: 2000:01:01
+    VCardFormatError: Invalid date
+    String: 2000:01:01
     >>> validate_date('2000101') # Too short
     Traceback (most recent call last):
-    VCardFormatError: Invalid date: 2000101
+    VCardFormatError: Invalid date
+    String: 2000101
     >>> validate_date('20080229')
     >>> validate_date('20100229') # Not a leap year
     Traceback (most recent call last):
-    VCardFormatError: Invalid date: 20100229
+    VCardFormatError: Invalid date
+    String: 20100229
     >>> validate_date('19000229') # Not a leap year (divisible by 100)
     Traceback (most recent call last):
-    VCardFormatError: Invalid date: 19000229
+    VCardFormatError: Invalid date
+    String: 19000229
     >>> validate_date('20000229') # Leap year (divisible by 400)
     >>> validate_date('aaaa-bb-cc')
     Traceback (most recent call last):
-    VCardFormatError: Invalid date: aaaa-bb-cc
+    VCardFormatError: Invalid date
+    String: aaaa-bb-cc
     """
     if re.match(r'^\d{4}-?\d{2}-?\d{2}$', text) is None:
-        raise VCardFormatError(MSG_INVALID_DATE + ': %s' % text, {})
+        raise VCardFormatError(MSG_INVALID_DATE, {'String': text})
 
     try:
         isodate.parse_date(text)
     except (isodate.ISO8601Error, ValueError):
-        raise VCardFormatError(MSG_INVALID_DATE + ': %s' % text, {})
+        raise VCardFormatError(MSG_INVALID_DATE, {'String': text})
 
 
 def validate_time_zone(text):
@@ -159,30 +204,36 @@ def validate_time_zone(text):
     >>> validate_time_zone('+00:30')
     >>> validate_time_zone('Z+01:00') # Can't combine Z and offset
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone: Z+01:00
+    VCardFormatError: Invalid time zone
+    String: Z+01:00
     >>> validate_time_zone('+1:00') # Need preceding zero
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone: +1:00
+    VCardFormatError: Invalid time zone
+    String: +1:00
     >>> validate_time_zone('0100') # Need + or -
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone: 0100
+    VCardFormatError: Invalid time zone
+    String: 0100
     >>> validate_time_zone('01') # Need colon and minutes
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone: 01
+    VCardFormatError: Invalid time zone
+    String: 01
     >>> validate_time_zone('01:') # Need minutes
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone: 01:
+    VCardFormatError: Invalid time zone
+    String: 01:
     >>> validate_time_zone('01:1') # Need preceding zero
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone: 01:1
+    VCardFormatError: Invalid time zone
+    String: 01:1
     """
     if not re.match(r'^(Z|[+-]\d{2}:?\d{2})$', text):
-        raise VCardFormatError(MSG_INVALID_TIME_ZONE + ': %s' % text, {})
+        raise VCardFormatError(MSG_INVALID_TIME_ZONE, {'String': text})
 
     try:
         isodate.parse_tzinfo(text.replace('+', 'Z+').replace('-', 'Z-'))
     except (isodate.ISO8601Error, ValueError):
-        raise VCardFormatError(MSG_INVALID_TIME_ZONE + ': %s' % text, {})
+        raise VCardFormatError(MSG_INVALID_TIME_ZONE, {'String': text})
 
 
 def validate_time(text):
@@ -199,23 +250,30 @@ def validate_time(text):
     >>> validate_time('01:02:03+01:30')
     >>> validate_time('01:02:60')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time: 01:02:60
+    VCardFormatError: Invalid time
+    String: 01:02:60
     >>> validate_time('01:60:59')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time: 01:60:59
+    VCardFormatError: Invalid time
+    String: 01:60:59
     >>> validate_time('24:00:00')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time: 24:00:00
+    VCardFormatError: Invalid time
+    String: 24:00:00
+    >>> validate_time('00:00:00Z+01')
+    Traceback (most recent call last):
+    VCardFormatError: Invalid time zone
+    String: Z+01
     """
     time_timezone = re.match(r'^(\d{2}:?\d{2}:?\d{2}(?:,\d+)?)(.*)$', text)
     if time_timezone is None:
-        raise VCardFormatError(MSG_INVALID_TIME + ': %s' % text, {})
+        raise VCardFormatError(MSG_INVALID_TIME, {'String': text})
 
     time_str, timezone_str = time_timezone.groups()
     try:
         isodate.parse_time(time_str)
     except (isodate.ISO8601Error, ValueError):
-        raise VCardFormatError(MSG_INVALID_TIME + ': %s' % text, {})
+        raise VCardFormatError(MSG_INVALID_TIME, {'String': text})
 
     if timezone_str == '':
         return
@@ -223,55 +281,59 @@ def validate_time(text):
     validate_time_zone(timezone_str)
 
 
-def validate_language_tag(language):
+def validate_language_tag(text):
     """
     langval, as defined by RFC 1766 <http://tools.ietf.org/html/rfc1766>
 
-    @param language: String
+    @param text: String
 
     Examples:
     >>> validate_language_tag('en')
     >>> validate_language_tag('-US') # Need primary tag
     Traceback (most recent call last):
-    VCardFormatError: Invalid language: -us
+    VCardFormatError: Invalid language
+    String: -us
     >>> validate_language_tag('en-') # Can't end with dash
     Traceback (most recent call last):
-    VCardFormatError: Invalid language: en-
+    VCardFormatError: Invalid language
+    String: en-
     >>> validate_language_tag('en-US')
 
     """
-    language = language.lower() # Case insensitive
+    text = text.lower() # Case insensitive
 
-    if re.match(r'^([a-z]{1,8})(-[a-z]{1,8})*$', language) is None:
-        raise VCardFormatError(
-            MSG_INVALID_LANGUAGE_VALUE + ': %s' % language,
-            {})
+    if re.match(r'^([a-z]{1,8})(-[a-z]{1,8})*$', text) is None:
+        raise VCardFormatError(MSG_INVALID_LANGUAGE_VALUE, {'String': text})
 
     # TODO: Extend to validate according to referenced ISO/RFC standards
 
 
-def validate_x_name(name):
+def validate_x_name(text):
     """
-    @param parameter: Single parameter name
+    @param text: Single parameter name
 
     Examples:
     >>> validate_x_name('X-abc')
     >>> validate_x_name('X-' + ID_CHARS)
     >>> validate_x_name('X-') # Have to have more characters
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name: X-
+    VCardFormatError: Invalid X-name
+    String: X-
     >>> validate_x_name('') # Have to start with X-
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name: 
+    VCardFormatError: Invalid X-name
+    String: 
     >>> validate_x_name('x-abc') # X must be upper case
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name: x-abc
+    VCardFormatError: Invalid X-name
+    String: x-abc
     >>> validate_x_name('foo') # Have to start with X-
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name: foo
+    VCardFormatError: Invalid X-name
+    String: foo
     """
-    if re.match(r'^X-[' + ID_CHARS + ']+$', name) is None:
-        raise VCardFormatError(MSG_INVALID_X_NAME + ': %s' % name, {})
+    if re.match(r'^X-[' + ID_CHARS + ']+$', text) is None:
+        raise VCardFormatError(MSG_INVALID_X_NAME, {'String': text})
 
 
 def validate_ptext(text):
@@ -286,10 +348,11 @@ def validate_ptext(text):
     >>> validate_ptext(SAFE_CHARS)
     >>> validate_ptext(u'\u000B') #doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value: ...
+    VCardFormatError: Invalid parameter value
+    String: ...
     """
     if re.match('^[' + SAFE_CHARS + ']*$', text) is None:
-        raise VCardFormatError(MSG_INVALID_PARAM_VALUE + ': %s' % text, {})
+        raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
 def validate_quoted_string(text):
@@ -303,15 +366,17 @@ def validate_quoted_string(text):
     >>> validate_quoted_string(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
     >>> validate_quoted_string(DQUOTE_CHAR + DQUOTE_CHAR)
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value: ""
+    VCardFormatError: Invalid parameter value
+    String: ""
     >>> validate_quoted_string(DQUOTE_CHAR + QSAFE_CHARS[-1]*2 + DQUOTE_CHAR)
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value: "ÿÿ"
+    VCardFormatError: Invalid parameter value
+    String: "ÿÿ"
     """
     if re.match(
         r'^' + DQUOTE_CHAR + '[' + QSAFE_CHARS + ']' + DQUOTE_CHAR + '$',
         text) is None:
-        raise VCardFormatError(MSG_INVALID_PARAM_VALUE + ': %s' % text, {})
+        raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
 def validate_param_value(text):
@@ -320,6 +385,15 @@ def validate_param_value(text):
     <http://tools.ietf.org/html/rfc2426#section-4>
 
     @param text: Single parameter value
+    
+    Examples:
+    >>> validate_param_value('')
+    >>> validate_param_value(SAFE_CHARS)
+    >>> validate_param_value(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
+    >>> validate_param_value(DQUOTE_CHAR + DQUOTE_CHAR)
+    Traceback (most recent call last):
+    VCardFormatError: Invalid parameter value
+    String: ""
     """
     try:
         validate_ptext(text)
@@ -327,7 +401,7 @@ def validate_param_value(text):
         try:
             validate_quoted_string(text)
         except VCardFormatError:
-            raise VCardFormatError(MSG_INVALID_PARAM_VALUE + ': %s' % text, {})
+            raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
 def validate_text_parameter(parameter):
@@ -336,14 +410,19 @@ def validate_text_parameter(parameter):
     <http://tools.ietf.org/html/rfc2426#section-4>
 
     @param parameter: Single parameter, as returned by get_vcard_property_param
+    
+    Examples:
+    >>> validate_text_parameter(['VALUE', set(['ptext'])])
     """
     param_name = parameter[0].upper()
     param_values = parameter[1]
 
-    if param_name == 'VALUE' and param_values != set(['ptext']):
-        raise VCardFormatError(
-            MSG_INVALID_PARAM_VALUE + ': %s' % param_values,
-            {})
+    if param_name == 'VALUE':
+        if param_values != set(['ptext']):
+            raise VCardFormatError(
+                MSG_INVALID_PARAM_VALUE + ': %s' % param_values,
+                {})
+        return
     elif param_name == 'LANGUAGE':
         if len(param_values) != 1:
             raise VCardFormatError(
@@ -691,5 +770,5 @@ def validate_vcard_property(prop):
                         {})
                 validate_float(value[0])
     except VCardFormatError as error:
-        error.context['property'] = property_name
+        error.context['Property'] = property_name
         raise VCardFormatError(error.message, error.context)

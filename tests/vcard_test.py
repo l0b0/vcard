@@ -10,6 +10,7 @@ Default syntax:
 
 import codecs
 import doctest
+import glob
 import os
 import unittest
 import urllib
@@ -139,13 +140,10 @@ class TestVCards(unittest.TestCase):
 
     def test_doc(self):
         """Documentation tests"""
-        self.assertEquals(doctest.testmod(vcard)[0], 0)
-
-
-def main():
-    """Command line options checkpoint"""
-    unittest.main()
-
-
-if __name__ == '__main__':
-    main()
+        self.assertEqual(doctest.testmod(vcard)[0], 0)
+        import vcard_defs
+        self.assertEqual(doctest.testmod(vcard_defs)[0], 0)
+        import vcard_utils
+        self.assertEqual(doctest.testmod(vcard_utils)[0], 0)
+        import vcard_validators
+        self.assertEqual(doctest.testmod(vcard_validators)[0], 0)

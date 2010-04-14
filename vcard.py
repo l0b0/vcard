@@ -299,7 +299,7 @@ def get_vcard_property(property_line):
         vcard_validators.validate_vcard_property(prop)
     except vcard_validators.VCardFormatError as error:
         # Add parameter name to error
-        error.context['property_line'] = property_line
+        error.context['Property line'] = property_line
         raise vcard_validators.VCardFormatError(error.message, error.context)
 
     return prop
@@ -321,7 +321,7 @@ def get_vcard_properties(lines):
             try:
                 properties.append(get_vcard_property(property_line))
             except vcard_validators.VCardFormatError as error:
-                error.context['vcard_line'] = index
+                error.context['vCard line'] = index
                 raise vcard_validators.VCardFormatError(
                     error.message,
                     error.context)
@@ -397,8 +397,8 @@ def validate_file(filename, verbose = False):
                     if verbose:
                         print(vcard)
                 except vcard_validators.VCardFormatError as error:
-                    error.context['path'] = filename
-                    error.context['file_line'] = index
+                    error.context['File'] = filename
+                    error.context['File line'] = index
                     raise vcard_validators.VCardFormatError(
                         error.message,
                         error.context)

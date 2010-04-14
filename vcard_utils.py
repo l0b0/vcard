@@ -17,21 +17,9 @@ def find_unescaped(text, char, escape_char = '\\'):
     Examples:
     >>> find_unescaped('BEGIN:VCARD', ':')
     5
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
-    >>> find_unescaped('', '')
     """
-    unescaped_regex = '(?<!' + escape_char + ')' + \
-            '(?:' + escape_char + escape_char + ')*' + \
+    unescaped_regex = '(?<!' + escape_char + escape_char + ')' + \
+            '(?:' + escape_char + escape_char + escape_char + escape_char + ')*' + \
             '(' + char + ')'
     regex = re.compile(unescaped_regex)
 
