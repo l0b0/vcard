@@ -157,25 +157,25 @@ def validate_date(text):
     >>> validate_date('2000-01-01')
     >>> validate_date('2000:01:01') # Wrong separator
     Traceback (most recent call last):
-    VCardFormatError: Invalid date
+    VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: 2000:01:01
     >>> validate_date('2000101') # Too short
     Traceback (most recent call last):
-    VCardFormatError: Invalid date
+    VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: 2000101
     >>> validate_date('20080229')
     >>> validate_date('20100229') # Not a leap year
     Traceback (most recent call last):
-    VCardFormatError: Invalid date
+    VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: 20100229
     >>> validate_date('19000229') # Not a leap year (divisible by 100)
     Traceback (most recent call last):
-    VCardFormatError: Invalid date
+    VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: 19000229
     >>> validate_date('20000229') # Leap year (divisible by 400)
     >>> validate_date('aaaa-bb-cc')
     Traceback (most recent call last):
-    VCardFormatError: Invalid date
+    VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: aaaa-bb-cc
     """
     if re.match(r'^\d{4}-?\d{2}-?\d{2}$', text) is None:
@@ -204,27 +204,27 @@ def validate_time_zone(text):
     >>> validate_time_zone('+00:30')
     >>> validate_time_zone('Z+01:00') # Can't combine Z and offset
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
     String: Z+01:00
     >>> validate_time_zone('+1:00') # Need preceding zero
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
     String: +1:00
     >>> validate_time_zone('0100') # Need + or -
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
     String: 0100
     >>> validate_time_zone('01') # Need colon and minutes
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
     String: 01
     >>> validate_time_zone('01:') # Need minutes
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
     String: 01:
     >>> validate_time_zone('01:1') # Need preceding zero
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
     String: 01:1
     """
     if not re.match(r'^(Z|[+-]\d{2}:?\d{2})$', text):
@@ -250,19 +250,19 @@ def validate_time(text):
     >>> validate_time('01:02:03+01:30')
     >>> validate_time('01:02:60')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time
+    VCardFormatError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
     String: 01:02:60
     >>> validate_time('01:60:59')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time
+    VCardFormatError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
     String: 01:60:59
     >>> validate_time('24:00:00')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time
+    VCardFormatError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
     String: 24:00:00
     >>> validate_time('00:00:00Z+01')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
     String: Z+01
     """
     time_timezone = re.match(r'^(\d{2}:?\d{2}:?\d{2}(?:,\d+)?)(.*)$', text)
@@ -291,11 +291,11 @@ def validate_language_tag(text):
     >>> validate_language_tag('en')
     >>> validate_language_tag('-US') # Need primary tag
     Traceback (most recent call last):
-    VCardFormatError: Invalid language
+    VCardFormatError: Invalid language (See RFC 1766 section 2 for details)
     String: -us
     >>> validate_language_tag('en-') # Can't end with dash
     Traceback (most recent call last):
-    VCardFormatError: Invalid language
+    VCardFormatError: Invalid language (See RFC 1766 section 2 for details)
     String: en-
     >>> validate_language_tag('en-US')
 
@@ -317,19 +317,19 @@ def validate_x_name(text):
     >>> validate_x_name('X-' + ID_CHARS)
     >>> validate_x_name('X-') # Have to have more characters
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name
+    VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: X-
     >>> validate_x_name('') # Have to start with X-
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name
+    VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: 
     >>> validate_x_name('x-abc') # X must be upper case
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name
+    VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: x-abc
     >>> validate_x_name('foo') # Have to start with X-
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name
+    VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: foo
     """
     if re.match(r'^X-[' + ID_CHARS + ']+$', text) is None:
@@ -348,7 +348,7 @@ def validate_ptext(text):
     >>> validate_ptext(SAFE_CHARS)
     >>> validate_ptext(u'\u000B') #doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value
+    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for param-value syntax)
     String: ...
     """
     if re.match('^[' + SAFE_CHARS + ']*$', text) is None:
@@ -366,11 +366,11 @@ def validate_quoted_string(text):
     >>> validate_quoted_string(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
     >>> validate_quoted_string(DQUOTE_CHAR + DQUOTE_CHAR)
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value
+    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for param-value syntax)
     String: ""
     >>> validate_quoted_string(DQUOTE_CHAR + QSAFE_CHARS[-1]*2 + DQUOTE_CHAR)
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value
+    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for param-value syntax)
     String: "ÿÿ"
     """
     if re.match(
@@ -392,7 +392,7 @@ def validate_param_value(text):
     >>> validate_param_value(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
     >>> validate_param_value(DQUOTE_CHAR + DQUOTE_CHAR)
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value
+    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for param-value syntax)
     String: ""
     """
     try:
@@ -450,22 +450,22 @@ def validate_float(text):
     >>> validate_float('-12.345')
     >>> validate_float('12.')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue, expected float value: 12.
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: 12.
     >>> validate_float('.12')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue, expected float value: .12
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: .12
     >>> validate_float('foo')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue, expected float value: foo
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: foo
     >>> validate_float('++12.345')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue, expected float value: ++12.345
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: ++12.345
     >>> validate_float('--12.345')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue, expected float value: --12.345
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: --12.345
     >>> validate_float('12.34.5')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue, expected float value: 12.34.5
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: 12.34.5
     """
     if re.match(r'^[+-]?\d+(\.\d+)?$', text) is None:
         raise VCardFormatError(

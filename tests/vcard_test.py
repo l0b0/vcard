@@ -10,7 +10,6 @@ Default syntax:
 
 import codecs
 import doctest
-import glob
 import os
 import unittest
 import urllib
@@ -92,7 +91,7 @@ class TestVCards(unittest.TestCase):
             vcard.VCard(VCARD_EMPTY)
             self.fail('Invalid vCard created')
         except VCardFormatError as error:
-            self.assertEquals(error.message, MSG_EMPTY_VCARD)
+            self.assertEquals(str(error).splitlines()[0], MSG_EMPTY_VCARD)
 
 
     def test_failing(self):
@@ -117,7 +116,7 @@ class TestVCards(unittest.TestCase):
                 self.fail(
                     'Valid vCard "%s" not created' % \
                     vcard_title + '\n' + \
-                    error.message)
+                    str(error))
 
 
     def test_rfc_2426_examples(self):
@@ -135,7 +134,7 @@ class TestVCards(unittest.TestCase):
                 pass
                 #self.fail(
                 #    'Valid vCard "%s" not created' % vcard_title + '\n' + \
-                #    error.message)
+                #    str(error))
 
 
     def test_doc(self):

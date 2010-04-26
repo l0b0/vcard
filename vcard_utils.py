@@ -19,7 +19,8 @@ def find_unescaped(text, char, escape_char = '\\'):
     5
     """
     unescaped_regex = '(?<!' + escape_char + escape_char + ')' + \
-            '(?:' + escape_char + escape_char + escape_char + escape_char + ')*' + \
+            '(?:' + escape_char + escape_char + escape_char + escape_char + \
+            ')*' + \
             '(' + char + ')'
     regex = re.compile(unescaped_regex)
 

@@ -20,7 +20,7 @@ WSP_CHARS = SP_CHAR + HTAB_CHAR
 NON_ASCII_CHARS = u'\u0080-\u00FF'
 QSAFE_CHARS = WSP_CHARS + u'\u0021' + u'\u0023-\u007E' + NON_ASCII_CHARS
 SAFE_CHARS = WSP_CHARS + u'\u0021' + u'\u0023-\u002B' + u'\u002D-\u0039' + \
-             u'\u003C-\u007E' + NON_ASCII_CHARS
+u'\u003C-\u007E' + NON_ASCII_CHARS
 VALUE_CHARS = WSP_CHARS + VCHAR_CHARS + NON_ASCII_CHARS
 
 # Known property names (RFC 2426 page 4)
@@ -44,33 +44,47 @@ VCARD_LINE_MAX_LENGTH_RAW = VCARD_LINE_MAX_LENGTH + len(CRLF_CHARS)
 """Including line ending"""
 
 # Error literals
-MSG_CONTINUATION_AT_START = 'Continuation line at start of vCard'
-MSG_DOT_AT_LINE_START = 'Dot at start of line without group name'
-MSG_EMPTY_LINE = 'Empty line found'
+MSG_CONTINUATION_AT_START = 'Continuation line at start of vCard (See RFC \
+2425 section 5.8.1 for line folding details)'
+MSG_DOT_AT_LINE_START = 'Dot at start of line without group name (See RFC \
+2426 section 4 for group syntax)'
 MSG_EMPTY_VCARD = 'vCard is empty'
-MSG_INVALID_DATE = 'Invalid date'
-MSG_INVALID_FIRST_LINE = 'Invalid first line'
-MSG_INVALID_LANGUAGE_VALUE = 'Invalid language'
-MSG_INVALID_LAST_LINE = 'Invalid last line'
-MSG_INVALID_LINE_SEPARATOR = 'Invalid line ending; should be CRLF (\\r\\n)'
-MSG_INVALID_PARAM_NAME = 'Invalid parameter name'
-MSG_INVALID_PARAM_VALUE = 'Invalid parameter value'
-MSG_INVALID_PROPERTY_NAME = 'Invalid property name'
-MSG_INVALID_SUBVALUE = 'Invalid subvalue'
-MSG_INVALID_SUBVALUE_COUNT = 'Invalid subvalue count'
-MSG_INVALID_TIME = 'Invalid time'
-MSG_INVALID_TIME_ZONE = 'Invalid time zone'
-MSG_INVALID_VALUE = 'Invalid value'
-MSG_INVALID_VALUE_COUNT = 'Invalid value count'
-MSG_INVALID_X_NAME = 'Invalid X-name'
-MSG_MISMATCH_GROUP = 'Group mismatch'
-MSG_MISMATCH_PARAM = 'Parameter mismatch'
-MSG_MISSING_GROUP = 'Missing group'
-MSG_MISSING_PARAM = 'Parameter missing'
-MSG_MISSING_PARAM_VALUE = 'Parameter value missing'
-MSG_MISSING_PROPERTY = 'Mandatory property missing'
-MSG_MISSING_VALUE_STRING = 'Missing value string'
-MSG_NON_EMPTY_PARAM = 'Property should not have parameters'
+MSG_INVALID_DATE = 'Invalid date (See RFC 2425 section 5.8.4 for date syntax)'
+MSG_INVALID_LANGUAGE_VALUE = 'Invalid language (See RFC 1766 section 2 for \
+details)'
+MSG_INVALID_LINE_SEPARATOR = 'Invalid line ending; should be \\r\\n (See RFC \
+2426 section 2.4.2 for details)'
+MSG_INVALID_PARAM_NAME = 'Invalid parameter name (See RFC 2426 section 4 for \
+param-name syntax)'
+MSG_INVALID_PARAM_VALUE = 'Invalid parameter value (See RFC 2426 section 4 \
+for param-value syntax)'
+MSG_INVALID_PROPERTY_NAME = 'Invalid property name (See RFC 2426 section 4 \
+for name syntax)'
+MSG_INVALID_SUBVALUE = 'Invalid subvalue (See RFC 2426 section 3 for details)'
+MSG_INVALID_SUBVALUE_COUNT = 'Invalid subvalue count (See RFC 2426 section 3 \
+for details)'
+MSG_INVALID_TIME = 'Invalid time (See RFC 2425 section 5.8.4 for time syntax)'
+MSG_INVALID_TIME_ZONE = 'Invalid time zone (See RFC 2426 section 3.4.1 for \
+time-zone syntax)'
+MSG_INVALID_VALUE = 'Invalid value (See RFC 2426 section 3 for details)'
+MSG_INVALID_VALUE_COUNT = 'Invalid value count (See RFC 2426 section 3 for \
+details)'
+MSG_INVALID_X_NAME = 'Invalid X-name (See RFC 2426 section 4 for x-name \
+syntax)'
+MSG_MISMATCH_GROUP = 'Group mismatch (See RFC 2426 section 4 for contentline \
+syntax)'
+MSG_MISMATCH_PARAM = 'Parameter mismatch (See RFC 2426 section 3 for details)'
+MSG_MISSING_GROUP = 'Missing group (See RFC 2426 section 4 for contentline \
+syntax)'
+MSG_MISSING_PARAM = 'Parameter missing (See RFC 2426 section 3 for details)'
+MSG_MISSING_PARAM_VALUE = 'Parameter value missing (See RFC 2426 section 3 \
+for details)'
+MSG_MISSING_PROPERTY = 'Mandatory property missing (See RFC 2426 section 5 \
+for details)'
+MSG_MISSING_VALUE_STRING = 'Missing value string (See RFC 2426 section 4 for \
+contentline syntax)'
+MSG_NON_EMPTY_PARAM = 'Property should not have parameters (See RFC 2426 \
+section 3 for details)'
 
 # Warning literals
 WARN_DEFAULT_TYPE_VALUE = 'Using default TYPE value; can be removed'
