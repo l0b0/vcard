@@ -66,6 +66,7 @@ for details)'
 MSG_INVALID_TIME = 'Invalid time (See RFC 2425 section 5.8.4 for time syntax)'
 MSG_INVALID_TIME_ZONE = 'Invalid time zone (See RFC 2426 section 3.4.1 for \
 time-zone syntax)'
+MSG_INVALID_URI = 'Invalid URI (See RFC 1738 section 5 for genericurl syntax)'
 MSG_INVALID_VALUE = 'Invalid value (See RFC 2426 section 3 for details)'
 MSG_INVALID_VALUE_COUNT = 'Invalid value count (See RFC 2426 section 3 for \
 details)'

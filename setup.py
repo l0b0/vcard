@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='vCard-module',
-    version='0.6.1',
+    version='0.6.2',
     description='vCard validator, class and utility functions',
     author='Victor Engmark',
     author_email='victor.engmark@gmail.com',

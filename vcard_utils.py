@@ -17,6 +17,14 @@ def find_unescaped(text, char, escape_char = '\\'):
     Examples:
     >>> find_unescaped('BEGIN:VCARD', ':')
     5
+    >>> find_unescaped('foo\\\\,bar,baz', ',')
+    8
+    >>> find_unescaped(r'foo\\,bar,baz', ',')
+    8
+    >>> find_unescaped('foo\\\\\\\\,bar,baz', ',')
+    5
+    >>> find_unescaped('foo,bar,baz', ':')
+    >>> find_unescaped('foo\\\\,bar\\\\,baz', ',')
     """
     unescaped_regex = '(?<!' + escape_char + escape_char + ')' + \
             '(?:' + escape_char + escape_char + escape_char + escape_char + \
