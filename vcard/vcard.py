@@ -4,15 +4,15 @@
 
 Default syntax:
 
-./vcard.py [options] -|file...
+vcard [options] -|file...
 
 Options:
 -v,--verbose    Verbose mode
 
 Example:
 
-./vcard.py *.vcf
-Validate all .vcf files in the current directory
+vcard *.vcf
+    Validate all .vcf files in the current directory
 """
 
 import codecs
