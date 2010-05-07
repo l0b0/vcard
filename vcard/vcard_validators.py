@@ -492,7 +492,7 @@ def validate_uri(text):
     String: http:
     """
     parts = urlparse(text)
-    if parts.scheme == '' or (parts.netloc == '' and parts.path == ''):
+    if parts[0] == '' or (parts[1] == '' and parts[2] == ''):
         raise VCardFormatError(MSG_INVALID_URI, {'String': text})
 
 

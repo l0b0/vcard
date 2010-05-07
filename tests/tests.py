@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Test suite for vcard module
+"""Test suite for vcard module <http://vcard-module.sourceforge.net/>"""
 
-Default syntax:
-
-./vcard_test.py
-    Run all unit tests
-"""
+__author__ = 'Victor Engmark'
+__email__ = 'victor.engmark@gmail.com'
+__copyright__ = 'Copyright (C) 2010 Victor Engmark'
+__license__ = 'GPLv3'
 
 import codecs
 import doctest
@@ -15,9 +14,10 @@ import unittest
 import urllib
 import warnings
 
-import vcard
-from vcard_defs import MSG_EMPTY_VCARD
-from vcard_validators import VCardFormatError
+from vcard import vcard
+from vcard import vcard_defs
+from vcard import vcard_utils
+from vcard import vcard_validators
 
 def _get_vcard_file(path):
     """
@@ -37,7 +37,6 @@ def _get_vcard_file(path):
     return contents
 
 
-# pylint: disable-msg=C0301
 # Invalid vCards
 VCARD_EMPTY = ''
 VCARDS_MISSING = {
@@ -63,7 +62,8 @@ VCARDS_INVALID_VALUE = {
     'http://en.wikipedia.org/wiki/VCard':
         _get_vcard_file('invalid_value_wp.vcf'),
     '01-tantek-basic':
-        _get_vcard_file('http://microformats.org/tests/hcard/01-tantek-basic.vcf'),
+        _get_vcard_file(
+            'http://microformats.org/tests/hcard/01-tantek-basic.vcf'),
     }
 
 VCARDS_VALID = {
@@ -80,8 +80,6 @@ VCARDS_REFERENCE = {
     'http://tools.ietf.org/html/rfc2426 2': _get_vcard_file('rfc_2426_b.vcf'),
     }
 
-# pylint: enable-msg=C0301
-
 
 class TestVCards(unittest.TestCase):
     """Test small vCards"""
@@ -90,8 +88,10 @@ class TestVCards(unittest.TestCase):
         try:
             vcard.VCard(VCARD_EMPTY)
             self.fail('Invalid vCard created')
-        except VCardFormatError as error:
-            self.assertEquals(str(error).splitlines()[0], MSG_EMPTY_VCARD)
+        except vcard_validators.VCardFormatError as error:
+            self.assertEquals(
+                str(error).splitlines()[0],
+                vcard_defs.MSG_EMPTY_VCARD)
 
 
     def test_failing(self):
@@ -101,7 +101,7 @@ class TestVCards(unittest.TestCase):
             try:
                 vcard.VCard(vcard_text)
                 self.fail('Invalid vCard "%s" created' % vcard_title)
-            except VCardFormatError:
+            except vcard_validators.VCardFormatError:
                 pass
 
 
@@ -112,7 +112,7 @@ class TestVCards(unittest.TestCase):
                 with warnings.catch_warnings(record=True):
                     vc_obj = vcard.VCard(vcard_text)
                 self.assertNotEqual(vc_obj, None)
-            except VCardFormatError as error:
+            except vcard_validators.VCardFormatError as error:
                 self.fail(
                     'Valid vCard "%s" not created' % \
                     vcard_title + '\n' + \
@@ -130,7 +130,7 @@ class TestVCards(unittest.TestCase):
                 with warnings.catch_warnings(record=True):
                     vc_obj = vcard.VCard(vcard_text)
                 self.assertNotEqual(vc_obj, None)
-            except VCardFormatError:
+            except vcard_validators.VCardFormatError:
                 pass
                 #self.fail(
                 #    'Valid vCard "%s" not created' % vcard_title + '\n' + \
@@ -140,9 +140,6 @@ class TestVCards(unittest.TestCase):
     def test_doc(self):
         """Documentation tests"""
         self.assertEqual(doctest.testmod(vcard)[0], 0)
-        import vcard_defs
         self.assertEqual(doctest.testmod(vcard_defs)[0], 0)
-        import vcard_utils
         self.assertEqual(doctest.testmod(vcard_utils)[0], 0)
-        import vcard_validators
         self.assertEqual(doctest.testmod(vcard_validators)[0], 0)

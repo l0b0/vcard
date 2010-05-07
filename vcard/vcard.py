@@ -22,7 +22,8 @@ import sys
 import warnings
 
 # Local modules
-from vcard_defs import ALL_PROPERTIES, \
+from vcard_defs import \
+    ALL_PROPERTIES, \
     CRLF_CHARS, \
     ID_CHARS, \
     MANDATORY_PROPERTIES, \

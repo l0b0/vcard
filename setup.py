@@ -1,19 +1,20 @@
 #!/usr/bin/env python
-"""vCard Module setup"""
+"""Setup configuration"""
 
-from setuptools import setup
+from setuptools import find_packages, setup
+from vcard.vcard import __doc__ as module_doc
 
 setup(
-    name='vCard-module',
-    version='0.6.2',
-    description='vCard validator, class and utility functions',
-    author='Victor Engmark',
-    author_email='victor.engmark@gmail.com',
-    url='http://vcard-module.sourceforge.net/',
-    py_modules=['vcard'],
+    name = 'vCard-module',
+    version = '0.7',
+    description = 'vCard validator, class and utility functions',
+    long_description = module_doc,
+    url = 'http://vcard-module.sourceforge.net/',
+    keywords = 'Delicious filterous search bookmarks tags',
+    packages = find_packages(exclude=['tests']),
     install_requires = ['isodate'],
-    test_suite = 'tests.vcard_test',
-    classifiers=[
+    entry_points = {'console_scripts': ['vcard = vcard.vcard:main']},
+    classifiers = [
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
@@ -22,4 +23,9 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.6',
         'Topic :: Text Processing',
-        'Topic :: Utilities',])
+        'Topic :: Utilities',
+    ],
+    test_suite = 'tests.tests',
+    author = 'Victor Engmark',
+    author_email = 'victor.engmark@gmail.com',
+    )
