@@ -178,7 +178,7 @@ def get_vcard_property_param(param_string):
             '=')
     except ValueError as error:
         raise vcard_validators.VCardFormatError(
-            MSG_MISSING_PARAM_VALUE + ': %s' % error,
+            MSG_MISSING_PARAM_VALUE + ': %s' % str(error),
             {})
 
     values = get_vcard_property_param_values(values_string)
@@ -366,7 +366,7 @@ class VCard():
         self.properties = get_vcard_properties(lines)
 
     def __str__(self):
-        return self.text
+        return self.text.encode('utf-8')
 
 
 def validate_file(filename, verbose = False):
@@ -405,7 +405,7 @@ def validate_file(filename, verbose = False):
                         error.context)
 
     except vcard_validators.VCardFormatError as error:
-        result += unicode(error.__str__())
+        result += str(error)
 
     if vcard_text != '' and result == '':
         result += 'Could not process entire %s - %i lines remain' % (
@@ -417,11 +417,15 @@ def validate_file(filename, verbose = False):
     return result
 
 
-class Usage(Exception):
+class UsageError(Exception):
     """Raise in case of invalid parameters."""
     def __init__(self, message):
         Exception.__init__(self)
-        self.message = message
+        self._message = message
+
+
+    def __str__(self):
+        return self._message.encode('utf-8')
 
 
 def main(argv = None):
@@ -440,20 +444,19 @@ def main(argv = None):
                 'v',
                 ['verbose'])
         except getopt.GetoptError, err:
-            raise Usage(err.message)
+            raise UsageError(str(err))
 
-        if len(opts) != 0:
-            for option in opts[0]:
-                if option in ('-v', '--verbose'):
-                    verbose = True
-                else:
-                    raise Usage('Unhandled option %s' % option)
+        for option, value in opts:
+            if option in ('-v', '--verbose'):
+                verbose = True
+            else:
+                raise UsageError('Unhandled option %s' % option)
 
         if not args:
-            raise Usage(__doc__)
+            raise UsageError(__doc__)
 
-    except Usage, err:
-        sys.stderr.write(err.message + '\n')
+    except UsageError, err:
+        sys.stderr.write(str(err) + '\n')
         return 2
 
     for filename in args:
