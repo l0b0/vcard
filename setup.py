@@ -10,7 +10,7 @@ setup(
     description = 'vCard validator, class and utility functions',
     long_description = module_doc,
     url = 'http://vcard-module.sourceforge.net/',
-    keywords = 'Delicious filterous search bookmarks tags',
+    keywords = 'vCard vCards RFC 2426 RFC2426 validator',
     packages = find_packages(exclude=['tests']),
     install_requires = ['isodate'],
     entry_points = {'console_scripts': ['vcard = vcard.vcard:main']},
