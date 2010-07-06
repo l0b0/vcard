@@ -347,7 +347,7 @@ class VCard():
 
         @param text: String containing a single vCard
         """
-        if text == '':
+        if text == '' or text is None:
             raise vcard_validators.VCardFormatError(
                 MSG_EMPTY_VCARD,
                 {'vCard line': 1, 'File line': 1})
