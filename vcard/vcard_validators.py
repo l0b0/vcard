@@ -27,6 +27,7 @@ from vcard_defs import DQUOTE_CHAR, \
     MSG_INVALID_TIME, \
     MSG_INVALID_TIME_ZONE, \
     MSG_INVALID_URI, \
+    MSG_INVALID_VALUE, \
     MSG_INVALID_VALUE_COUNT, \
     MSG_INVALID_X_NAME, \
     MSG_MISMATCH_PARAM, \
@@ -508,6 +509,28 @@ def validate_vcard_property(prop):
     property_name = prop['name'].upper()
 
     try:
+        if property_name in ('BEGIN', 'END'):
+            # <http://tools.ietf.org/html/rfc2426#section-2.1.1>
+            if 'parameters' in prop:
+                raise VCardFormatError(
+                    MSG_NON_EMPTY_PARAM + ': %s' % prop['parameters'],
+                    {})
+            if len(prop['values']) != 1:
+                raise VCardFormatError(
+                    MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                        prop['values']),
+                    {})
+            if len(prop['values'][0]) != 1:
+                raise VCardFormatError(
+                    MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
+                        prop['values'][0]),
+                    {})
+            if prop['values'][0][0].lower() != 'vcard':
+                raise VCardFormatError(
+                    MSG_INVALID_VALUE + ': %s (expected "VCARD")' % \
+                        prop['values'][0][0],
+                    {})
+            
         if property_name == 'FN':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.1>
             if 'parameters' in prop:

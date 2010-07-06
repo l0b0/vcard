@@ -37,35 +37,183 @@ def _get_vcard_file(path):
     return contents
 
 
-# Invalid vCards
-VCARD_EMPTY = ''
-VCARDS_MISSING = {
-    'properties': _get_vcard_file('missing_properties.vcf'),
-    'start': _get_vcard_file('missing_start.vcf'),
-    'end': _get_vcard_file('missing_end.vcf'),
-    'version': _get_vcard_file('missing_version.vcf'),
-    'n': _get_vcard_file('missing_n.vcf'),
-    'fn': _get_vcard_file('missing_fn.vcf'),
+# vCards with errors
+VCARDS_CONTINUATION_AT_START = {
+    'message': vcard_defs.MSG_CONTINUATION_AT_START,
+    'vcards': {
+        }
     }
-VCARDS_INVALID_PROPERTY_NAME = {
-    'foo': _get_vcard_file('invalid_property_foo.vcf'),
+VCARDS_DOT_AT_LINE_START = {
+    'message': vcard_defs.MSG_DOT_AT_LINE_START,
+    'vcards': {
+        }
     }
-VCARDS_INVALID_PARAM = {
+VCARDS_EMPTY_VCARD = {
+    'message': vcard_defs.MSG_EMPTY_VCARD,
+    'vcards': {
+        }
+    }
+VCARDS_INVALID_DATE = {
+    'message': vcard_defs.MSG_INVALID_DATE,
+    'vcards': {
+        }
+    }
+VCARDS_INVALID_LANGUAGE_VALUE = {
+    'message': vcard_defs.MSG_INVALID_LANGUAGE_VALUE,
+    'vcards': {
+        }
+    }
+VCARDS_INVALID_LINE_SEPARATOR = {
+    'message': vcard_defs.MSG_INVALID_LINE_SEPARATOR,
+    'vcards': {
+        }
+    }
+VCARDS_INVALID_PARAM_NAME = {
+    'message': vcard_defs.MSG_INVALID_PARAM_NAME,
+    'vcards': {
+        }
     }
 VCARDS_INVALID_PARAM_VALUE = {
+    'message': vcard_defs.MSG_INVALID_PARAM_VALUE,
+    'vcards': {
+        }
     }
-VCARDS_INVALID_X_NAME = {
-    'Tantek Çelik': _get_vcard_file(
-        'http://h2vx.com/vcf/tantek.com/%23contact'),
+VCARDS_INVALID_PROPERTY_NAME = {
+    'message': vcard_defs.MSG_INVALID_PROPERTY_NAME,
+    'vcards': {
+        'foo': _get_vcard_file('invalid_property_foo.vcf'),
+        }
+    }
+VCARDS_INVALID_SUBVALUE = {
+    'message': vcard_defs.MSG_INVALID_SUBVALUE,
+    'vcards': {
+        }
+    }
+VCARDS_INVALID_SUBVALUE_COUNT = {
+    'message': vcard_defs.MSG_INVALID_SUBVALUE_COUNT,
+    'vcards': {
+        }
+    }
+VCARDS_INVALID_TIME = {
+    'message': vcard_defs.MSG_INVALID_TIME,
+    'vcards': {
+        }
+    }
+VCARDS_INVALID_TIME_ZONE = {
+    'message': vcard_defs.MSG_INVALID_TIME_ZONE,
+    'vcards': {
+        }
+    }
+VCARDS_INVALID_URI = {
+    'message': vcard_defs.MSG_INVALID_URI,
+    'vcards': {
+        }
     }
 VCARDS_INVALID_VALUE = {
-    'http://en.wikipedia.org/wiki/VCard':
-        _get_vcard_file('invalid_value_wp.vcf'),
+    'message': vcard_defs.MSG_INVALID_VALUE,
+    'vcards': {
+        'begin with postfix': _get_vcard_file('invalid_begin.vcf'),
+        }
+    }
+VCARDS_INVALID_VALUE_COUNT = {
+    'message': vcard_defs.MSG_INVALID_VALUE_COUNT,
+    'vcards': {
+        'http://en.wikipedia.org/wiki/VCard':
+            _get_vcard_file('invalid_value_count_wp.vcf'),
+        }
+    }
+VCARDS_INVALID_X_NAME = {
+    'message': vcard_defs.MSG_INVALID_X_NAME,
+    'vcards': {
+        }
+    }
+VCARDS_MISMATCH_GROUP = {
+    'message': vcard_defs.MSG_MISMATCH_GROUP,
+    'vcards': {
+        }
+    }
+VCARDS_MISMATCH_PARAM = {
+    'message': vcard_defs.MSG_MISMATCH_PARAM,
+    'vcards': {
+        }
+    }
+VCARDS_MISSING_GROUP = {
+    'message': vcard_defs.MSG_MISSING_GROUP,
+    'vcards': {
+        }
+    }
+VCARDS_MISSING_PARAM = {
+    'message': vcard_defs.MSG_MISSING_PARAM,
+    'vcards': {
+        }
+    }
+VCARDS_MISSING_PARAM_VALUE = {
+    'message': vcard_defs.MSG_MISSING_PARAM_VALUE,
+    'vcards': {
+        }
+    }
+VCARDS_MISSING_PROPERTY = {
+    'message': vcard_defs.MSG_MISSING_PROPERTY,
+    'vcards': {
+        'properties': _get_vcard_file('missing_properties.vcf'),
+        'start': _get_vcard_file('missing_start.vcf'),
+        'end': _get_vcard_file('missing_end.vcf'),
+        'version': _get_vcard_file('missing_version.vcf'),
+        'n': _get_vcard_file('missing_n.vcf'),
+        'fn': _get_vcard_file('missing_fn.vcf'),
+        }
+    }
+VCARDS_MISSING_VALUE_STRING = {
+    'message': vcard_defs.MSG_MISSING_VALUE_STRING,
+    'vcards': {
+        }
+    }
+VCARDS_NON_EMPTY_PARAM = {
+    'message': vcard_defs.MSG_NON_EMPTY_PARAM,
+    'vcards': {
+        }
+    }
+VCARDS_WITH_ERROR = [
+    VCARDS_CONTINUATION_AT_START,
+    VCARDS_DOT_AT_LINE_START,
+    VCARDS_EMPTY_VCARD,
+    VCARDS_INVALID_DATE,
+    VCARDS_INVALID_LANGUAGE_VALUE,
+    VCARDS_INVALID_LINE_SEPARATOR,
+    VCARDS_INVALID_PARAM_NAME,
+    VCARDS_INVALID_PARAM_VALUE,
+    VCARDS_INVALID_PROPERTY_NAME,
+    VCARDS_INVALID_SUBVALUE,
+    VCARDS_INVALID_SUBVALUE_COUNT,
+    VCARDS_INVALID_TIME,
+    VCARDS_INVALID_TIME_ZONE,
+    VCARDS_INVALID_URI,
+    VCARDS_INVALID_VALUE,
+    VCARDS_INVALID_VALUE_COUNT,
+    VCARDS_INVALID_X_NAME,
+    VCARDS_MISMATCH_GROUP,
+    VCARDS_MISMATCH_PARAM,
+    VCARDS_MISSING_GROUP,
+    VCARDS_MISSING_PARAM,
+    VCARDS_MISSING_PARAM_VALUE,
+    VCARDS_MISSING_PROPERTY,
+    VCARDS_MISSING_VALUE_STRING,
+    VCARDS_NON_EMPTY_PARAM]
+
+# Reference cards with errors
+VCARDS_REFERENCE_ERRORS = {
     '01-tantek-basic':
         _get_vcard_file(
             'http://microformats.org/tests/hcard/01-tantek-basic.vcf'),
-    }
+    'Tantek Çelik': _get_vcard_file(
+        'http://h2vx.com/vcf/tantek.com/%23contact'),
+    'http://tools.ietf.org/html/rfc2426 1':
+        _get_vcard_file('rfc_2426_a.vcf'),
+    'http://tools.ietf.org/html/rfc2426 2':
+        _get_vcard_file('rfc_2426_b.vcf'),
+}
 
+# Valid vCards
 VCARDS_VALID = {
     'minimal': _get_vcard_file('minimal.vcf'),
     'scrambled case': _get_vcard_file('scrambled_case.vcf'),
@@ -75,34 +223,27 @@ VCARDS_VALID = {
         'http://www.troywolf.com/articles/php/class_vcard/vcard_example.php'),
     }
 
-VCARDS_REFERENCE = {
-    'http://tools.ietf.org/html/rfc2426 1': _get_vcard_file('rfc_2426_a.vcf'),
-    'http://tools.ietf.org/html/rfc2426 2': _get_vcard_file('rfc_2426_b.vcf'),
-    }
-
 
 class TestVCards(unittest.TestCase):
-    """Test small vCards"""
-    def test_empty(self):
-        """Empty string"""
-        try:
-            vcard.VCard(VCARD_EMPTY)
-            self.fail('Invalid vCard created')
-        except vcard_validators.VCardFormatError as error:
-            self.assertEquals(
-                str(error).splitlines()[0],
-                vcard_defs.MSG_EMPTY_VCARD)
-
+    """Test example vCards"""
 
     def test_failing(self):
-        """vCards missing a mandatory property"""
-        for vcard_title, vcard_text in \
-        VCARDS_MISSING.items() + VCARDS_INVALID_X_NAME.items():
-            try:
-                vcard.VCard(vcard_text)
-                self.fail('Invalid vCard "%s" created' % vcard_title)
-            except vcard_validators.VCardFormatError:
-                pass
+        """vCards with errors"""
+        for vcards in VCARDS_WITH_ERROR:
+            for vcard_title, vcard_text in vcards['vcards'].items():
+                try:
+                    with warnings.catch_warnings(record=True):
+                        vcard.VCard(vcard_text)
+                        self.fail('Invalid vCard "%s" created' % vcard_title)
+                except vcard_validators.VCardFormatError as error:
+                    message = str(error).splitlines()[0].split(':')[0]
+                    self.assertEquals(
+                        message,
+                        vcards['message'],
+                        'Wrong message for vCard "%s"\n' % vcard_title + \
+                        'Got "%s", expected "%s"' % (
+                            message,
+                            vcards['message']))
 
 
     def test_valid(self):
@@ -119,22 +260,14 @@ class TestVCards(unittest.TestCase):
                     str(error))
 
 
-    def test_rfc_2426_examples(self):
-        """
-        Examples from RFC 2426 <http://tools.ietf.org/html/rfc2426#section-7>
-        Skipping because RFC vCards are not valid :/
-        <http://l0b0.wordpress.com/2009/12/25/vcard-parser-and-validator/>
-        """
-        for vcard_text in VCARDS_REFERENCE.values():
-            try:
-                with warnings.catch_warnings(record=True):
-                    vc_obj = vcard.VCard(vcard_text)
-                self.assertNotEqual(vc_obj, None)
-            except vcard_validators.VCardFormatError:
-                pass
-                #self.fail(
-                #    'Valid vCard "%s" not created' % vcard_title + '\n' + \
-                #    str(error))
+    def test_online(self):
+        """vCards in references which are invalid"""
+        for vcard_title, vcard_text in VCARDS_REFERENCE_ERRORS.items():
+            with warnings.catch_warnings(record=True):
+                self.assertRaises(
+                    vcard_validators.VCardFormatError,
+                    vcard.VCard,
+                    vcard_text)
 
 
     def test_doc(self):
