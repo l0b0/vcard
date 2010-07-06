@@ -41,11 +41,11 @@ def _get_vcard_file(path):
 VCARDS_CONTINUATION_AT_START = {
     'message': vcard_defs.MSG_CONTINUATION_AT_START,
     'vcards': [
-        ]}
+        _get_vcard_file('continuation_at_start.vcf')]}
 VCARDS_DOT_AT_LINE_START = {
     'message': vcard_defs.MSG_DOT_AT_LINE_START,
     'vcards': [
-        ]}
+        _get_vcard_file('dot_at_line_start.vcf')]}
 VCARDS_EMPTY_VCARD = {
     'message': vcard_defs.MSG_EMPTY_VCARD,
     'vcards': [
@@ -62,7 +62,9 @@ VCARDS_INVALID_LANGUAGE_VALUE = {
 VCARDS_INVALID_LINE_SEPARATOR = {
     'message': vcard_defs.MSG_INVALID_LINE_SEPARATOR,
     'vcards': [
-        ]}
+        _get_vcard_file('line_ending_mac.vcf'),
+        _get_vcard_file('line_ending_unix.vcf'),
+        'BEGIN:VCARD\r\nVERSION:3.0\rN:Doe;John;;Mr;\nFN:John Doe\r\nEND:VCARD\r\n']}
 VCARDS_INVALID_PARAM_NAME = {
     'message': vcard_defs.MSG_INVALID_PARAM_NAME,
     'vcards': [
@@ -98,7 +100,7 @@ VCARDS_INVALID_URI = {
 VCARDS_INVALID_VALUE = {
     'message': vcard_defs.MSG_INVALID_VALUE,
     'vcards': [
-    _get_vcard_file('invalid_begin.vcf')]}
+        _get_vcard_file('invalid_begin.vcf')]}
 VCARDS_INVALID_VALUE_COUNT = {
     'message': vcard_defs.MSG_INVALID_VALUE_COUNT,
     'vcards': [
