@@ -1,0 +1,7 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Doe;John;;Mr;
+FN:John Doe
+URL;WORK:http://example.com/work/index.xyz?test=foo&bar=baz#section7
+END:VCARD
+

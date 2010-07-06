@@ -113,7 +113,7 @@ VCARDS_INVALID_X_NAME = {
 VCARDS_MISMATCH_GROUP = {
     'message': vcard_defs.MSG_MISMATCH_GROUP,
     'vcards': [
-        ]}
+        _get_vcard_file('mismatch_group.vcf')]}
 VCARDS_MISMATCH_PARAM = {
     'message': vcard_defs.MSG_MISMATCH_PARAM,
     'vcards': [
@@ -121,15 +121,15 @@ VCARDS_MISMATCH_PARAM = {
 VCARDS_MISSING_GROUP = {
     'message': vcard_defs.MSG_MISSING_GROUP,
     'vcards': [
-        ]}
+        _get_vcard_file('missing_group.vcf')]}
 VCARDS_MISSING_PARAM = {
     'message': vcard_defs.MSG_MISSING_PARAM,
     'vcards': [
-        ]}
+        _get_vcard_file('missing_photo_param.vcf')]}
 VCARDS_MISSING_PARAM_VALUE = {
     'message': vcard_defs.MSG_MISSING_PARAM_VALUE,
     'vcards': [
-        ]}
+        _get_vcard_file('missing_param_value.vcf')]}
 VCARDS_MISSING_PROPERTY = {
     'message': vcard_defs.MSG_MISSING_PROPERTY,
     'vcards': [
