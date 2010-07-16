@@ -119,7 +119,8 @@ def get_vcard_group(lines):
     else:
         # Make sure there are no groups elsewhere
         for index in range(len(lines)):
-            if group_re.match(lines[index]):
+            next_match = group_re.match(lines[index])
+            if next_match:
                 raise vcard_validators.VCardFormatError(
                     MSG_MISMATCH_GROUP + ': %s != %s' % (
                         next_match.group(1),

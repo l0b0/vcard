@@ -113,7 +113,8 @@ VCARDS_INVALID_X_NAME = {
 VCARDS_MISMATCH_GROUP = {
     'message': vcard_defs.MSG_MISMATCH_GROUP,
     'vcards': [
-        _get_vcard_file('mismatch_group.vcf')]}
+        _get_vcard_file('mismatch_group.vcf'),
+         _get_vcard_file('http://nhumi.com/static/NhumiTechnologiesGmbH.vcf')]}
 VCARDS_MISMATCH_PARAM = {
     'message': vcard_defs.MSG_MISMATCH_PARAM,
     'vcards': [
