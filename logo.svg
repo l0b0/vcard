@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    x="0"
+    y="0"
+    width="64px"
+    height="64px">
+    <g>
+        <text
+            x="32px"
+            y="32px"
+            text-anchor="middle"
+            dominant-baseline="central"
+            style="font-size:32px;font-family:STIXGeneral">vCm</text>
+    </g>
+</svg>
