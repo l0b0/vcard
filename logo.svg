@@ -2,37 +2,34 @@
 <svg
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
-    width="64"
-    height="64">
-    <rect
-        id="frame"
-        x="0"
-        y="0"
-        width="64"
-        height="64"
-        fill="none"
-        stroke="black"/>
+    width="512"
+    height="512">
     <g
         id="name">
         <text
             x="0"
-            y="16"
-            style="font-size:32px;font-family:STIXGeneral">v</text>
+            y="160"
+            fill="blue"
+            style="font-size:320px;font-family:STIXGeneral">v</text>
         <text
-            x="28"
-            y="30"
+            x="256"
+            y="352"
             text-anchor="middle"
-            dominant-baseline="central"
-            style="font-size:56px;font-family:STIXGeneral">C</text>
+            fill="blue"
+            style="font-size:448px;font-family:STIXGeneral">C</text>
         <text
-            x="64"
-            y="64"
+            x="512"
+            y="512"
             text-anchor="end"
-            style="font-size:36px;font-family:STIXGeneral">m</text>
+            fill="blue"
+            fill-opacity="0.5"
+            style="font-size:288px;font-family:STIXGeneral">m</text>
         <text
-            x="32"
-            y="29"
+            x="512"
+            y="232"
             dominant-baseline="middle"
-            style="font-size:22px;font-family:STIXGeneral">3.0</text>
+            text-anchor="end"
+            fill="blue"
+            style="font-size:176px;font-family:STIXGeneral">3.0</text>
     </g>
 </svg>
