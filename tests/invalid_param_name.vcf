@@ -1,0 +1,7 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Doe;John;;Mr;
+FN:John Doe
+PHOTO;invalid=jpg:http://example.com/me.jpg
+END:VCARD
+
