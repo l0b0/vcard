@@ -26,8 +26,7 @@
             style="font-size:288px;font-family:STIXGeneral">m</text>
         <text
             x="512"
-            y="232"
-            dominant-baseline="middle"
+            y="276"
             text-anchor="end"
             fill="blue"
             style="font-size:176px;font-family:STIXGeneral">3.0</text>
