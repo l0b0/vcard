@@ -22,6 +22,7 @@ QSAFE_CHARS = WSP_CHARS + u'\u0021' + u'\u0023-\u007E' + NON_ASCII_CHARS
 SAFE_CHARS = WSP_CHARS + u'\u0021' + u'\u0023-\u002B' + u'\u002D-\u0039' + \
 u'\u003C-\u007E' + NON_ASCII_CHARS
 VALUE_CHARS = WSP_CHARS + VCHAR_CHARS + NON_ASCII_CHARS
+ESCAPED_CHARS = u'\\;,nN'
 
 # Known property names (RFC 2426 page 4)
 MANDATORY_PROPERTIES = ['BEGIN', 'END', 'FN', 'N', 'VERSION']
@@ -63,6 +64,7 @@ for name syntax)'
 MSG_INVALID_SUBVALUE = 'Invalid subvalue (See RFC 2426 section 3 for details)'
 MSG_INVALID_SUBVALUE_COUNT = 'Invalid subvalue count (See RFC 2426 section 3 \
 for details)'
+MSG_INVALID_TEXT_VALUE = 'Invalid text value (See RFC 2426 section 4 for details)'
 MSG_INVALID_TIME = 'Invalid time (See RFC 2425 section 5.8.4 for time syntax)'
 MSG_INVALID_TIME_ZONE = 'Invalid time zone (See RFC 2426 section 3.4.1 for \
 time-zone syntax)'

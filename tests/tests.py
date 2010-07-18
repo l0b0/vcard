@@ -58,7 +58,7 @@ VCARDS_INVALID_DATE = {
 VCARDS_INVALID_LANGUAGE_VALUE = {
     'message': vcard_defs.MSG_INVALID_LANGUAGE_VALUE,
     'vcards': [
-        ]}
+        _get_vcard_file('invalid_language_value.vcf')]}
 VCARDS_INVALID_LINE_SEPARATOR = {
     'message': vcard_defs.MSG_INVALID_LINE_SEPARATOR,
     'vcards': [
@@ -68,11 +68,11 @@ VCARDS_INVALID_LINE_SEPARATOR = {
 VCARDS_INVALID_PARAM_NAME = {
     'message': vcard_defs.MSG_INVALID_PARAM_NAME,
     'vcards': [
-        ]}
+        _get_vcard_file('invalid_param_name.vcf')]}
 VCARDS_INVALID_PARAM_VALUE = {
     'message': vcard_defs.MSG_INVALID_PARAM_VALUE,
     'vcards': [
-        ]}
+        _get_vcard_file('invalid_param_value.vcf')]}
 VCARDS_INVALID_PROPERTY_NAME = {
     'message': vcard_defs.MSG_INVALID_PROPERTY_NAME,
     'vcards': [
@@ -83,6 +83,10 @@ VCARDS_INVALID_SUBVALUE = {
         ]}
 VCARDS_INVALID_SUBVALUE_COUNT = {
     'message': vcard_defs.MSG_INVALID_SUBVALUE_COUNT,
+    'vcards': [
+        ]}
+VCARDS_INVALID_TEXT_VALUE = {
+    'message': vcard_defs.MSG_INVALID_TEXT_VALUE,
     'vcards': [
         ]}
 VCARDS_INVALID_TIME = {
