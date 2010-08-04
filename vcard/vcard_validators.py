@@ -685,6 +685,16 @@ def validate_vcard_property(prop):
             # <http://tools.ietf.org/html/rfc2426#section-3.5.4>
             if not 'parameters' in prop:
                 raise VCardFormatError(MSG_MISSING_PARAM, {})
+            if len(prop['values']) != 1:
+                raise VCardFormatError(
+                    MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
+                        prop['values']),
+                    {})
+            if len(prop['values'][0]) != 1:
+                raise VCardFormatError(
+                    MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
+                        prop['values'][0]),
+                    {})
             for param_name, param_values in prop['parameters'].items():
                 if param_name.upper() == 'ENCODING':
                     if param_values != set(['b']):
@@ -702,27 +712,17 @@ def validate_vcard_property(prop):
                     raise VCardFormatError(
                         MSG_MISSING_PARAM + ': %s' % 'ENCODING',
                         {})
-                elif param_name.upper() == 'VALUE' and \
-                     param_values != set(['uri']):
-                    raise VCardFormatError(
-                        MSG_INVALID_PARAM_VALUE + ': %s' % param_values,
-                        {})
+                elif param_name.upper() == 'VALUE':
+                    if param_values != set(['uri']):
+                        raise VCardFormatError(
+                            MSG_INVALID_PARAM_VALUE + ': %s' % param_values,
+                            {})
+                    else:
+                        validate_uri(prop['values'][0][0])
                 elif param_name.upper() not in ['ENCODING', 'TYPE', 'VALUE']:
                     raise VCardFormatError(
                         MSG_INVALID_PARAM_NAME + ': %s' % param_name,
                         {})
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    MSG_INVALID_VALUE_COUNT + ': %d (expected 1)' % len(
-                        prop['values']),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    MSG_INVALID_SUBVALUE_COUNT + ': %d (expected 1)' % len(
-                        prop['values'][0]),
-                    {})
-            validate_uri(prop['values'][0][0])
-
 
         elif property_name == 'BDAY':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.5>

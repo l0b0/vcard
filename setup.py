@@ -6,7 +6,7 @@ from vcard.vcard import __doc__ as module_doc
 
 setup(
     name = 'vCard-module',
-    version = '0.7.4',
+    version = '0.7.5',
     description = 'vCard validator, class and utility functions',
     long_description = module_doc,
     url = 'http://vcard-module.sourceforge.net/',
