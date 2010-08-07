@@ -1,0 +1,28 @@
+BEGIN:VCARD
+VERSION:3.0
+PROFILE:VCARD
+CLASS:PUBLIC
+SOURCE;VALUE=uri:http://example.org/example.vcf
+N:Doe;John;Quentin;Mr,Dr;Esq.
+FN:John Doe
+NICKNAME:Johnny,Dr Q
+ORG:Example Organization;Example Department;Example Sub-Department;Example 
+ Office
+LOGO;VALUE=uri:http://example.org/example.svg
+TITLE:Assistant assessor
+URL;TYPE=WORK:http://example.org/example-department/example-sub-department/
+ example-office
+EMAIL;TYPE=INTERNET;TYPE=PREF;TYPE=WORK:jdoe+work-related@example.org
+TEL;TYPE=VOICE;TYPE=PREF;TYPE=MSG;TYPE=WORK:+1234567890
+TEL;TYPE=FAX;TYPE=WORK:+0123456789
+ADR:Post office box 1;West wing;1 Some Street;Tinytown;Schwarzwald;12345;Fa
+ ntasia
+LABEL:Pb 1\n1 Some Street\n12345 Tinytown\nFantasia
+PHOTO;VALUE=uri:http://example.org/jdoe.jpg
+NOTE:Who is this guy anyway? He looks like a double agent from the eighties
+ \, talks like a loon\, and reads comics when he should be working.
+TZ:+10:30
+GEO:1.2345;6.7890
+CATEGORIES:Worker drones,Finance\, marketing and bull****ing
+END:VCARD
+
