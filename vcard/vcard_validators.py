@@ -111,9 +111,9 @@ class VCardFormatError(Exception):
         VCardFormatError: test
         File: /home/user/test.vcf
         Property: ADR
-        >>> raise VCardFormatError('Cöntexte randomisé', {'foo': QSAFE_CHARS[-1]*2})
+        >>> raise VCardFormatError('Cöntexte randomisę', {'foo': QSAFE_CHARS[-1]*2})
         Traceback (most recent call last):
-        VCardFormatError: Cöntexte randomisé
+        VCardFormatError: Cöntexte randomisę
         foo: ÿÿ
         """
         Exception.__init__(self)
@@ -127,7 +127,7 @@ class VCardFormatError(Exception):
 
         @return: Printable error message
         """
-        message = self.message
+        message = _stringify(self.message)
 
         # Sort context information
         keys = [

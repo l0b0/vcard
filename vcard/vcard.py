@@ -463,7 +463,7 @@ def main(argv = None):
     for filename in args:
         result = validate_file(filename, verbose)
         if result is not None:
-            print(result.encode('utf-8') + '\n')
+            print(result + '\n')
 
 
 if __name__ == '__main__':
