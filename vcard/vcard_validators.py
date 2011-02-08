@@ -43,7 +43,7 @@ from vcard_defs import DQUOTE_CHAR, \
     WARN_MULTIPLE_NAMES
 
 
-# pylint: disable-msg=R0913,W0613,W0622
+# pylint: disable=R0913,W0613,W0622
 def _show_warning(
     message,
     category = UserWarning,
@@ -53,7 +53,7 @@ def _show_warning(
     line = None):
     """Custom simple warning."""
     file.write(str(message) + '\n')
-# pylint: enable-msg=R0913,W0613,W0622
+# pylint: enable=R0913,W0613,W0622
 
 
 def _stringify(text):

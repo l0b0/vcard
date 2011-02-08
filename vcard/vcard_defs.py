@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """vCards v3.0 (RFC 2426) definitions and message strings"""
 
-# pylint: disable-msg=W0105
+# pylint: disable=W0105
 
 # Literals, RFC 2426 pages 27, 28
 ALPHA_CHARS = u'\u0041-\u005A\u0061-\u007A'
@@ -64,7 +64,8 @@ for name syntax)'
 MSG_INVALID_SUBVALUE = 'Invalid subvalue (See RFC 2426 section 3 for details)'
 MSG_INVALID_SUBVALUE_COUNT = 'Invalid subvalue count (See RFC 2426 section 3 \
 for details)'
-MSG_INVALID_TEXT_VALUE = 'Invalid text value (See RFC 2426 section 4 for details)'
+MSG_INVALID_TEXT_VALUE = 'Invalid text value (See RFC 2426 section 4 for \
+details)'
 MSG_INVALID_TIME = 'Invalid time (See RFC 2425 section 5.8.4 for time syntax)'
 MSG_INVALID_TIME_ZONE = 'Invalid time zone (See RFC 2426 section 3.4.1 for \
 time-zone syntax)'
