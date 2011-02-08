@@ -64,7 +64,7 @@ VCARDS_INVALID_LINE_SEPARATOR = {
     'vcards': [
         _get_vcard_file('line_ending_mac.vcf'),
         _get_vcard_file('line_ending_unix.vcf'),
-        'BEGIN:VCARD\r\nVERSION:3.0\rN:Doe;John;;Mr;\nFN:John Doe\r\nEND:VCARD\r\n']}
+        _get_vcard_file('line_ending_mixed.vcf')]}
 VCARDS_INVALID_PARAM_NAME = {
     'message': vcard_defs.MSG_INVALID_PARAM_NAME,
     'vcards': [
