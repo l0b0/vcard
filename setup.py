@@ -2,18 +2,21 @@
 """Setup configuration"""
 
 from setuptools import find_packages, setup
-from vcard.vcard import __doc__ as module_doc
+from vcard import vcard as package
 
 setup(
-    name = 'vCard-module',
-    version = '0.7.6',
+    name = package.__package__,
+    version = package.__version__,
     description = 'vCard validator, class and utility functions',
-    long_description = module_doc,
-    url = 'http://vcard-module.sourceforge.net/',
+    long_description = package.__doc__,
+    url = package.__url__,
     keywords = 'vCard vCards RFC 2426 RFC2426 validator',
-    packages = find_packages(exclude=['tests']),
+    packages = [package.__package__],
     install_requires = ['isodate'],
-    entry_points = {'console_scripts': ['vcard = vcard.vcard:main']},
+    entry_points = {
+        'console_scripts': [
+            '%(package)s = %(package)s.%(package)s:main' % {
+                'package': package.__package__}]},
     classifiers = [
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
@@ -26,11 +29,11 @@ setup(
         'Topic :: Utilities',
     ],
     test_suite = 'test.test_package',
-    author = 'Victor Engmark',
-    author_email = 'victor.engmark@gmail.com',
-    maintainer = 'Victor Engmark',
-    maintainer_email = 'victor.engmark@gmail.com',
-    download_url = 'http://sourceforge.net/projects/vcard-module/files/',
+    author = package.__author__,
+    author_email = package.__email__,
+    maintainer = package.__maintainer__,
+    maintainer_email = package.__email__,
+    download_url = 'http://pypi.python.org/pypi/vcard-module/',
     platforms = ['POSIX', 'Windows'],
-    license = 'GPL v3 or newer',
+    license = package.__license__,
     )
