@@ -25,7 +25,7 @@ setup(
         'Topic :: Text Processing',
         'Topic :: Utilities',
     ],
-    test_suite = 'tests.tests',
+    test_suite = 'test.test_package',
     author = 'Victor Engmark',
     author_email = 'victor.engmark@gmail.com',
     maintainer = 'Victor Engmark',
