@@ -188,6 +188,7 @@ VCARDS_REFERENCE_ERRORS = [
 
 # Valid vCards
 VCARDS_VALID = [
+    _get_vcard_file('comma_in_FN.vcf'),
     _get_vcard_file('minimal.vcf'),
     _get_vcard_file('maximal.vcf'),
     _get_vcard_file('scrambled_case.vcf'),
