@@ -39,7 +39,7 @@ def find_unescaped(text, char, escape_char = '\\'):
     return char_match.start(1)
 
 
-def split_unescaped(text, separator, escape_char = '\\\\'):
+def split_unescaped(text, separator, escape_char = '\\'):
     """
     Find strings separated by an unescaped character.
 
