@@ -324,10 +324,11 @@ def validate_x_name(text):
     Traceback (most recent call last):
     VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: X-
-    >>> validate_x_name('') # Have to start with X-
+    >>> validate_x_name('') # Have to start with X- #doctest: +ELLIPSIS
     Traceback (most recent call last):
+    ...
     VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
-    String:
+    ...
     >>> validate_x_name('x-abc') # X must be upper case
     Traceback (most recent call last):
     VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
