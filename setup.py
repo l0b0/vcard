@@ -34,7 +34,8 @@ setup(
     author_email = __email__,
     maintainer = __maintainer__,
     maintainer_email = __email__,
-    download_url = 'http://pypi.python.org/pypi/vcard-module/',
+    download_url = 'http://pypi.python.org/pypi/vcard/',
     platforms = ['POSIX', 'Windows'],
     license = __license__,
+    obsoletes = 'vcard_module',
     )

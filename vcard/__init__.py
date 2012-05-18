@@ -6,5 +6,5 @@ __credits__ = ['Victor Engmark']
 __maintainer__ = 'Victor Engmark'
 __email__ = 'victor.engmark@gmail.com'
 __license__ = 'GPL v3 or newer'
-__url__ = 'https://github.com/l0b0/vcard-module'
+__url__ = 'https://github.com/l0b0/vcard'
 __version__ = '0.7.8'
