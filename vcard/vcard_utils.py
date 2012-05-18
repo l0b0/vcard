@@ -13,7 +13,7 @@ def find_unescaped(text, char, escape_char = '\\'):
     @param char: Character to find
     @param escape_char: Escape character
     @return: Index of first match, None if no match
-    
+
     Examples:
     >>> find_unescaped('BEGIN:VCARD', ':')
     5

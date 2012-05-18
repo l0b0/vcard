@@ -63,7 +63,7 @@ def unfold_vcard_lines(lines):
             raise vcard_validators.VCardFormatError(
                 MSG_INVALID_LINE_SEPARATOR,
                 {'File line': index + 1})
-        
+
         if len(line) > VCARD_LINE_MAX_LENGTH_RAW:
             warnings.warn('Long line in vCard: %s' % line.encode('utf-8'))
 

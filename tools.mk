@@ -16,7 +16,7 @@ variables:
 			$(filter-out \
 				environment% default automatic, \
 				$(origin $v)), \
-			$(info $v = $($v) ($(value $v)))))                         
+			$(info $v = $($v) ($(value $v)))))
 	@true
 
 .PHONY: variable-%
