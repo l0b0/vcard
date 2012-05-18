@@ -20,7 +20,7 @@ RM := /bin/rm -f
 
 NAME = vcard
 
-RELEASE_TAG = v$(shell PYTHONPATH=. $(PYTHON_CMD) 'from $(NAME).$(NAME) import __version__; print __version__')
+RELEASE_TAG = v$(shell PYTHONPATH=. $(PYTHON_CMD) 'from $(NAME) import __version__; print __version__')
 
 .PHONY: all
 all: dist
