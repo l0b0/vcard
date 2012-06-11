@@ -32,4 +32,11 @@
 #
 ################################################################################
 
-sed -n '1h;1!H;${;g;s/\r\n //g;p;}' "$@"
+sed -n '
+1h             # Replace the hold space with the first line
+1!H            # Append following lines to the hold space
+${             # If this is the last line
+    g          # Use the multiple accumulated lines
+    s/\r\n //g # Remove any line splits
+    p          # Print the result
+}' "$@"
