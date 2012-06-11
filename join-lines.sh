@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 #
 # NAME
 #        join-lines.sh - Join previously split vCard lines
