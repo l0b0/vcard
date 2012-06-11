@@ -1,0 +1,6 @@
+BEGIN:VCARD
+VERSION:3.0
+N;LANGUAGE=en-:Doe;John;;Mr;
+FN:John Doe
+END:VCARD
+

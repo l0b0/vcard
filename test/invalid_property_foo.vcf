@@ -1,0 +1,7 @@
+BEGIN:VCARD
+VERSION:3.0
+FOO:bar
+N:Doe;John;;Mr;
+FN:John Doe
+END:VCARD
+

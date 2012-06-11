@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+    width="512"
+    height="512">
+    <rect
+        style="fill:white"
+        width="512"
+        height="512"/>
+    <g
+        id="name">
+        <text
+            x="0"
+            y="160"
+            fill="blue"
+            style="font-size:320px;font-family:STIXGeneral">v</text>
+        <text
+            x="256"
+            y="352"
+            text-anchor="middle"
+            fill="blue"
+            style="font-size:448px;font-family:STIXGeneral">C</text>
+        <text
+            x="512"
+            y="512"
+            text-anchor="end"
+            fill="blue"
+            fill-opacity="0.5"
+            style="font-size:288px;font-family:STIXGeneral">m</text>
+        <text
+            x="512"
+            y="276"
+            text-anchor="end"
+            fill="blue"
+            style="font-size:176px;font-family:STIXGeneral">3.0</text>
+    </g>
+</svg>
