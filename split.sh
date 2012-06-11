@@ -35,4 +35,4 @@
 
 set -o errexit -o noclobber -o nounset -o pipefail
 
-csplit --elide-empty-files "$@" $'/^BEGIN:VCARD\r$/' {*}
+csplit --elide-empty-files "$@" $'/^BEGIN:VCARD\r$/' {*} >/dev/null
