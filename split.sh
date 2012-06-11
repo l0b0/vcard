@@ -13,7 +13,7 @@
 #        See `man csplit` for options.
 #
 # BUGS
-#        https://github.com/l0b0/split/issues
+#        https://github.com/l0b0/vcard/issues
 #
 # COPYRIGHT
 #        Copyright (C) 2012 Victor Engmark
