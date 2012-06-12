@@ -9,7 +9,7 @@
 # DESCRIPTION
 #        Simply removes any occurrences of the sequence CR, LF, space.
 #
-#        Can be used as a preprocessing script for vCards handling.
+#        Can be used as a preprocessing script for vCard handling.
 #
 # BUGS
 #        https://github.com/l0b0/vcard/issues

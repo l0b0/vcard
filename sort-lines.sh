@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # NAME
-#        sort-lines.sh - Sort vCards property lines according to a custom key
+#        sort-lines.sh - Sort vCard property lines according to a custom key
 #
 # SYNOPSIS
 #        sort-lines.sh KEYFILE FILE...
