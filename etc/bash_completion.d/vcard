@@ -1,0 +1,14 @@
+# Autocomplete for filterous command
+_vcard()
+{
+    local cur prev opts base
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    # Basic options
+    opts="-v --verbose"
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+complete -o filenames -o default -F _vcard vcard
