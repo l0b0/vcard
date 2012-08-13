@@ -13,8 +13,7 @@ Additional scripts:
 Installation
 ------------
 
-    make test # Recommended
-    sudo make install
+    sudo pip install --upgrade vcard
 
 Examples
 --------
