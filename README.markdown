@@ -15,3 +15,8 @@ Installation
 
     make test # Recommended
     sudo make install
+
+Examples
+--------
+
+The `test` directory contains two valid vCards: `maximal.vcf` and `minimal.vcf`.
