@@ -65,7 +65,8 @@ def unfold_vcard_lines(lines):
                 {'File line': index + 1})
 
         if len(line) > VCARD_LINE_MAX_LENGTH_RAW:
-            warnings.warn('Long line in vCard: %s' % line.encode('utf-8'))
+            warnings.warn('Long line in vCard: {0}'.format(
+                line.encode('utf-8')))
 
         if line.startswith(' '):
             if index == 0:
@@ -73,11 +74,13 @@ def unfold_vcard_lines(lines):
                     MSG_CONTINUATION_AT_START,
                     {'File line': index + 1})
             elif len(lines[index - 1]) < VCARD_LINE_MAX_LENGTH_RAW:
-                warnings.warn('Short folded line at line %i' % (index - 1))
+                warnings.warn(
+                    'Short folded line at line {0:d}'.format(index - 1)
+                )
             elif line == SP_CHAR + CRLF_CHARS:
-                warnings.warn('Empty folded line at line %i' % index)
-            property_lines[-1] = property_lines[-1][:-len(CRLF_CHARS)] + \
-                line[1:]
+                warnings.warn('Empty folded line at line {0:d}'.format(index))
+            property_lines[-1] = \
+                property_lines[-1][:-len(CRLF_CHARS)] + line[1:]
         else:
             property_lines.append(line)
 
@@ -112,9 +115,8 @@ def get_vcard_group(lines):
                     {'File line': index + 1})
             if next_match.group(1) != group:
                 raise vcard_validators.VCardFormatError(
-                    MSG_MISMATCH_GROUP + ': %s != %s' % (
-                        next_match.group(1),
-                        group),
+                    '{0}: {1} != {2}'.format(MSG_MISMATCH_GROUP,
+                        (next_match.group(1), group)),
                     {'File line': index + 1})
     else:
         # Make sure there are no groups elsewhere
@@ -122,9 +124,8 @@ def get_vcard_group(lines):
             next_match = group_re.match(lines[index])
             if next_match:
                 raise vcard_validators.VCardFormatError(
-                    MSG_MISMATCH_GROUP + ': %s != %s' % (
-                        next_match.group(1),
-                        group),
+                    '{0}: {1} != {2}'.format(MSG_MISMATCH_GROUP,
+                        (next_match.group(1), group)),
                     {'File line': index + 1})
 
     return group
@@ -160,7 +161,7 @@ def get_vcard_property_param_values(values_string):
             '^[' + SAFE_CHARS + ']+$|^"[' + QSAFE_CHARS + ']+"$',
             value):
             raise vcard_validators.VCardFormatError(
-                MSG_INVALID_VALUE + ': %s' % value,
+                '{0}: {1}'.format(MSG_INVALID_VALUE, value),
                 {})
 
     return values
@@ -179,7 +180,7 @@ def get_vcard_property_param(param_string):
             '=')
     except ValueError as error:
         raise vcard_validators.VCardFormatError(
-            MSG_MISSING_PARAM_VALUE + ': %s' % str(error),
+            '{0}: {1}'.format(MSG_MISSING_PARAM_VALUE, str(error)),
             {})
 
     values = get_vcard_property_param_values(values_string)
@@ -187,7 +188,9 @@ def get_vcard_property_param(param_string):
     # Validate
     if not re.match('^[' + ID_CHARS + ']+$', param_name):
         raise vcard_validators.VCardFormatError(
-            MSG_INVALID_PARAM_NAME + ': %s' % param_name,
+            '{0}: {1}'.format(
+                MSG_INVALID_PARAM_NAME,
+                param_name),
             {})
 
     return {'name': param_name, 'values': values}
@@ -232,7 +235,7 @@ def get_vcard_property_subvalues(value_string):
     for subvalue in subvalues:
         if not re.match('^[' + VALUE_CHARS + ']*$', subvalue):
             raise vcard_validators.VCardFormatError(
-                MSG_INVALID_SUBVALUE + ': %s' % subvalue,
+                '{0}: {1}'.format(MSG_INVALID_SUBVALUE, subvalue),
                 {})
 
     return subvalues
@@ -269,7 +272,7 @@ def get_vcard_property(property_line):
     property_parts = vcard_utils.split_unescaped(property_line, ':')
     if len(property_parts) < 2:
         raise vcard_validators.VCardFormatError(
-            MSG_MISSING_VALUE_STRING + ': %s' % property_line,
+            '{0}: {1}'.format(MSG_MISSING_VALUE_STRING, property_line),
             {})
     elif len(property_parts) > 2:
         # Merge - Colon doesn't have to be escaped in values
@@ -288,7 +291,7 @@ def get_vcard_property(property_line):
         prop['name'],
         re.IGNORECASE):
         raise vcard_validators.VCardFormatError(
-            MSG_INVALID_PROPERTY_NAME + ': %s' % prop['name'],
+            '{0}: {1[name]}'.format(MSG_INVALID_PROPERTY_NAME, prop),
             {})
 
     try:
@@ -332,7 +335,7 @@ def get_vcard_properties(lines):
         if mandatory_property not in [
             prop['name'].upper() for prop in properties]:
             raise vcard_validators.VCardFormatError(
-                MSG_MISSING_PROPERTY + ': %s' % mandatory_property,
+                '{0}: {1}'.format(MSG_MISSING_PROPERTY, mandatory_property),
                 {'Property': mandatory_property})
 
     return properties
@@ -451,19 +454,19 @@ def main(argv = None):
             if option in ('-v', '--verbose'):
                 verbose = True
             else:
-                raise UsageError('Unhandled option %s' % option)
+                raise UsageError('Unhandled option {0}'.format(option))
 
         if not args:
             raise UsageError(__doc__)
 
     except UsageError, err:
-        sys.stderr.write(str(err) + '\n')
+        sys.stderr.write('{0}\n'.format(str(err)))
         return 2
 
     for filename in args:
         result = validate_file(filename, verbose)
         if result is not None:
-            print(result + '\n')
+            print('{0}\n'.format(result))
 
 
 if __name__ == '__main__':
