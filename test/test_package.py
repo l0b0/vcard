@@ -14,10 +14,12 @@ import unittest
 import urllib
 import warnings
 
-from vcard import vcard
-from vcard import vcard_defs
-from vcard import vcard_utils
-from vcard import vcard_validators
+from vcard import (
+    vcard,
+    vcard_defs,
+    vcard_utils,
+    vcard_validators
+)
 
 def _get_vcard_file(path):
     """
