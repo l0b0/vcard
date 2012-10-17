@@ -53,7 +53,7 @@ def _show_warning(
     file = sys.stderr,
     line = None):
     """Custom simple warning."""
-    file.write(str(message) + '\n')
+    file.write('{0}\n'.format(message))
 # pylint: enable=R0913,W0613,W0622
 
 
