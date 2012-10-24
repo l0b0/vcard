@@ -37,5 +37,5 @@ setup(
     download_url = 'http://pypi.python.org/pypi/vcard/',
     platforms = ['POSIX', 'Windows'],
     license = __license__,
-    obsoletes = 'vcard_module',
+    obsoletes = ['vcard_module'],
     )
