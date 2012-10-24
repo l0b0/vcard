@@ -44,83 +44,83 @@ def _get_vcard_file(path):
 # vCards with errors
 VCARDS_CONTINUATION_AT_START = {
     'message': vcard_defs.MSG_CONTINUATION_AT_START,
-    'vcards': ('continuation_at_start.vcf')}
+    'vcards': ('continuation_at_start.vcf',)}
 VCARDS_DOT_AT_LINE_START = {
     'message': vcard_defs.MSG_DOT_AT_LINE_START,
-    'vcards': ('dot_at_line_start.vcf')}
+    'vcards': ('dot_at_line_start.vcf',)}
 VCARDS_EMPTY_VCARD = {
     'message': vcard_defs.MSG_EMPTY_VCARD,
     'vcards': ('',None)}
 VCARDS_INVALID_DATE = {
     'message': vcard_defs.MSG_INVALID_DATE,
-    'vcards': ()}
+    'vcards': tuple()}
 VCARDS_INVALID_LANGUAGE_VALUE = {
     'message': vcard_defs.MSG_INVALID_LANGUAGE_VALUE,
-    'vcards': ('invalid_language_value.vcf')}
+    'vcards': ('invalid_language_value.vcf',)}
 VCARDS_INVALID_LINE_SEPARATOR = {
     'message': vcard_defs.MSG_INVALID_LINE_SEPARATOR,
     'vcards': (
         'line_ending_mac.vcf',
         'line_ending_unix.vcf',
-        'line_ending_mixed.vcf')}
+        'line_ending_mixed.vcf',)}
 VCARDS_INVALID_PARAM_NAME = {
     'message': vcard_defs.MSG_INVALID_PARAM_NAME,
-    'vcards': ('invalid_param_name.vcf')}
+    'vcards': ('invalid_param_name.vcf',)}
 VCARDS_INVALID_PARAM_VALUE = {
     'message': vcard_defs.MSG_INVALID_PARAM_VALUE,
-    'vcards': ('invalid_param_value.vcf')}
+    'vcards': ('invalid_param_value.vcf',)}
 VCARDS_INVALID_PROPERTY_NAME = {
     'message': vcard_defs.MSG_INVALID_PROPERTY_NAME,
-    'vcards': ('invalid_property_foo.vcf')}
+    'vcards': ('invalid_property_foo.vcf',)}
 VCARDS_INVALID_SUBVALUE = {
     'message': vcard_defs.MSG_INVALID_SUBVALUE,
-    'vcards': ()}
+    'vcards': tuple()}
 VCARDS_INVALID_SUBVALUE_COUNT = {
     'message': vcard_defs.MSG_INVALID_SUBVALUE_COUNT,
-    'vcards': ()}
+    'vcards': tuple()}
 VCARDS_INVALID_TEXT_VALUE = {
     'message': vcard_defs.MSG_INVALID_TEXT_VALUE,
-    'vcards': ()}
+    'vcards': tuple()}
 VCARDS_INVALID_TIME = {
     'message': vcard_defs.MSG_INVALID_TIME,
-    'vcards': ()}
+    'vcards': tuple()}
 VCARDS_INVALID_TIME_ZONE = {
     'message': vcard_defs.MSG_INVALID_TIME_ZONE,
-    'vcards': ()}
+    'vcards': tuple()}
 VCARDS_INVALID_URI = {
     'message': vcard_defs.MSG_INVALID_URI,
-    'vcards': ()}
+    'vcards': tuple()}
 VCARDS_INVALID_VALUE = {
     'message': vcard_defs.MSG_INVALID_VALUE,
     'vcards': (
-        'invalid_begin.vcf')}
+        'invalid_begin.vcf',)}
 VCARDS_INVALID_VALUE_COUNT = {
     'message': vcard_defs.MSG_INVALID_VALUE_COUNT,
     'vcards': (
         # http://en.wikipedia.org/wiki/VCard
-        'invalid_value_count_wp.vcf')}
+        'invalid_value_count_wp.vcf',)}
 VCARDS_INVALID_X_NAME = {
     'message': vcard_defs.MSG_INVALID_X_NAME,
-    'vcards': ()}
+    'vcards': tuple()}
 VCARDS_MISMATCH_GROUP = {
     'message': vcard_defs.MSG_MISMATCH_GROUP,
     'vcards': (
-        'mismatch_group.vcf')}
+        'mismatch_group.vcf',)}
 VCARDS_MISMATCH_PARAM = {
     'message': vcard_defs.MSG_MISMATCH_PARAM,
-    'vcards': ()}
+    'vcards': tuple()}
 VCARDS_MISSING_GROUP = {
     'message': vcard_defs.MSG_MISSING_GROUP,
     'vcards': (
-        'missing_group.vcf')}
+        'missing_group.vcf',)}
 VCARDS_MISSING_PARAM = {
     'message': vcard_defs.MSG_MISSING_PARAM,
     'vcards': (
-        'missing_photo_param.vcf')}
+        'missing_photo_param.vcf',)}
 VCARDS_MISSING_PARAM_VALUE = {
     'message': vcard_defs.MSG_MISSING_PARAM_VALUE,
     'vcards': (
-        'missing_param_value.vcf')}
+        'missing_param_value.vcf',)}
 VCARDS_MISSING_PROPERTY = {
     'message': vcard_defs.MSG_MISSING_PROPERTY,
     'vcards': (
@@ -129,14 +129,14 @@ VCARDS_MISSING_PROPERTY = {
         'missing_end.vcf',
         'missing_version.vcf',
         'missing_n.vcf',
-        'missing_fn.vcf')}
+        'missing_fn.vcf',)}
 VCARDS_MISSING_VALUE_STRING = {
     'message': vcard_defs.MSG_MISSING_VALUE_STRING,
     'vcards': (
-        'missing_n_value.vcf')}
+        'missing_n_value.vcf',)}
 VCARDS_NON_EMPTY_PARAM = {
     'message': vcard_defs.MSG_NON_EMPTY_PARAM,
-    'vcards': ()}
+    'vcards': tuple()}
 
 VCARDS_WITH_ERROR = (
     VCARDS_CONTINUATION_AT_START,
