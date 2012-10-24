@@ -760,8 +760,8 @@ def validate_vcard_property(prop):
                     raise VCardFormatError(
                         '{0}: {1}'.format(
                             MSG_INVALID_PARAM_NAME,
-                            param_name)
-                        )
+                            param_name),
+                        {})
 
         elif property_name == 'BDAY':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.5>
