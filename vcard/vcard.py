@@ -117,7 +117,8 @@ def get_vcard_group(lines):
             if next_match.group(1) != group:
                 raise vcard_validators.VCardFormatError(
                     '{0}: {1} != {2}'.format(MSG_MISMATCH_GROUP,
-                        (next_match.group(1), group)),
+                        next_match.group(1),
+                        group),
                     {'File line': index + 1})
     else:
         # Make sure there are no groups elsewhere
