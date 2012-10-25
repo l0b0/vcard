@@ -30,7 +30,9 @@ def _get_vcard_file(path):
     @param filename: File relative to current directory or a URL
     @return: Text in the given file
     """
-    if path.startswith('http'):
+    if path in ('', None):
+        return ''
+    elif path.startswith('http'):
         filename = urllib.urlretrieve(path)[0]
     else:
         filename = os.path.join(os.path.dirname(__file__), path)
