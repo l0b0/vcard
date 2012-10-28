@@ -18,7 +18,7 @@ UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
 # System
 RM := /bin/rm -f
 
-NAME = vcard
+NAME = $(notdir $(CURDIR))
 
 RELEASE_TAG = v$(shell PYTHONPATH=. $(PYTHON_CMD) 'from $(NAME) import __version__; print __version__')
 
