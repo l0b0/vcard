@@ -44,14 +44,15 @@ from vcard_defs import  (
     WARN_MULTIPLE_NAMES
 )
 
+
 # pylint: disable=R0913,W0613,W0622
 def _show_warning(
     message,
-    category = UserWarning,
-    filename = '',
-    lineno = -1,
-    file = sys.stderr,
-    line = None):
+    category=UserWarning,
+    filename='',
+    lineno=-1,
+    file=sys.stderr,
+    line=None):
     """Custom simple warning."""
     file.write(str(message) + '\n')
 # pylint: enable=R0913,W0613,W0622
@@ -84,7 +85,9 @@ class VCardFormatError(Exception):
         >>> raise VCardFormatError('test', {})
         Traceback (most recent call last):
         VCardFormatError: test
-        >>> raise VCardFormatError('with path', {'File': '/home/user/test.vcf'})
+        >>> raise VCardFormatError(
+        ... 'with path',
+        ... {'File': '/home/user/test.vcf'})
         Traceback (most recent call last):
         VCardFormatError: with path
         File: /home/user/test.vcf
@@ -112,7 +115,9 @@ class VCardFormatError(Exception):
         VCardFormatError: test
         File: /home/user/test.vcf
         Property: ADR
-        >>> raise VCardFormatError('Cöntexte randomisę', {'foo': QSAFE_CHARS[-1]*2})
+        >>> raise VCardFormatError(
+        ... 'Cöntexte randomisę',
+        ... {'foo': QSAFE_CHARS[-1]*2})
         Traceback (most recent call last):
         VCardFormatError: Cöntexte randomisę
         foo: ÿÿ
@@ -120,7 +125,6 @@ class VCardFormatError(Exception):
         Exception.__init__(self)
         self.message = message
         self.context = context
-
 
     def __str__(self):
         """
@@ -214,27 +218,33 @@ def validate_time_zone(text):
     >>> validate_time_zone('+00:30')
     >>> validate_time_zone('Z+01:00') # Can't combine Z and offset
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
+    time-zone syntax)
     String: Z+01:00
     >>> validate_time_zone('+1:00') # Need preceding zero
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
+    time-zone syntax)
     String: +1:00
     >>> validate_time_zone('0100') # Need + or -
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
+    time-zone syntax)
     String: 0100
     >>> validate_time_zone('01') # Need colon and minutes
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
+    time-zone syntax)
     String: 01
     >>> validate_time_zone('01:') # Need minutes
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
+    time-zone syntax)
     String: 01:
     >>> validate_time_zone('01:1') # Need preceding zero
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
+    time-zone syntax)
     String: 01:1
     """
     if not re.match(r'^(Z|[+-]\d{2}:?\d{2})$', text):
@@ -272,7 +282,8 @@ def validate_time(text):
     String: 24:00:00
     >>> validate_time('00:00:00Z+01')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for time-zone syntax)
+    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
+    time-zone syntax)
     String: Z+01
     """
     time_timezone = re.match(r'^(\d{2}:?\d{2}:?\d{2}(?:,\d+)?)(.*)$', text)
@@ -310,7 +321,7 @@ def validate_language_tag(text):
     >>> validate_language_tag('en-US')
 
     """
-    text = text.lower() # Case insensitive
+    text = text.lower()  # Case insensitive
 
     if re.match(r'^([a-z]{1,8})(-[a-z]{1,8})*$', text) is None:
         raise VCardFormatError(MSG_INVALID_LANGUAGE_VALUE, {'String': text})
@@ -359,7 +370,8 @@ def validate_ptext(text):
     >>> validate_ptext(SAFE_CHARS)
     >>> validate_ptext(u'\u000B') #doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for param-value syntax)
+    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for
+    param-value syntax)
     String: ...
     """
     if re.match('^[' + SAFE_CHARS + ']*$', text) is None:
@@ -383,7 +395,8 @@ def validate_text_value(text):
     String: ...
     """
     if re.match(
-        '^([' + SAFE_CHARS + ':' + DQUOTE_CHAR + ']|\\' + ESCAPED_CHARS + ')*$',
+        '^([' + SAFE_CHARS + ':' + DQUOTE_CHAR + ']|\\' + \
+            ESCAPED_CHARS + ')*$',
         text) is None:
         raise VCardFormatError(MSG_INVALID_TEXT_VALUE, {'String': text})
 
@@ -399,11 +412,13 @@ def validate_quoted_string(text):
     >>> validate_quoted_string(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
     >>> validate_quoted_string(DQUOTE_CHAR + DQUOTE_CHAR)
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for param-value syntax)
+    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for
+    param-value syntax)
     String: ""
     >>> validate_quoted_string(DQUOTE_CHAR + QSAFE_CHARS[-1]*2 + DQUOTE_CHAR)
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for param-value syntax)
+    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for
+    param-value syntax)
     String: "ÿÿ"
     """
     if re.match(
@@ -425,7 +440,8 @@ def validate_param_value(text):
     >>> validate_param_value(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
     >>> validate_param_value(DQUOTE_CHAR + DQUOTE_CHAR)
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for param-value syntax)
+    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for
+    param-value syntax)
     String: ""
     """
     try:
@@ -484,43 +500,54 @@ def validate_float(text):
     >>> validate_float('-12.345')
     >>> validate_float('12.')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: 12.
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
+    expected float value: 12.
     >>> validate_float('.12')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: .12
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
+    expected float value: .12
     >>> validate_float('foo')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: foo
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
+    expected float value: foo
     >>> validate_float('++12.345')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: ++12.345
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
+    expected float value: ++12.345
     >>> validate_float('--12.345')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: --12.345
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
+    expected float value: --12.345
     >>> validate_float('12.34.5')
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details), expected float value: 12.34.5
+    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
+    expected float value: 12.34.5
     """
     if re.match(r'^[+-]?\d+(\.\d+)?$', text) is None:
         raise VCardFormatError(
-            '{0}, expected float value: {1}'.format(MSG_INVALID_SUBVALUE, text),
+            '{0}, expected float value: {1}'.format(
+                MSG_INVALID_SUBVALUE,
+                text),
             {})
 
 
 def validate_uri(text):
     """
-    genericurl, as described in RFC 1738 <http://tools.ietf.org/html/rfc1738#section-5>.
+    genericurl, as described in RFC 1738
+    <http://tools.ietf.org/html/rfc1738#section-5>.
     @param text: Single parameter value
 
     Examples:
     >>> validate_uri('http://example.org/')
     >>> validate_uri('http\\://example.org/')
     Traceback (most recent call last):
-    VCardFormatError: Invalid URI (See RFC 1738 section 5 for genericurl syntax)
+    VCardFormatError: Invalid URI (See RFC 1738 section 5 for genericurl
+    syntax)
     String: http\\://example.org/
     >>> validate_uri('http:')
     Traceback (most recent call last):
-    VCardFormatError: Invalid URI (See RFC 1738 section 5 for genericurl syntax)
+    VCardFormatError: Invalid URI (See RFC 1738 section 5 for genericurl
+    syntax)
     String: http:
     """
     parts = urlparse(text)
@@ -631,7 +658,7 @@ def validate_vcard_property(prop):
                         raise VCardFormatError(
                             '{0}: {1} and {2}'.format(
                                 MSG_MISMATCH_PARAM,
-                                ('VALUE','CONTEXT')),
+                                ('VALUE', 'CONTEXT')),
                             {})
                 elif param_name.upper() == 'CONTEXT':
                     if param_values != set(['word']):
@@ -644,7 +671,7 @@ def validate_vcard_property(prop):
                         raise VCardFormatError(
                             '{0}: {1} and {2}'.format(
                                 MSG_MISMATCH_PARAM,
-                                ('VALUE','CONTEXT')),
+                                ('VALUE', 'CONTEXT')),
                             {})
                 else:
                     raise VCardFormatError(
@@ -740,7 +767,7 @@ def validate_vcard_property(prop):
                         raise VCardFormatError(
                             '{0}: {1} and {2}'.format(
                                 MSG_MISMATCH_PARAM,
-                                ('ENCODING','VALUE')),
+                                ('ENCODING', 'VALUE')),
                             {})
                 elif param_name.upper() == 'TYPE' and \
                        'ENCODING' not in prop['parameters']:
@@ -925,7 +952,7 @@ def validate_vcard_property(prop):
                                 'internet',
                                 'x400',
                                 'pref',
-                                'dom', # IANA registered address types?
+                                'dom',  # IANA registered address types?
                                 'intl',
                                 'postal',
                                 'parcel',
@@ -1087,14 +1114,15 @@ def validate_vcard_property(prop):
                     {})
                 for value in prop['values']:
                     if len(value) != 1:
-                        raise VCardFormatError('{0}: {1:d} (expected 1)'.format(
-                            MSG_INVALID_SUBVALUE_COUNT,
-                            len(prop['values'][0])),
-                        {})
+                        raise VCardFormatError(
+                            '{0}: {1:d} (expected 1)'.format(
+                                MSG_INVALID_SUBVALUE_COUNT,
+                                len(prop['values'][0])),
+                            {})
                     validate_uri(value[0])
             else:
                 # Inline vCard object
-                pass # TODO: Un-escape and validate value
+                pass  # TODO: Un-escape and validate value
 
     except VCardFormatError as error:
         error.context['Property'] = property_name

@@ -213,7 +213,7 @@ def get_vcard_property_params(params_string):
 
     for param_string in vcard_utils.split_unescaped(params_string, ';'):
         param = get_vcard_property_param(param_string)
-        param_name = param['name'].upper() # To be able to merge TYPE & type
+        param_name = param['name'].upper()  # To be able to merge TYPE & type
         if param_name not in params:
             params[param_name] = param['values']
         else:
@@ -283,7 +283,9 @@ def get_vcard_property(property_line):
     property_string, values_string = property_parts
 
     # Split property name and property parameters
-    property_name_and_params = vcard_utils.split_unescaped(property_string, ';')
+    property_name_and_params = vcard_utils.split_unescaped(
+            property_string,
+            ';')
 
     prop['name'] = property_name_and_params.pop(0)
 
@@ -346,10 +348,11 @@ def get_vcard_properties(lines):
 class VCard():
     """Container for structured and unstructured vCard contents."""
     # pylint: disable=R0903
-    def __init__(self, text, filename = None):
+    def __init__(self, text, filename=None):
         """
         Create vCard object from text string. Includes text (the entire
-        unprocessed vCard), group (optional prefix on each line) and properties.
+        unprocessed vCard), group (optional prefix on each line) and
+        properties.
 
         @param text: String containing a single vCard
         """
@@ -375,7 +378,7 @@ class VCard():
         return self.text.encode('utf-8')
 
 
-def validate_file(filename, verbose = False):
+def validate_file(filename, verbose=False):
     """
     Create object for each vCard in a file, and show the error output.
 
@@ -429,12 +432,11 @@ class UsageError(Exception):
         Exception.__init__(self)
         self._message = message
 
-
     def __str__(self):
         return self._message.encode('utf-8')
 
 
-def main(argv = None):
+def main(argv=None):
     """Argument handling."""
 
     if argv is None:

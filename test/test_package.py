@@ -23,6 +23,7 @@ from vcard import (
     vcard_validators
 )
 
+
 def _get_vcard_file(path):
     """
     Get the vCard contents locally or remotely.
@@ -39,7 +40,6 @@ def _get_vcard_file(path):
         contents = file_pointer.read()
 
     return contents
-
 
 # vCards with errors
 VCARDS_CONTINUATION_AT_START = {
@@ -210,22 +210,23 @@ class TestVCards(unittest.TestCase):
                 try:
                     with warnings.catch_warnings(record=True):
                         vcard.VCard(vcard_text)
-                        self.fail('Invalid vCard created:\n{0}'.format(vcard_text))
+                        self.fail('Invalid vCard created:\n{0}'.format(
+                            vcard_text))
                 except vcard_validators.VCardFormatError as error:
                     message = str(error).splitlines()[0].split(':')[0]
                     self.assertEquals(
                         message,
                         vcards['message'],
-                        dedent( '''
-                                Wrong message for vCard:
-                                {0}
-                                
-                                Got: {1}
-                                Expected: {2}
-                                '''.format( vcard_text,
-                                            message,
-                                            vcards['message'])))
+                        dedent('''
+                               Wrong message for vCard:
+                               {0}
 
+                               Got: {1}
+                               Expected: {2}
+                               '''.format(
+                                   vcard_text,
+                                   message,
+                                   vcards['message'])))
 
     def test_valid(self):
         """Valid (but not necessarily sane) vCards"""
@@ -237,10 +238,9 @@ class TestVCards(unittest.TestCase):
             except vcard_validators.VCardFormatError as error:
                 self.fail(dedent(''' Valid vCard not created:
                                      {0}
-                                     
+
                                      {1}
                                  '''.format(vcard_text, error)))
-
 
     def test_online(self):
         """vCards in references which are invalid"""
@@ -250,7 +250,6 @@ class TestVCards(unittest.TestCase):
                     vcard_validators.VCardFormatError,
                     vcard.VCard,
                     vcard_text)
-
 
     def test_doc(self):
         """Run DocTests"""
