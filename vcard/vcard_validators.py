@@ -217,35 +217,34 @@ def validate_time_zone(text):
     >>> validate_time_zone('-00:30')
     >>> validate_time_zone('+00:30')
     >>> validate_time_zone('Z+01:00') # Can't combine Z and offset
+    ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
-    time-zone syntax)
+    VCardFormatError: Invalid time zone ...
     String: Z+01:00
     >>> validate_time_zone('+1:00') # Need preceding zero
+    ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
-    time-zone syntax)
+    VCardFormatError: Invalid time zone ...
     String: +1:00
     >>> validate_time_zone('0100') # Need + or -
+    ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
-    time-zone syntax)
+    VCardFormatError: Invalid time zone ...
     String: 0100
     >>> validate_time_zone('01') # Need colon and minutes
+    ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
-    time-zone syntax)
+    VCardFormatError: Invalid time zone ...
     String: 01
     >>> validate_time_zone('01:') # Need minutes
+    ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
-    time-zone syntax)
+    VCardFormatError: Invalid time zone ...
     String: 01:
     >>> validate_time_zone('01:1') # Need preceding zero
+    ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
-    time-zone syntax)
-    String: 01:1
+    VCardFormatError: Invalid time zone ...
     """
     if not re.match(r'^(Z|[+-]\d{2}:?\d{2})$', text):
         raise VCardFormatError(MSG_INVALID_TIME_ZONE, {'String': text})
@@ -280,10 +279,9 @@ def validate_time(text):
     Traceback (most recent call last):
     VCardFormatError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
     String: 24:00:00
-    >>> validate_time('00:00:00Z+01')
+    >>> validate_time('00:00:00Z+01') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone (See RFC 2426 section 3.4.1 for
-    time-zone syntax)
+    VCardFormatError: Invalid time zone ...
     String: Z+01
     """
     time_timezone = re.match(r'^(\d{2}:?\d{2}:?\d{2}(?:,\d+)?)(.*)$', text)
@@ -370,8 +368,7 @@ def validate_ptext(text):
     >>> validate_ptext(SAFE_CHARS)
     >>> validate_ptext(u'\u000B') #doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for
-    param-value syntax)
+    VCardFormatError: Invalid parameter value ...
     String: ...
     """
     if re.match('^[' + SAFE_CHARS + ']*$', text) is None:
@@ -389,7 +386,7 @@ def validate_text_value(text):
     >>> validate_text_value('')
     >>> validate_text_value(SAFE_CHARS)
     >>> validate_text_value('\\n')
-    >>> validate_text_value(';') #doctest: +ELLIPSIS
+    >>> validate_text_value(';') # doctest: +ELLIPSIS
     Traceback (most recent call last):
     VCardFormatError: Invalid text value (See RFC 2426 section 4 for details)
     String: ...
@@ -410,15 +407,13 @@ def validate_quoted_string(text):
 
     Examples:
     >>> validate_quoted_string(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
-    >>> validate_quoted_string(DQUOTE_CHAR + DQUOTE_CHAR)
+    >>> validate_quoted_string(DQUOTE_CHAR + DQUOTE_CHAR) # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for
-    param-value syntax)
-    String: ""
-    >>> validate_quoted_string(DQUOTE_CHAR + QSAFE_CHARS[-1]*2 + DQUOTE_CHAR)
+    VCardFormatError: Invalid parameter value ...
+    >>> validate_quoted_string(
+    ... DQUOTE_CHAR + QSAFE_CHARS[-1]*2 + DQUOTE_CHAR) # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for
-    param-value syntax)
+    VCardFormatError: Invalid parameter value ...
     String: "ÿÿ"
     """
     if re.match(
@@ -438,10 +433,9 @@ def validate_param_value(text):
     >>> validate_param_value('')
     >>> validate_param_value(SAFE_CHARS)
     >>> validate_param_value(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
-    >>> validate_param_value(DQUOTE_CHAR + DQUOTE_CHAR)
+    >>> validate_param_value(DQUOTE_CHAR + DQUOTE_CHAR) # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value (See RFC 2426 section 4 for
-    param-value syntax)
+    VCardFormatError: Invalid parameter value ...
     String: ""
     """
     try:
@@ -498,30 +492,30 @@ def validate_float(text):
     >>> validate_float('12.345')
     >>> validate_float('+12.345')
     >>> validate_float('-12.345')
-    >>> validate_float('12.')
+    >>> validate_float('12.') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
-    expected float value: 12.
-    >>> validate_float('.12')
+        ...
+    VCardFormatError: Invalid subvalue ...
+    >>> validate_float('.12') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
-    expected float value: .12
-    >>> validate_float('foo')
+        ...
+    VCardFormatError: Invalid subvalue ...
+    >>> validate_float('foo') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
-    expected float value: foo
-    >>> validate_float('++12.345')
+        ...
+    VCardFormatError: Invalid subvalue ...
+    >>> validate_float('++12.345') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
-    expected float value: ++12.345
-    >>> validate_float('--12.345')
+        ...
+    VCardFormatError: Invalid subvalue ...
+    >>> validate_float('--12.345') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
-    expected float value: --12.345
-    >>> validate_float('12.34.5')
+        ...
+    VCardFormatError: Invalid subvalue ...
+    >>> validate_float('12.34.5') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid subvalue (See RFC 2426 section 3 for details),
-    expected float value: 12.34.5
+        ...
+    VCardFormatError: Invalid subvalue ...
     """
     if re.match(r'^[+-]?\d+(\.\d+)?$', text) is None:
         raise VCardFormatError(
@@ -539,15 +533,13 @@ def validate_uri(text):
 
     Examples:
     >>> validate_uri('http://example.org/')
-    >>> validate_uri('http\\://example.org/')
+    >>> validate_uri('http\\://example.org/') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid URI (See RFC 1738 section 5 for genericurl
-    syntax)
+    VCardFormatError: Invalid URI ...
     String: http\\://example.org/
-    >>> validate_uri('http:')
+    >>> validate_uri('http:') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid URI (See RFC 1738 section 5 for genericurl
-    syntax)
+    VCardFormatError: Invalid URI ...
     String: http:
     """
     parts = urlparse(text)
