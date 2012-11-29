@@ -27,8 +27,8 @@ setup(
         'console_scripts': [
             '%(package)s=%(package)s.%(package)s:main' % {
                 'package': __package__}]},
-        'Development Status :: 3 - Alpha',
     classifiers=[
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: GNU General Public License (GPL)',
