@@ -1,5 +1,3 @@
-include tools.mk
-
 # Release
 GPG_ID ?= 92126B54
 
@@ -54,3 +52,6 @@ distclean:
 release: test register
 	$(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
 	$(GIT_TAG) -m 'PyPI release' $(RELEASE_TAG)
+
+include make-includes/python.mk
+include make-includes/variables.mk
