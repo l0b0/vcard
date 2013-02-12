@@ -32,13 +32,13 @@ build: test
 
 .PHONY: clean
 clean: distclean
-	-$(RM) -r build
+	-$(RM) -r build isodate-*.egg $(NAME).egg-info
 	$(SETUP) clean
 
 .PHONY: install
 install:
 	$(SETUP) install $(INSTALL_OPTIONS)
-	install --mode 644 etc/bash_completion.d/$(notdir $(CURDIR)) /etc/bash_completion.d/
+	install --mode 644 etc/bash_completion.d/$(NAME) /etc/bash_completion.d/
 
 .PHONY: register
 register:

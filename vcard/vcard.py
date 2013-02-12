@@ -116,7 +116,8 @@ def get_vcard_group(lines):
                     {'File line': index + 1})
             if next_match.group(1) != group:
                 raise vcard_validators.VCardFormatError(
-                    '{0}: {1} != {2}'.format(MSG_MISMATCH_GROUP,
+                    '{0}: {1} != {2}'.format(
+                        MSG_MISMATCH_GROUP,
                         next_match.group(1),
                         group),
                     {'File line': index + 1})
@@ -284,8 +285,8 @@ def get_vcard_property(property_line):
 
     # Split property name and property parameters
     property_name_and_params = vcard_utils.split_unescaped(
-            property_string,
-            ';')
+        property_string,
+        ';')
 
     prop['name'] = property_name_and_params.pop(0)
 
