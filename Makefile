@@ -21,7 +21,7 @@ NAME = $(notdir $(CURDIR))
 RELEASE_TAG = v$(shell PYTHONPATH=. $(PYTHON_CMD) 'from $(NAME) import __version__; print __version__')
 
 .PHONY: all
-all: dist
+all: build
 
 .PHONY: test
 test:
