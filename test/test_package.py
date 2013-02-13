@@ -34,7 +34,11 @@ def _get_vcard_file(path):
     if path in ('', None):
         return ''
     elif path.startswith('http'):
-        filename = urllib.urlretrieve(path)[0]
+        try:
+            filename = urllib.urlretrieve(path)[0]
+        except IOError as error:
+            print('No internet connection; skipping {}\n'.format(path))
+            return
     else:
         filename = os.path.join(os.path.dirname(__file__), path)
 
@@ -198,6 +202,8 @@ class TestVCards(unittest.TestCase):
         for testgroup in VCARDS_WITH_ERROR:
             for vcard_file in testgroup['vcards']:
                 vcard_text = _get_vcard_file(vcard_file)
+                if vcard_text == None:
+                    continue
 
                 try:
                     with warnings.catch_warnings(record=True):
@@ -225,6 +231,8 @@ class TestVCards(unittest.TestCase):
         """Valid (but not necessarily sane) vCards"""
         for vcard_file in VCARDS_VALID:
             vcard_text = _get_vcard_file(vcard_file)
+            if vcard_text == None:
+                continue
 
             try:
                 with warnings.catch_warnings(record=True):
@@ -241,6 +249,8 @@ class TestVCards(unittest.TestCase):
         """vCards in references which are invalid"""
         for vcard_file in VCARDS_REFERENCE_ERRORS:
             vcard_text = _get_vcard_file(vcard_file)
+            if vcard_text == None:
+                continue
 
             with warnings.catch_warnings(record=True):
                 self.assertRaises(
