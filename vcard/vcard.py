@@ -348,7 +348,6 @@ def get_vcard_properties(lines):
 
 class VCard():
     """Container for structured and unstructured vCard contents."""
-    # pylint: disable=R0903
     def __init__(self, text, filename=None):
         """
         Create vCard object from text string. Includes text (the entire

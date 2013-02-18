@@ -45,7 +45,6 @@ from vcard_defs import  (
 )
 
 
-# pylint: disable=R0913,W0613,W0622
 def _show_warning(
     message,
     category=UserWarning,

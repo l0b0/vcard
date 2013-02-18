@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """vCards v3.0 (RFC 2426) definitions and message strings"""
 
-# pylint: disable=W0105
 
 # Literals, RFC 2426 pages 27, 28
 ALPHA_CHARS = u'\u0041-\u005A\u0061-\u007A'
