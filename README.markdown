@@ -10,6 +10,14 @@ Additional scripts:
 * `join-lines.sh` - Join previously split vCard lines
 * `split-lines.sh` - Split long vCard lines
 
+Test
+----
+
+Requires `shunit2`.
+
+    git submodule update --init
+    make test
+
 Installation / upgrade
 ----------------------
 
