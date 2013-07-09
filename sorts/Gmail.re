@@ -1,4 +1,7 @@
 ^BEGIN[^A-Z]
+^CLASS[^A-Z]
+^PROFILE[^A-Z]
+^SOURCE[^A-Z]
 ^VERSION[^A-Z]
 ^FN[^A-Z]
 ^N[^A-Z]
@@ -7,7 +10,9 @@
 ^X-
 ^TEL[^A-Z]
 ^ADR[^A-Z]
+^LABEL[^A-Z]
 ^ORG[^A-Z]
+^LOGO[^A-Z]
 ^TITLE[^A-Z]
 ^BDAY[^A-Z]
 ^URL[^A-Z]
