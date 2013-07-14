@@ -16,7 +16,7 @@
 #        https://github.com/l0b0/vcard/issues
 #
 # COPYRIGHT
-#        Copyright (C) 2012 Victor Engmark
+#        Copyright (C) 2012-2013 Victor Engmark
 #
 #        This program is free software: you can redistribute it and/or modify
 #        it under the terms of the GNU General Public License as published by
@@ -35,4 +35,7 @@
 
 set -o errexit -o noclobber -o nounset -o pipefail
 
-csplit --elide-empty-files "$@" $'/^BEGIN:VCARD\r$/' {*} >/dev/null
+for path
+do
+    csplit --elide-empty-files --prefix "$(basename -- "$path")" "$path" $'/^BEGIN:VCARD\r$/' {*} >/dev/null
+done
