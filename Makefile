@@ -38,7 +38,14 @@ clean: distclean
 .PHONY: install
 install:
 	$(SETUP) install $(INSTALL_OPTIONS)
-	install --mode 644 etc/bash_completion.d/$(NAME) /etc/bash_completion.d/
+	for dir in /etc/bash_completion.d /usr/share/bash-completion/completions; \
+	do \
+		if [ -d "$$dir" ]; \
+		then \
+			install --mode 644 bash-completion/$(NAME) "$$dir" || exit 1; \
+			break; \
+		fi; \
+	done
 
 .PHONY: register
 register:
