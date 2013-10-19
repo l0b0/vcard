@@ -19,17 +19,12 @@ def find_unescaped(text, char, escape_char='\\'):
     5
     >>> find_unescaped('foo\\\\,bar,baz', ',')
     8
-    >>> find_unescaped(r'foo\\,bar,baz', ',')
-    8
     >>> find_unescaped('foo\\\\\\\\,bar,baz', ',')
     5
     >>> find_unescaped('foo,bar,baz', ':')
     >>> find_unescaped('foo\\\\,bar\\\\,baz', ',')
     """
-    unescaped_regex = '(?<!' + escape_char + escape_char + ')' + \
-        '(?:' + escape_char + escape_char + escape_char + escape_char + \
-        ')*' + \
-        '(' + char + ')'
+    unescaped_regex = '(?<!{0}{0})(?:{0}{0}{0}{0})*({1})'.format(escape_char, re.escape(char))
     regex = re.compile(unescaped_regex)
 
     char_match = regex.search(text)
@@ -39,7 +34,7 @@ def find_unescaped(text, char, escape_char='\\'):
     return char_match.start(1)
 
 
-def split_unescaped(text, separator, escape_char='\\\\'):
+def split_unescaped(text, separator, escape_char='\\'):
     """
     Find strings separated by an unescaped character.
 

@@ -97,7 +97,7 @@ def get_vcard_group(lines):
     """
     group = None
 
-    group_re = re.compile('^([' + ID_CHARS + ']*)\.')
+    group_re = re.compile('^([{0}]*)\.'.format(re.escape(ID_CHARS)))
 
     group_match = group_re.match(lines[0])
     if group_match is not None:
@@ -162,7 +162,7 @@ def get_vcard_property_param_values(values_string):
 
     # Validate
     for value in values:
-        if not re.match(u'^[{0}]+$|^"[{1}]+"$'.format(SAFE_CHARS, QSAFE_CHARS), value):
+        if not re.match(u'^[{0}]+$|^"[{1}]+"$'.format(re.escape(SAFE_CHARS), re.escape(QSAFE_CHARS)), value):
             raise vcard_validators.VCardFormatError(
                 '{0}: {1}'.format(MSG_INVALID_VALUE, value),
                 {})
@@ -189,7 +189,7 @@ def get_vcard_property_param(param_string):
     values = get_vcard_property_param_values(values_string)
 
     # Validate
-    if not re.match('^[' + ID_CHARS + ']+$', param_name):
+    if not re.match('^[{0}]+$'.format(re.escape(ID_CHARS)), param_name):
         raise vcard_validators.VCardFormatError(
             '{0}: {1}'.format(
                 MSG_INVALID_PARAM_NAME,
@@ -236,7 +236,7 @@ def get_vcard_property_subvalues(value_string):
 
     # Validate string
     for subvalue in subvalues:
-        if not re.match('^[' + VALUE_CHARS + ']*$', subvalue):
+        if not re.match(u'^[{0}]*$'.format(re.escape(VALUE_CHARS)), subvalue):
             raise vcard_validators.VCardFormatError(
                 '{0}: {1}'.format(MSG_INVALID_SUBVALUE, subvalue),
                 {})
@@ -292,7 +292,7 @@ def get_vcard_property(property_line):
 
     # String validation
     if not prop['name'].upper() in ALL_PROPERTIES and not re.match(
-        '^X-[{0}]+$'.format(ID_CHARS),
+        '^X-[{0}]+$'.format(re.escape(ID_CHARS)),
         prop['name'],
         re.IGNORECASE
     ):

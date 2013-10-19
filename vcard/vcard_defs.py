@@ -3,23 +3,28 @@
 """vCards v3.0 (RFC 2426) definitions and message strings"""
 
 
+def character_range(start, end):
+    return u"".join(unichr(index) for index in range(start, end + 1))
+
 # Literals, RFC 2426 pages 27, 28
-ALPHA_CHARS = u'\u0041-\u005A\u0061-\u007A'
-CHAR_CHARS = u'\u0001-\u007F'
-CR_CHAR = u'\u000D'
-LF_CHAR = u'\u000A'
+ALPHA_CHARS = character_range(0x41, 0x5A) + character_range(0x61, 0x7A)
+CHAR_CHARS = character_range(0x01, 0x7F)
+CR_CHAR = unichr(0x0D)
+LF_CHAR = unichr(0x0A)
 CRLF_CHARS = CR_CHAR + LF_CHAR
-CTL_CHARS = u'\u0000-\u001F\u007F'
-DIGIT_CHARS = u'\u0030-\u0039'
-DQUOTE_CHAR = u'\u0022'
-HTAB_CHAR = u'\u0009'
-SP_CHAR = u'\u0020'
-VCHAR_CHARS = u'\u0021-\u007E'
+CTL_CHARS = character_range(0x00, 0x1F) + unichr(0x7F)
+DIGIT_CHARS = character_range(0x30, 0x39)
+DQUOTE_CHAR = unichr(0x22)
+HTAB_CHAR = unichr(0x09)
+SP_CHAR = unichr(0x20)
+VCHAR_CHARS = character_range(0x21, 0x7E)
 WSP_CHARS = SP_CHAR + HTAB_CHAR
-NON_ASCII_CHARS = u'\u0080-\u00FF'
-QSAFE_CHARS = WSP_CHARS + u'\u0021' + u'\u0023-\u007E' + NON_ASCII_CHARS
-SAFE_CHARS = WSP_CHARS + u'\u0021' + u'\u0023-\u002B' + u'\u002D-\u0039' + \
-    u'\u003C-\u007E' + NON_ASCII_CHARS
+NON_ASCII_CHARS = character_range(0x80, 0xFF)
+
+# Have to remove backslash!
+QSAFE_CHARS = WSP_CHARS + unichr(0x21) + character_range(0x23, 0x5B) + character_range(0x5D, 0x7E) + NON_ASCII_CHARS
+SAFE_CHARS = WSP_CHARS + unichr(0x21) + character_range(0x23, 0x2B) + character_range(0x2D, 0x39) + \
+    character_range(0x3C, 0x5B) + character_range(0x5D, 0x7E) + NON_ASCII_CHARS
 VALUE_CHARS = WSP_CHARS + VCHAR_CHARS + NON_ASCII_CHARS
 ESCAPED_CHARS = u'\\;,nN'
 

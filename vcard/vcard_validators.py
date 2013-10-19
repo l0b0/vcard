@@ -351,7 +351,7 @@ def validate_x_name(text):
     VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: foo
     """
-    if re.match(r'^X-[' + ID_CHARS + ']+$', text) is None:
+    if re.match(r'^X-[{0}]+$'.format(re.escape(ID_CHARS)), text) is None:
         raise VCardFormatError(MSG_INVALID_X_NAME, {'String': text})
 
 
@@ -370,7 +370,7 @@ def validate_ptext(text):
     VCardFormatError: Invalid parameter value ...
     String: ...
     """
-    if re.match('^[' + SAFE_CHARS + ']*$', text) is None:
+    if re.match(u'^[{0}]*$'.format(re.escape(SAFE_CHARS)), text) is None:
         raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
@@ -383,14 +383,25 @@ def validate_text_value(text):
 
     Examples:
     >>> validate_text_value('')
+    >>> validate_text_value('\\\\,')
     >>> validate_text_value(SAFE_CHARS)
-    >>> validate_text_value('\\n')
+    >>> validate_text_value('\\\\n')
     >>> validate_text_value(';') # doctest: +ELLIPSIS
     Traceback (most recent call last):
     VCardFormatError: Invalid text value (See RFC 2426 section 4 for details)
     String: ...
+    >>> validate_text_value('\\\\\\\\;') # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    VCardFormatError: Invalid text value (See RFC 2426 section 4 for details)
+    String: ...
     """
-    if re.match(u'^([{0}:{1}]|\\{2})*$'.format(SAFE_CHARS, DQUOTE_CHAR, ESCAPED_CHARS), text) is None:
+    if re.match(
+        u'^([{0}:{1}]|(\\\\[{2}]))*$'.format(
+            re.escape(SAFE_CHARS),
+            DQUOTE_CHAR,
+            re.escape(ESCAPED_CHARS)),
+        text
+    ) is None:
         raise VCardFormatError(MSG_INVALID_TEXT_VALUE, {'String': text})
 
 
@@ -412,7 +423,7 @@ def validate_quoted_string(text):
     VCardFormatError: Invalid parameter value ...
     String: "ÿÿ"
     """
-    if re.match(u'^{0}[{1}]{0}$'.format(DQUOTE_CHAR, QSAFE_CHARS), text) is None:
+    if re.match(u'^{0}[{1}]{0}$'.format(DQUOTE_CHAR, re.escape(QSAFE_CHARS)), text) is None:
         raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
