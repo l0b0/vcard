@@ -16,7 +16,7 @@ import warnings
 import isodate
 
 # Local modules
-from vcard_defs import  (
+from vcard_defs import (
     DQUOTE_CHAR,
     ID_CHARS,
     ESCAPED_CHARS,
@@ -51,10 +51,10 @@ def _show_warning(
     filename='',
     lineno=-1,
     file=sys.stderr,
-    line=None):
+    line=None
+):
     """Custom simple warning."""
     file.write('{0}\n'.format(message))
-# pylint: enable=R0913,W0613,W0622
 
 
 def _stringify(text):
@@ -64,10 +64,10 @@ def _stringify(text):
     @param text: Something convertible to str
     @return: Printable string
     """
-    if isinstance(text, unicode):
-        text = text.encode('utf-8')
-    if not isinstance(text, str):
+    try:
         text = str(text)
+    except UnicodeEncodeError:
+        text = text.encode('utf-8')
     return text
 
 
@@ -390,10 +390,7 @@ def validate_text_value(text):
     VCardFormatError: Invalid text value (See RFC 2426 section 4 for details)
     String: ...
     """
-    if re.match(
-        '^([' + SAFE_CHARS + ':' + DQUOTE_CHAR + ']|\\' + \
-            ESCAPED_CHARS + ')*$',
-        text) is None:
+    if re.match(u'^([{0}:{1}]|\\{2})*$'.format(SAFE_CHARS, DQUOTE_CHAR, ESCAPED_CHARS), text) is None:
         raise VCardFormatError(MSG_INVALID_TEXT_VALUE, {'String': text})
 
 
@@ -415,9 +412,7 @@ def validate_quoted_string(text):
     VCardFormatError: Invalid parameter value ...
     String: "ÿÿ"
     """
-    if re.match(
-        r'^' + DQUOTE_CHAR + '[' + QSAFE_CHARS + ']' + DQUOTE_CHAR + '$',
-        text) is None:
+    if re.match(u'^{0}[{1}]{0}$'.format(DQUOTE_CHAR, QSAFE_CHARS), text) is None:
         raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
@@ -454,13 +449,13 @@ def validate_text_parameter(parameter):
     @param parameter: Single parameter, as returned by get_vcard_property_param
 
     Examples:
-    >>> validate_text_parameter(['VALUE', set(['ptext'])])
+    >>> validate_text_parameter(['VALUE', {'ptext'}])
     """
     param_name = parameter[0].upper()
     param_values = parameter[1]
 
     if param_name == 'VALUE':
-        if param_values != set(['ptext']):
+        if param_values != {'ptext'}:
             raise VCardFormatError(
                 '{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values),
                 {})
@@ -553,7 +548,7 @@ def validate_vcard_property(prop):
     <http://tools.ietf.org/html/rfc2426#section-4>. Checks are grouped by
     property to allow easy overview rather than a short function.
 
-    @param property: Formatted property
+    @param prop: Formatted property
     """
     property_name = prop['name'].upper()
 
@@ -639,7 +634,7 @@ def validate_vcard_property(prop):
                 raise VCardFormatError(MSG_MISSING_PARAM, {})
             for param_name, param_values in prop['parameters'].items():
                 if param_name.upper() == 'VALUE':
-                    if param_values != set(['uri']):
+                    if param_values != {'uri'}:
                         raise VCardFormatError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_VALUE,
@@ -652,7 +647,7 @@ def validate_vcard_property(prop):
                                 ('VALUE', 'CONTEXT')),
                             {})
                 elif param_name.upper() == 'CONTEXT':
-                    if param_values != set(['word']):
+                    if param_values != {'word'}:
                         raise VCardFormatError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_VALUE,
@@ -706,16 +701,13 @@ def validate_vcard_property(prop):
                 warnings.showwarning = _show_warning
                 for name in names:
                     validate_text_value(name)
-                    if name.find(SP_CHAR) != -1 and \
-                           ''.join([''.join(names) \
-                                    for names in prop['values']]) != name:
+                    if name.find(SP_CHAR) != -1 and ''.join([''.join(names) for names in prop['values']]) != name:
                         # Space in name
                         # Not just a single name
                         warnings.warn(
                             '{0}: {1}'.format(
                                 WARN_MULTIPLE_NAMES,
-                                name.encode('utf-8'))
-                            )
+                                name.encode('utf-8')))
 
         elif property_name == 'NICKNAME':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.3>
@@ -748,7 +740,7 @@ def validate_vcard_property(prop):
                     {})
             for param_name, param_values in prop['parameters'].items():
                 if param_name.upper() == 'ENCODING':
-                    if param_values != set(['b']):
+                    if param_values != {'b'}:
                         raise VCardFormatError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_VALUE,
@@ -760,13 +752,12 @@ def validate_vcard_property(prop):
                                 MSG_MISMATCH_PARAM,
                                 ('ENCODING', 'VALUE')),
                             {})
-                elif param_name.upper() == 'TYPE' and \
-                       'ENCODING' not in prop['parameters']:
+                elif param_name.upper() == 'TYPE' and 'ENCODING' not in prop['parameters']:
                     raise VCardFormatError(
                         '{0}: {1}'.format(MSG_MISSING_PARAM, 'ENCODING'),
                         {})
                 elif param_name.upper() == 'VALUE':
-                    if param_values != set(['uri']):
+                    if param_values != {'uri'}:
                         raise VCardFormatError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_VALUE,
@@ -809,7 +800,7 @@ def validate_vcard_property(prop):
                 raise VCardFormatError('{0}: {1:d} (expected 7)'.format(
                     MSG_INVALID_VALUE_COUNT,
                     len(prop['values'])),
-                {})
+                    {})
             if 'parameters' in prop:
                 for param_name, param_values in prop['parameters'].items():
                     if param_name.upper() == 'TYPE':
@@ -821,24 +812,20 @@ def validate_vcard_property(prop):
                                 'parcel',
                                 'home',
                                 'work',
-                                'pref']:
+                                'pref'
+                            ]:
                                 raise VCardFormatError(
                                     '{0}: {1}'.format(
                                         MSG_INVALID_PARAM_VALUE,
                                         param_subvalue),
                                     {})
-                        if param_values == set([
-                            'intl',
-                            'postal',
-                            'parcel',
-                            'work']):
+                        if param_values == {'intl', 'postal', 'parcel', 'work'}:
                             warnings.warn(
                                 '{0}: {1}'.format(
                                     WARN_DEFAULT_TYPE_VALUE,
-                                    prop['values'])
-                                )
+                                    prop['values']))
                     else:
-                        validate_text_parameter(parameter)
+                        validate_text_parameter(prop)
 
         elif property_name == 'LABEL':
             # <http://tools.ietf.org/html/rfc2426#section-3.2.2>
@@ -853,22 +840,19 @@ def validate_vcard_property(prop):
                                 'parcel',
                                 'home',
                                 'work',
-                                'pref']:
+                                'pref'
+                            ]:
                                 raise VCardFormatError('{0}: {1}'.format(
                                     MSG_INVALID_PARAM_VALUE,
                                     param_subvalue),
-                                {})
-                        if param_values == set([
-                            'intl',
-                            'postal',
-                            'parcel',
-                            'work']):
+                                    {})
+                        if param_values == {'intl', 'postal', 'parcel', 'work'}:
                             warnings.warn('{0}: {1}'.format(
                                 WARN_DEFAULT_TYPE_VALUE,
                                 prop['values'])
                             )
                     else:
-                        validate_text_parameter(parameter)
+                        validate_text_parameter(prop)
             if len(prop['values']) != 1:
                 raise VCardFormatError(
                     '{0}: {1:d} (expected 1)'.format(
@@ -903,13 +887,13 @@ def validate_vcard_property(prop):
                                 'modem',
                                 'car',
                                 'isdn',
-                                'pcs']:
+                                'pcs'
+                            ]:
                                 raise VCardFormatError('{0}: {1}'.format(
                                     MSG_INVALID_PARAM_VALUE,
                                     param_subvalue),
-                                {})
-                        if set([value.lower() for value in param_values]) == \
-                               set(['voice']):
+                                    {})
+                        if set([value.lower() for value in param_values]) == {'voice'}:
                             warnings.warn('{0}: {1}'.format(
                                 WARN_DEFAULT_TYPE_VALUE,
                                 prop['values'])
@@ -948,18 +932,18 @@ def validate_vcard_property(prop):
                                 'postal',
                                 'parcel',
                                 'home',
-                                'work']:
+                                'work'
+                            ]:
                                 warnings.warn('{0}: {1}'.format(
                                     WARN_INVALID_EMAIL_TYPE,
                                     param_subvalue)
                                 )
                         if set([value.lower() for value in param_values]) == \
-                               set(['internet']):
+                                {'internet'}:
                             warnings.warn(
                                 '{0}: {1[values]}'.format(
                                     WARN_DEFAULT_TYPE_VALUE,
-                                    prop)
-                                )
+                                    prop))
                     else:
                         raise VCardFormatError(
                             '{0}: {1}'.format(
@@ -1076,12 +1060,12 @@ def validate_vcard_property(prop):
                 raise VCardFormatError('{0}: {1:d} (expected 1)'.format(
                     MSG_INVALID_VALUE_COUNT,
                     len(prop['values'])),
-                {})
+                    {})
             if len(prop['values'][0]) != 1:
                 raise VCardFormatError('{0}: {1:d} (expected 1)'.format(
                     MSG_INVALID_SUBVALUE_COUNT,
                     len(prop['values'][0])),
-                {})
+                    {})
             validate_text_value(prop['values'][0][0])
 
         elif property_name == 'AGENT':
@@ -1092,17 +1076,18 @@ def validate_vcard_property(prop):
                         raise VCardFormatError('{0}: {1}'.format(
                             MSG_INVALID_PARAM_NAME,
                             param_values),
-                        {})
-                    if param_values != set(['uri']):
-                        raise VCardFormatError('{0}: {1}'.format(
-                            MSG_INVALID_PARAM_VALUE,
-                            param_values),
-                        {})
+                            {})
+                    if param_values != {'uri'}:
+                        raise VCardFormatError(
+                            '{0}: {1}'.format(
+                                MSG_INVALID_PARAM_VALUE,
+                                param_values),
+                            {})
                 if len(prop['values']) != 1:
                     raise VCardFormatError('{0}: {1:d} (expected 1)'.format(
                         MSG_INVALID_VALUE_COUNT,
                         len(prop['values'])),
-                    {})
+                        {})
                 for value in prop['values']:
                     if len(value) != 1:
                         raise VCardFormatError(

@@ -27,9 +27,9 @@ def find_unescaped(text, char, escape_char='\\'):
     >>> find_unescaped('foo\\\\,bar\\\\,baz', ',')
     """
     unescaped_regex = '(?<!' + escape_char + escape_char + ')' + \
-            '(?:' + escape_char + escape_char + escape_char + escape_char + \
-            ')*' + \
-            '(' + char + ')'
+        '(?:' + escape_char + escape_char + escape_char + escape_char + \
+        ')*' + \
+        '(' + char + ')'
     regex = re.compile(unescaped_regex)
 
     char_match = regex.search(text)

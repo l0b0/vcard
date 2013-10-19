@@ -28,7 +28,7 @@ def _get_vcard_file(path):
     """
     Get the vCard contents locally or remotely.
 
-    @param filename: File relative to current directory or a URL
+    @param path: File relative to current directory or a URL
     @return: Text in the given file
     """
     if path in ('', None):
@@ -36,7 +36,7 @@ def _get_vcard_file(path):
     elif path.startswith('http'):
         try:
             filename = urllib.urlretrieve(path)[0]
-        except IOError as error:
+        except IOError:
             print('No internet connection; skipping {}\n'.format(path))
             return
     else:
@@ -182,7 +182,7 @@ VCARDS_REFERENCE_ERRORS = (
     # http://tools.ietf.org/html/rfc2426
     'rfc_2426_a.vcf',
     'rfc_2426_b.vcf'
-    )
+)
 
 # Valid vCards
 VCARDS_VALID = (
@@ -191,7 +191,7 @@ VCARDS_VALID = (
     'scrambled_case.vcf',
     'http://aspaass.no/kontakt/Aspaas%20Sykler.vcf',
     'http://www.troywolf.com/articles/php/class_vcard/vcard_example.php'
-    )
+)
 
 
 class TestVCards(unittest.TestCase):
@@ -202,7 +202,7 @@ class TestVCards(unittest.TestCase):
         for testgroup in VCARDS_WITH_ERROR:
             for vcard_file in testgroup['vcards']:
                 vcard_text = _get_vcard_file(vcard_file)
-                if vcard_text == None:
+                if vcard_text is None:
                     continue
 
                 try:
@@ -211,7 +211,7 @@ class TestVCards(unittest.TestCase):
                         self.fail(
                             'Invalid vCard created:\n{0}'.format(vcard_text))
                 except vcard_validators.VCardFormatError as error:
-                    message = str(error).splitlines()[0].split(':')[0]
+                    message = str(error).splitlines(False)[0].split(':')[0]
                     self.assertEquals(
                         message,
                         testgroup['message'],
@@ -223,15 +223,15 @@ class TestVCards(unittest.TestCase):
                             Got: {1}
                             Expected: {2}
                             '''.format(
-                                vcard_text,
-                                message,
-                                testgroup['message'])))
+                            vcard_text,
+                            message,
+                            testgroup['message'])))
 
     def test_valid(self):
         """Valid (but not necessarily sane) vCards"""
         for vcard_file in VCARDS_VALID:
             vcard_text = _get_vcard_file(vcard_file)
-            if vcard_text == None:
+            if vcard_text is None:
                 continue
 
             try:
@@ -249,7 +249,7 @@ class TestVCards(unittest.TestCase):
         """vCards in references which are invalid"""
         for vcard_file in VCARDS_REFERENCE_ERRORS:
             vcard_text = _get_vcard_file(vcard_file)
-            if vcard_text == None:
+            if vcard_text is None:
                 continue
 
             with warnings.catch_warnings(record=True):

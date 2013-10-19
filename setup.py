@@ -11,7 +11,7 @@ from vcard import (
     __email__,
     __maintainer__,
     __license__,
-    )
+)
 
 setup(
     name=__package__,
@@ -34,7 +34,7 @@ setup(
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
         'Topic :: Text Processing',
         'Topic :: Utilities',
     ],
@@ -47,4 +47,4 @@ setup(
     platforms=['POSIX', 'Windows'],
     license=__license__,
     obsoletes=['vcard_module'],
-    )
+)

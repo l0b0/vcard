@@ -127,8 +127,10 @@ def get_vcard_group(lines):
             next_match = group_re.match(lines[index])
             if next_match:
                 raise vcard_validators.VCardFormatError(
-                    '{0}: {1} != {2}'.format(MSG_MISMATCH_GROUP,
-                        (next_match.group(1), group)),
+                    '{0}: {1} != {2}'.format(
+                        MSG_MISMATCH_GROUP,
+                        next_match.group(1), group
+                    ),
                     {'File line': index + 1})
 
     return group
@@ -151,7 +153,7 @@ def get_vcard_property_param_values(values_string):
     """
     Get the parameter values. RFC 2426 page 29.
 
-    @param text: Comma separated values
+    @param values_string: Comma separated values
     @return: Set of values. Assumes that sequence doesn't matter and that
     duplicate values can be discarded, even though RFC 2426 doesn't explicitly
     say this. I.e., assumes that TYPE=WORK,VOICE,WORK === TYPE=VOICE,WORK.
@@ -160,9 +162,7 @@ def get_vcard_property_param_values(values_string):
 
     # Validate
     for value in values:
-        if not re.match(
-            '^[' + SAFE_CHARS + ']+$|^"[' + QSAFE_CHARS + ']+"$',
-            value):
+        if not re.match(u'^[{0}]+$|^"[{1}]+"$'.format(SAFE_CHARS, QSAFE_CHARS), value):
             raise vcard_validators.VCardFormatError(
                 '{0}: {1}'.format(MSG_INVALID_VALUE, value),
                 {})
@@ -292,9 +292,10 @@ def get_vcard_property(property_line):
 
     # String validation
     if not prop['name'].upper() in ALL_PROPERTIES and not re.match(
-        '^X-[' + ID_CHARS + ']+$',
+        '^X-[{0}]+$'.format(ID_CHARS),
         prop['name'],
-        re.IGNORECASE):
+        re.IGNORECASE
+    ):
         raise vcard_validators.VCardFormatError(
             '{0}: {1[name]}'.format(MSG_INVALID_PROPERTY_NAME, prop),
             {})
@@ -319,7 +320,7 @@ def get_vcard_properties(lines):
     """
     Get the properties for each line. RFC 2426 pages 28, 29.
 
-    @param properties: List of unfolded vCard lines
+    @param lines: List of unfolded vCard lines
     @return: List of properties, for simplicity. AFAIK sequence doesn't matter
     and duplicates add no information, but ignoring this to make sure vCard
     output looks like the original.
@@ -337,8 +338,7 @@ def get_vcard_properties(lines):
                     error.context)
 
     for mandatory_property in MANDATORY_PROPERTIES:
-        if mandatory_property not in [
-            prop['name'].upper() for prop in properties]:
+        if mandatory_property not in [prop['name'].upper() for prop in properties]:
             raise vcard_validators.VCardFormatError(
                 '{0}: {1}'.format(MSG_MISSING_PROPERTY, mandatory_property),
                 {'Property': mandatory_property})
@@ -419,7 +419,7 @@ def validate_file(filename, verbose=False):
     if vcard_text != '' and result == '':
         result += 'Could not process entire %s - %i lines remain' % (
             filename,
-            len(vcard_text.splitlines()))
+            len(vcard_text.splitlines(False)))
 
     if result == '':
         return None
@@ -451,7 +451,7 @@ def main(argv=None):
                 argv[1:],
                 'v',
                 ['verbose'])
-        except getopt.GetoptError, err:
+        except getopt.GetoptError as err:
             raise UsageError(str(err))
 
         for option, value in opts:
@@ -463,7 +463,7 @@ def main(argv=None):
         if not args:
             raise UsageError(__doc__)
 
-    except UsageError, err:
+    except UsageError as err:
         sys.stderr.write('{0}\n'.format(str(err)))
         return 2
 
