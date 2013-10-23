@@ -1,5 +1,5 @@
+*.egg
+*.egg-info/
 *.pyc
 build/
 dist/
-*.egg/
-*.egg-info/
