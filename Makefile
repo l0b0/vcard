@@ -59,6 +59,7 @@ distclean:
 release: test register
 	$(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
 	$(GIT_TAG) -m 'PyPI release' $(RELEASE_TAG)
+	@echo 'Remember to `git push --tags`'
 
 include make-includes/python.mk
 include make-includes/variables.mk
