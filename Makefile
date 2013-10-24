@@ -7,7 +7,6 @@ GIT_TAG = $(GIT) tag -au $(GPG_ID)
 
 # Python
 PYTHON = /usr/bin/python$(PYTHON_VERSION)
-PYTHON_CMD = $(PYTHON) -c
 PYTHON_VERSION := 2.7
 SETUP = $(PYTHON) setup.py
 INSTALL_OPTIONS := -O2
@@ -17,8 +16,6 @@ UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
 RM := /bin/rm -f
 
 NAME = $(notdir $(CURDIR))
-
-RELEASE_TAG = v$(shell PYTHONPATH=. $(PYTHON_CMD) 'from $(NAME) import __version__; print __version__')
 
 .PHONY: all
 all: build
@@ -58,7 +55,7 @@ distclean:
 .PHONY: release
 release: test register
 	$(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
-	$(GIT_TAG) -m 'PyPI release' $(RELEASE_TAG)
+	$(GIT_TAG) -m 'PyPI release' v$(shell $(PYTHON) version.py)
 	@echo 'Remember to `git push --tags`'
 
 include make-includes/python.mk
