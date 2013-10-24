@@ -5,11 +5,11 @@ This program can be used for strict validation and parsing of vCards.
 
 Additional scripts:
 
-* `format-TEL.sh` - Format phone numbers according to national standards
-* `split.sh` - Split a multiple vCards file into individual files
-* `sort-lines.sh` - Sort vCard property lines according to a custom key
-* `join-lines.sh` - Join previously split vCard lines
-* `split-lines.sh` - Split long vCard lines
+* [`format-TEL.sh`](format-TEL.sh) - Format phone numbers according to national standards
+* [`split.sh`](split.sh) - Split a multiple vCards file into individual files
+* [`sort-lines.sh`](sort-lines.sh) - Sort vCard property lines according to a custom key
+* [`join-lines.sh`](join-lines.sh) - Join previously split vCard lines
+* [`split-lines.sh`](split-lines.sh) - Split long vCard lines
 
 Installation / upgrade
 ----------------------
@@ -19,7 +19,8 @@ Installation / upgrade
 Examples
 --------
 
-The `test` directory contains two valid vCards: `maximal.vcf` and `minimal.vcf`.
+* [`minimal.vcf`](test/minimal.vcf)
+* [`maximal.vcf`](test/maximal.vcf)
 
 Development
 -----------
