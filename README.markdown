@@ -34,6 +34,6 @@ Development
 
 **Test:**
 
-Requires `shunit2` and `setuptools` (part of `virtualenv`).
+Requires `setuptools` (part of `virtualenv`).
 
     make test
