@@ -52,7 +52,7 @@ distclean:
 	-$(RM) -r dist
 
 .PHONY: release
-release: test register
+release: build register
 	$(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
 	$(GIT_TAG) -m 'PyPI release' v$(shell $(PYTHON) version.py)
 	@echo 'Remember to `git push --tags`'
