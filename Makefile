@@ -29,6 +29,8 @@ build: test
 .PHONY: clean
 clean: distclean
 	-$(RM) -r build isodate-*.egg $(NAME).egg-info
+	-$(FIND) . -type d -name '__pycache__' -delete
+	-$(FIND) . -type f -name '*.pyc' -delete
 
 .PHONY: install
 install:
