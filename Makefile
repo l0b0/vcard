@@ -28,7 +28,6 @@ build: test
 
 .PHONY: clean
 clean: distclean
-	$(SETUP) clean
 	-$(RM) -r build isodate-*.egg $(NAME).egg-info
 
 .PHONY: install
