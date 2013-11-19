@@ -14,6 +14,8 @@ Additional scripts:
 Installation / upgrade
 ----------------------
 
+If your system uses Python 3 as the system Python, you'll have to install `pip2` and use that instead of `pip` below.
+
     sudo pip install --upgrade vcard
 
 Examples
