@@ -57,12 +57,13 @@ lines() {
     wc -l "$@" | cut -d ' ' -f 1
 }
 
-for file
+for path
 do
     # Split
-    "$dir/split.sh" --digits=8 -- "$file"
+    "$dir/split.sh" "$path"
 
-    for vcard in xx*
+    filename="$(basename -- "$path")"
+    for vcard in "$filename"????????
     do
         ll_vcard=ll-"$vcard"
         sorted_ll_vcard=sll-"$vcard"
@@ -97,7 +98,7 @@ do
 
     # Restore file
     set +o noclobber
-    cat -- s-* > "$file"
+    cat -- s-* > "$path"
     set -o noclobber
     rm -- *
 done

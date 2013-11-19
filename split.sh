@@ -37,5 +37,5 @@ set -o errexit -o noclobber -o nounset -o pipefail
 
 for path
 do
-    csplit --elide-empty-files --prefix "$(basename -- "$path")" "$path" $'/^BEGIN:VCARD\r$/' {*} >/dev/null
+    csplit --elide-empty-files --digits=8 --prefix "$(basename -- "$path")" "$path" $'/^BEGIN:VCARD\r$/' '{*}' >/dev/null
 done
