@@ -1,3 +1,5 @@
+NAME = $(notdir $(CURDIR))
+
 # Release
 GPG_ID ?= 92126B54
 
@@ -16,8 +18,6 @@ UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
 
 # System
 RM := /bin/rm -f
-
-NAME = $(notdir $(CURDIR))
 
 build_directory = build
 virtualenv_directory = $(build_directory)/virtualenv
