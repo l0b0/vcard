@@ -25,14 +25,14 @@ virtualenv_directory = $(build_directory)/virtualenv
 .PHONY: all
 all: $(build_directory)
 
-$(virtualenv_directory):
+$(virtualenv_python):
 	virtualenv --python=$(system_python) $(virtualenv_directory)
 
 .PHONY: test
-test: $(virtualenv_directory)
+test: $(virtualenv_python)
 	. $(virtualenv_directory)/bin/activate && $(SETUP) test
 
-$(build_directory): test $(virtualenv_directory)
+$(build_directory): test $(virtualenv_python)
 	. $(virtualenv_directory)/bin/activate && $(SETUP) build
 
 .PHONY: clean
@@ -42,7 +42,7 @@ clean: distclean
 	-$(FIND) . -type f -name '*.pyc' -delete
 
 .PHONY: install
-install: $(virtualenv_directory)
+install: $(virtualenv_python)
 	. $(virtualenv_directory)/bin/activate && $(SETUP) install $(INSTALL_OPTIONS)
 	for dir in /etc/bash_completion.d /usr/share/bash-completion/completions; \
 	do \
@@ -54,7 +54,7 @@ install: $(virtualenv_directory)
 	done
 
 .PHONY: register
-register: $(virtualenv_directory)
+register: $(virtualenv_python)
 	. $(virtualenv_directory)/bin/activate && $(SETUP) register
 
 .PHONY: distclean
@@ -62,7 +62,7 @@ distclean:
 	-$(RM) -r dist
 
 .PHONY: release
-release: $(build_directory) register $(virtualenv_directory)
+release: $(build_directory) register $(virtualenv_python)
 	. $(virtualenv_directory)/bin/activate && $(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
 	$(GIT_TAG) -m 'PyPI release' v$(shell $(virtualenv_python) version.py)
 	@echo 'Remember to `git push --tags`'
