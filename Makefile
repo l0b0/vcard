@@ -13,7 +13,7 @@ python_version_major = 2
 python_version_minor = 7
 python_series = $(python_version_major).$(python_version_minor)
 system_python = python$(python_series)
-SETUP = ./setup.py
+SETUP = setup.py
 INSTALL_OPTIONS := -O2
 UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
 
@@ -31,10 +31,10 @@ $(virtualenv_python):
 
 .PHONY: test
 test: $(virtualenv_python)
-	. $(virtualenv_directory)/bin/activate && $(SETUP) test
+	. $(virtualenv_directory)/bin/activate && $(virtualenv_python) $(SETUP) test
 
 $(build_directory): test $(virtualenv_python)
-	. $(virtualenv_directory)/bin/activate && $(SETUP) build
+	. $(virtualenv_directory)/bin/activate && $(virtualenv_python) $(SETUP) build
 
 .PHONY: clean
 clean: distclean
@@ -44,7 +44,7 @@ clean: distclean
 
 .PHONY: install
 install: $(virtualenv_python)
-	. $(virtualenv_directory)/bin/activate && $(SETUP) install $(INSTALL_OPTIONS)
+	. $(virtualenv_directory)/bin/activate && $(virtualenv_python) $(SETUP) install $(INSTALL_OPTIONS)
 	for dir in /etc/bash_completion.d /usr/share/bash-completion/completions; \
 	do \
 		if [ -d "$$dir" ]; \
@@ -56,7 +56,7 @@ install: $(virtualenv_python)
 
 .PHONY: register
 register: $(virtualenv_python)
-	. $(virtualenv_directory)/bin/activate && $(SETUP) register
+	. $(virtualenv_directory)/bin/activate && $(virtualenv_python) $(SETUP) register
 
 .PHONY: distclean
 distclean:
@@ -64,7 +64,7 @@ distclean:
 
 .PHONY: release
 release: $(build_directory) register $(virtualenv_python)
-	. $(virtualenv_directory)/bin/activate && $(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
+	. $(virtualenv_directory)/bin/activate && $(virtualenv_python) $(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
 	$(GIT_TAG) -m 'PyPI release' v$(shell $(virtualenv_python) version.py)
 	@echo 'Remember to `git push --tags`'
 
