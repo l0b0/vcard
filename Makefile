@@ -62,7 +62,7 @@ $(python_tarball_signature_path):
 	wget --timestamp --directory-prefix=$(build_directory) $(python_tarball_signature_url)
 
 $(gpg_keyring):
-	gpg --no-default-keyring --keyring $(gpg_keyring) --recv-keys $(python_tarball_pgp_public_key_id)
+	gpg --keyserver keys.gnupg.net --no-default-keyring --keyring $(gpg_keyring) --recv-keys $(python_tarball_pgp_public_key_id)
 
 $(system_python): $(python_tarball_path) $(python_tarball_signature_path) $(gpg_keyring)
 	gpg --no-default-keyring --keyring $(gpg_keyring) $(python_tarball_signature_path)
