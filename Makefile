@@ -11,7 +11,8 @@ GIT_TAG = $(GIT) tag -au $(GPG_ID)
 virtualenv_python = $(virtualenv_directory)/bin/python
 python_version_major = 2
 python_version_minor = 7
-system_python = python$(python_version_major).$(python_version_minor)
+python_series = $(python_version_major).$(python_version_minor)
+system_python = python$(python_series)
 SETUP = ./setup.py
 INSTALL_OPTIONS := -O2
 UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
