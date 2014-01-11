@@ -6,7 +6,7 @@ GIT := /usr/bin/git
 GIT_TAG = $(GIT) tag -au $(GPG_ID)
 
 # Python
-PYTHON = python
+python_executable = $(virtualenv_directory)/bin/python
 SETUP = ./setup.py
 INSTALL_OPTIONS := -O2
 UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
@@ -61,7 +61,7 @@ distclean:
 .PHONY: release
 release: $(build_directory) register virtualenv
 	. $(virtualenv_directory)/bin/activate && $(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
-	$(GIT_TAG) -m 'PyPI release' v$(shell $(PYTHON) version.py)
+	$(GIT_TAG) -m 'PyPI release' v$(shell $(python_executable) version.py)
 	@echo 'Remember to `git push --tags`'
 
 include make-includes/python.mk
