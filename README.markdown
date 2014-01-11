@@ -40,6 +40,6 @@ Development
 
 **Test:**
 
-Requires `setuptools` (part of `virtualenv`).
+Requires `gpg`, `tar`, `make` and `wget`.
 
     make test
