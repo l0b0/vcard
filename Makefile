@@ -37,10 +37,17 @@ virtualenv = $(build_directory)/bin/virtualenv
 virtualenv_version = 1.11
 virtualenv_release = virtualenv-$(virtualenv_version)
 virtualenv_tarball = $(virtualenv_release).tar.gz
-virtualenv_tarball_url = https://pypi.python.org/packages/source/v/virtualenv/$(virtualenv_tarball)
+virtualenv_url = https://pypi.python.org/packages/source/v/virtualenv/
+virtualenv_tarball_url = $(virtualenv_url)/$(virtualenv_tarball)
 virtualenv_tarball_path = $(build_directory)/$(virtualenv_tarball)
 virtualenv_path = $(build_directory)/$(virtualenv_release)
 virtualenv_prefix = $(CURDIR)/$(build_directory)
+
+virtualenv_tarball_signature = $(virtualenv_tarball).asc
+virtualenv_tarball_signature_url = $(virtualenv_url)/$(virtualenv_tarball_signature)
+virtualenv_tarball_signature_path = $(build_directory)/$(virtualenv_tarball_signature)
+
+virtualenv_tarball_pgp_public_key_id = 3372DCFA
 
 SETUP = setup.py
 INSTALL_OPTIONS := -O2
@@ -62,7 +69,7 @@ $(python_tarball_signature_path):
 	wget --timestamp --directory-prefix=$(build_directory) $(python_tarball_signature_url)
 
 $(gpg_keyring):
-	gpg --keyserver keys.gnupg.net --no-default-keyring --keyring $(gpg_keyring) --recv-keys $(python_tarball_pgp_public_key_id)
+	gpg --keyserver keys.gnupg.net --no-default-keyring --keyring $(gpg_keyring) --recv-keys $(python_tarball_pgp_public_key_id) $(virtualenv_tarball_pgp_public_key_id)
 
 $(system_python): $(python_tarball_path) $(python_tarball_signature_path) $(gpg_keyring)
 	gpg --no-default-keyring --keyring $(gpg_keyring) $(python_tarball_signature_path)
@@ -71,8 +78,14 @@ $(system_python): $(python_tarball_path) $(python_tarball_signature_path) $(gpg_
 	make -C $(python_path)
 	make -C $(python_path) altinstall
 
-$(virtualenv): $(system_python)
+$(virtualenv_tarball_path):
 	wget --timestamp --directory-prefix=$(build_directory) $(virtualenv_tarball_url)
+
+$(virtualenv_tarball_signature_path):
+	wget --timestamp --directory-prefix=$(build_directory) $(virtualenv_tarball_signature_url)
+
+$(virtualenv): $(virtualenv_tarball_path) $(system_python) $(virtualenv_tarball_signature_path) $(gpg_keyring)
+	gpg --no-default-keyring --keyring $(gpg_keyring) $(virtualenv_tarball_signature_path)
 	tar -C $(build_directory) -zxvf $(virtualenv_tarball_path)
 	cd $(virtualenv_path) && $(system_python) setup.py install --prefix $(virtualenv_prefix)
 
