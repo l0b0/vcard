@@ -40,6 +40,14 @@ Development
 
 **Test:**
 
-Requires `gpg`, `tar`, `make` and `wget`.
-
     make test
+
+Test requirements:
+
+- `gcc`
+- `gpg`
+- `tar`
+- `make`
+- `openssl` development headers/libraries
+- `wget`
+- `zlib` development headers/libraries
