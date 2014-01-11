@@ -42,6 +42,10 @@ Development
 
     make test
 
+To test a specific Python version:
+
+    make python_version_minor=2 python_version_minor=7 python_version_patch=5 test
+
 Test requirements:
 
 - `gcc`

@@ -28,7 +28,7 @@ python_tarball_signature = $(python_release).tgz.asc
 python_tarball_signature_url = $(python_url)/$(python_version)/$(python_tarball_signature)
 python_tarball_signature_path = $(build_directory)/$(python_tarball_signature)
 
-python_tarball_pgp_public_key_id = 18ADD4FF
+python_tarball_pgp_public_key_id = 6A45C816 36580288 7D9DC8D2 18ADD4FF A4135B38 A74B06BF EA5BBD71 ED9D77D5 E6DF025C 6F5E1540 F73C700D
 
 python_path = $(build_directory)/$(python_release)
 python_prefix = $(CURDIR)/$(build_directory)
