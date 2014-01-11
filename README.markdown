@@ -1,6 +1,8 @@
 vCard module
 ============
 
+[![Build Status](https://jenkins.engmark.name:8090/job/vcard/badge/icon)](https://jenkins.engmark.name:8090/job/vcard/)
+
 This program can be used for strict validation and parsing of vCards.
 
 Additional scripts:
