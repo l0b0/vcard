@@ -7,6 +7,9 @@ GIT_TAG = $(GIT) tag -au $(GPG_ID)
 
 # Python
 python_executable = $(virtualenv_directory)/bin/python
+python_version_major = 2
+python_version_minor = 7
+system_python = python$(python_version_major).$(python_version_minor)
 SETUP = ./setup.py
 INSTALL_OPTIONS := -O2
 UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
@@ -23,7 +26,7 @@ virtualenv_directory = $(build_directory)/virtualenv
 all: $(build_directory)
 
 $(virtualenv_directory):
-	virtualenv --python=python2.7 $(virtualenv_directory)
+	virtualenv --python=$(system_python) $(virtualenv_directory)
 
 .PHONY: test
 test: $(virtualenv_directory)
