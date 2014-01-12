@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/download" />
       <excludeFolder url="file://$MODULE_DIR$/isodate-0.4.9-py2.7.egg" />
       <excludeFolder url="file://$MODULE_DIR$/make-includes" />
       <excludeFolder url="file://$MODULE_DIR$/vcard.egg-info" />
