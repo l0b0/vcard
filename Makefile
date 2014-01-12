@@ -97,6 +97,7 @@ $(virtualenv_python): $(system_python) $(virtualenv)
 test: $(virtualenv_python)
 	. $(virtualenv_directory)/bin/activate && $(virtualenv_python) $(SETUP) test
 
+.PHONY: compile
 compile: test $(virtualenv_python)
 	. $(virtualenv_directory)/bin/activate && $(virtualenv_python) $(SETUP) build
 
