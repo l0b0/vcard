@@ -8,7 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/make-includes" />
       <excludeFolder url="file://$MODULE_DIR$/vcard.egg-info" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python virtualenv at ~/dev/vcard/build/virtualenv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
