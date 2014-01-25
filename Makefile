@@ -63,13 +63,13 @@ virtualenv_directory = $(build_directory)/virtualenv
 .PHONY: all
 all: compile
 
-$(python_tarball_path):
+$(python_tarball_path): $(download_directory)
 	wget --timestamp --directory-prefix=$(download_directory) $(python_tarball_url)
 
-$(python_tarball_signature_path):
+$(python_tarball_signature_path): $(download_directory)
 	wget --timestamp --directory-prefix=$(download_directory) $(python_tarball_signature_url)
 
-$(gpg_keyring):
+$(gpg_keyring): $(download_directory)
 	gpg --keyserver keys.gnupg.net --no-default-keyring --keyring $(gpg_keyring) --recv-keys $(python_tarball_pgp_public_key_id) $(virtualenv_tarball_pgp_public_key_id)
 
 $(system_python): $(python_tarball_path) $(python_tarball_signature_path) $(gpg_keyring) $(build_directory)
@@ -79,10 +79,10 @@ $(system_python): $(python_tarball_path) $(python_tarball_signature_path) $(gpg_
 	make -C $(python_path)
 	make -C $(python_path) altinstall
 
-$(virtualenv_tarball_path):
+$(virtualenv_tarball_path): $(download_directory)
 	wget --timestamp --directory-prefix=$(download_directory) $(virtualenv_tarball_url)
 
-$(virtualenv_tarball_signature_path):
+$(virtualenv_tarball_signature_path): $(download_directory)
 	wget --timestamp --directory-prefix=$(download_directory) $(virtualenv_tarball_signature_url)
 
 $(virtualenv): $(virtualenv_tarball_path) $(system_python) $(virtualenv_tarball_signature_path) $(gpg_keyring) $(build_directory)
@@ -136,8 +136,8 @@ release: compile register $(virtualenv_python)
 	$(GIT_TAG) -m 'PyPI release' v$(shell $(virtualenv_python) version.py)
 	@echo 'Remember to `git push --tags`'
 
-$(build_directory):
-	mkdir $(build_directory)
+$(build_directory) $(download_directory):
+	mkdir -p $@
 
 include make-includes/python.mk
 include make-includes/variables.mk
