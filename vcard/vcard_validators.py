@@ -69,6 +69,16 @@ def _show_warning(
     file.write('{0}\n'.format(message))
 
 
+def _expect_no_params(prop):
+    if 'parameters' in prop:
+        raise VCardFormatError(
+            '{0}: {1[parameters]}'.format(MSG_NON_EMPTY_PARAM, prop),
+            {})
+
+def _expect_params(prop):
+    if not 'parameters' in prop:
+        raise VCardFormatError(MSG_MISSING_PARAM, {})
+
 def _stringify(text):
     """
     Get the text as a string representation
@@ -572,10 +582,7 @@ def validate_vcard_property(prop):
     try:
         if property_name in ('BEGIN', 'END'):
             # <http://tools.ietf.org/html/rfc2426#section-2.1.1>
-            if 'parameters' in prop:
-                raise VCardFormatError(
-                    '{0}: {1[parameters]}'.format(MSG_NON_EMPTY_PARAM, prop),
-                    {})
+            _expect_no_params(prop)
             if len(prop['values']) != 1:
                 raise VCardFormatError(
                     '{0}: {1:d} (expected 1)'.format(
@@ -597,12 +604,7 @@ def validate_vcard_property(prop):
 
         if property_name == 'NAME':
             # <http://tools.ietf.org/html/rfc2426#section-2.1.2>
-            if 'parameters' in prop:
-                raise VCardFormatError(
-                    '{0}: {1[parameters]}'.format(
-                        MSG_NON_EMPTY_PARAM,
-                        prop),
-                    {})
+            _expect_no_params(prop)
             if len(prop['values']) != 1:
                 raise VCardFormatError(
                     '{0}: {1:d} (expected 1)'.format(
@@ -619,12 +621,7 @@ def validate_vcard_property(prop):
 
         if property_name == 'PROFILE':
             # <http://tools.ietf.org/html/rfc2426#section-2.1.3>
-            if 'parameters' in prop:
-                raise VCardFormatError(
-                    '{0}: {1[parameters]}'.format(
-                        MSG_NON_EMPTY_PARAM,
-                        prop),
-                    {})
+            _expect_no_params(prop)
             if len(prop['values']) != 1:
                 raise VCardFormatError(
                     '{0}: {1:d} (expected 1)'.format(
@@ -647,8 +644,7 @@ def validate_vcard_property(prop):
 
         if property_name == 'SOURCE':
             # <http://tools.ietf.org/html/rfc2426#section-2.1.4>
-            if not 'parameters' in prop:
-                raise VCardFormatError(MSG_MISSING_PARAM, {})
+            _expect_params(prop)
             for param_name, param_values in prop['parameters'].items():
                 if param_name.upper() == 'VALUE':
                     if param_values != {'uri'}:
@@ -758,8 +754,7 @@ def validate_vcard_property(prop):
         elif property_name in ['PHOTO', 'LOGO']:
             # <http://tools.ietf.org/html/rfc2426#section-3.1.4>
             # <http://tools.ietf.org/html/rfc2426#section-3.5.4>
-            if not 'parameters' in prop:
-                raise VCardFormatError(MSG_MISSING_PARAM, {})
+            _expect_params(prop)
             if len(prop['values']) != 1:
                 raise VCardFormatError(
                     '{0}: {1:d} (expected 1)'.format(
@@ -808,12 +803,7 @@ def validate_vcard_property(prop):
 
         elif property_name == 'BDAY':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.5>
-            if 'parameters' in prop:
-                raise VCardFormatError(
-                    '{0}: {1}'.format(
-                        MSG_NON_EMPTY_PARAM,
-                        prop['parameters']),
-                    {})
+            _expect_no_params(prop)
             if len(prop['values']) != 1:
                 raise VCardFormatError(
                     '{0}: {1:d} (expected 1)'.format(
@@ -1000,12 +990,7 @@ def validate_vcard_property(prop):
 
         elif property_name == 'MAILER':
             # <http://tools.ietf.org/html/rfc2426#section-3.3.3>
-            if 'parameters' in prop:
-                raise VCardFormatError(
-                    '{0}: {1[parameters]}'.format(
-                        MSG_NON_EMPTY_PARAM,
-                        prop),
-                    {})
+            _expect_no_params(prop)
             if len(prop['values']) != 1:
                 raise VCardFormatError(
                     '{0}: {1:d} (expected 1)'.format(
@@ -1022,12 +1007,7 @@ def validate_vcard_property(prop):
 
         elif property_name == 'TZ':
             # <http://tools.ietf.org/html/rfc2426#section-3.4.1>
-            if 'parameters' in prop:
-                raise VCardFormatError(
-                    '{0}: {1[parameters]}'.format(
-                        MSG_NON_EMPTY_PARAM,
-                        prop),
-                    {})
+            _expect_no_params(prop)
             if len(prop['values']) != 1:
                 raise VCardFormatError(
                     '{0}: {1:d} (expected 1)'.format(
@@ -1045,12 +1025,7 @@ def validate_vcard_property(prop):
 
         elif property_name == 'GEO':
             # <http://tools.ietf.org/html/rfc2426#section-3.4.2>
-            if 'parameters' in prop:
-                raise VCardFormatError(
-                    '{0}: {1[parameters]}'.format(
-                        MSG_NON_EMPTY_PARAM,
-                        prop),
-                    {})
+            _expect_no_params(prop)
             if len(prop['values']) != 2:
                 raise VCardFormatError(
                     '{0}: {1:d} (expected 2)'.format(
