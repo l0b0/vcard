@@ -696,6 +696,23 @@ def validate_vcard_property(prop):
                     {})
             validate_text_value(prop['values'][0][0])
 
+        elif property_name == 'VERSION':
+            if 'parameters' in prop:
+                raise VCardFormatError(
+                    '{0}: {1[parameters]}'.format(MSG_NON_EMPTY_PARAM, prop),
+                    {})
+            if len(prop['values']) != 1:
+                raise VCardFormatError(
+                    '{0}: {1:d} (expected 1)'.format(
+                        MSG_INVALID_VALUE_COUNT,
+                        len(prop['values'])),
+                    {})
+            if prop['values'][0][0].lower() != '3.0':
+                raise VCardFormatError(
+                    '{0}: {1} (expected "3.0")'.format(
+                        MSG_INVALID_VALUE,
+                        prop['values'][0][0]),
+                    {})
         elif property_name == 'N':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.2>
             if 'parameters' in prop:
