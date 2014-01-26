@@ -68,17 +68,6 @@ def _show_warning(
     """Custom simple warning."""
     file.write('{0}\n'.format(message))
 
-
-def _expect_no_params(prop):
-    if 'parameters' in prop:
-        raise VCardFormatError(
-            '{0}: {1[parameters]}'.format(MSG_NON_EMPTY_PARAM, prop),
-            {})
-
-def _expect_params(prop):
-    if not 'parameters' in prop:
-        raise VCardFormatError(MSG_MISSING_PARAM, {})
-
 def _stringify(text):
     """
     Get the text as a string representation
@@ -179,6 +168,33 @@ class VCardFormatError(Exception):
 
         return message
 
+def _expect_no_params(prop):
+    if 'parameters' in prop:
+        raise VCardFormatError(
+            '{0}: {1[parameters]}'.format(MSG_NON_EMPTY_PARAM, prop),
+            {})
+
+def _expect_params(prop):
+    if not 'parameters' in prop:
+        raise VCardFormatError(MSG_MISSING_PARAM, {})
+
+def _expect_value_count(values, count):
+    if len(values) != count:
+        raise VCardFormatError(
+            '{0}: {1:d} (expected {2})'.format(
+                MSG_INVALID_VALUE_COUNT,
+                len(values),
+                count),
+            {})
+
+def _expect_subvalue_count(subvalues, count):
+    if len(subvalues) != count:
+        raise VCardFormatError(
+            '{0}: {1:d} (expected {2})'.format(
+                MSG_INVALID_SUBVALUE_COUNT,
+                len(subvalues),
+                count),
+            {})
 
 def validate_date(text):
     """
@@ -583,18 +599,8 @@ def validate_vcard_property(prop):
         if property_name in ('BEGIN', 'END'):
             # <http://tools.ietf.org/html/rfc2426#section-2.1.1>
             _expect_no_params(prop)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1) 
+            _expect_subvalue_count(prop['values'][0], 1)
             if prop['values'][0][0].lower() != 'vcard':
                 raise VCardFormatError(
                     '{0}: {1} (expected "VCARD")'.format(
@@ -605,35 +611,15 @@ def validate_vcard_property(prop):
         if property_name == 'NAME':
             # <http://tools.ietf.org/html/rfc2426#section-2.1.2>
             _expect_no_params(prop)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {0:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
             validate_text_value(prop['values'][0][0])
 
         if property_name == 'PROFILE':
             # <http://tools.ietf.org/html/rfc2426#section-2.1.3>
             _expect_no_params(prop)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
             if prop['values'][0][0].lower() != 'vcard':
                 raise VCardFormatError(
                     '{0}: {1} (expected "VCARD")'.format(
@@ -684,18 +670,8 @@ def validate_vcard_property(prop):
             if 'parameters' in prop:
                 for parameter in prop['parameters'].items():
                     validate_text_parameter(parameter)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
             validate_text_value(prop['values'][0][0])
 
         elif property_name == 'VERSION':
@@ -720,12 +696,7 @@ def validate_vcard_property(prop):
             if 'parameters' in prop:
                 for parameter in prop['parameters'].items():
                     validate_text_parameter(parameter)
-            if len(prop['values']) != 5:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 5)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
+            _expect_value_count(prop['values'], 5)
             # Should names be split?
             for names in prop['values']:
                 warnings.showwarning = _show_warning
@@ -744,29 +715,14 @@ def validate_vcard_property(prop):
             if 'parameters' in prop:
                 for parameter in prop['parameters'].items():
                     validate_text_parameter(parameter)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
+            _expect_value_count(prop['values'], 1)
 
         elif property_name in ['PHOTO', 'LOGO']:
             # <http://tools.ietf.org/html/rfc2426#section-3.1.4>
             # <http://tools.ietf.org/html/rfc2426#section-3.5.4>
             _expect_params(prop)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
             for param_name, param_values in prop['parameters'].items():
                 if param_name.upper() == 'ENCODING':
                     if param_values != {'b'}:
@@ -804,27 +760,13 @@ def validate_vcard_property(prop):
         elif property_name == 'BDAY':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.5>
             _expect_no_params(prop)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
             validate_date(prop['values'][0][0])
 
         elif property_name == 'ADR':
             # <http://tools.ietf.org/html/rfc2426#section-3.2.1>
-            if len(prop['values']) != 7:
-                raise VCardFormatError('{0}: {1:d} (expected 7)'.format(
-                    MSG_INVALID_VALUE_COUNT,
-                    len(prop['values'])),
-                    {})
+            _expect_value_count(prop['values'], 7)
             if 'parameters' in prop:
                 for param_name, param_values in prop['parameters'].items():
                     if param_name.upper() == 'TYPE':
@@ -877,18 +819,8 @@ def validate_vcard_property(prop):
                             )
                     else:
                         validate_text_parameter(prop)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
             validate_text_value(prop['values'][0][0])
 
         elif property_name == 'TEL':
@@ -928,18 +860,8 @@ def validate_vcard_property(prop):
                                 MSG_INVALID_PARAM_NAME,
                                 param_name),
                             {})
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
 
         elif property_name == 'EMAIL':
             # <http://tools.ietf.org/html/rfc2426#section-3.3.2>
@@ -974,64 +896,32 @@ def validate_vcard_property(prop):
                                 MSG_INVALID_PARAM_NAME,
                                 param_name),
                             {})
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
             validate_text_value(prop['values'][0][0])
 
         elif property_name == 'MAILER':
             # <http://tools.ietf.org/html/rfc2426#section-3.3.3>
             _expect_no_params(prop)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_value_count(prop['values'][0], 1)
             validate_text_value(prop['values'][0][0])
 
         elif property_name == 'TZ':
             # <http://tools.ietf.org/html/rfc2426#section-3.4.1>
             _expect_no_params(prop)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
             value = prop['values'][0][0]
             validate_time_zone(value)
 
         elif property_name == 'GEO':
             # <http://tools.ietf.org/html/rfc2426#section-3.4.2>
             _expect_no_params(prop)
-            if len(prop['values']) != 2:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 2)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
+            _expect_value_count(prop['values'], 2)
+            # can the following be...
+            #   _expect_subvalue_count(prop['values'][0], 2)
+            # ...?
             for value in prop['values']:
                 if len(value) != 1:
                     raise VCardFormatError(
@@ -1046,18 +936,8 @@ def validate_vcard_property(prop):
             if 'parameters' in prop:
                 for parameter in prop['parameters'].items():
                     validate_text_parameter(parameter)
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_SUBVALUE_COUNT,
-                        len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
             validate_text_value(prop['values'][0][0])
 
         elif property_name == 'ROLE':
@@ -1065,16 +945,8 @@ def validate_vcard_property(prop):
             if 'parameters' in prop:
                 for parameter in prop['parameters'].items():
                     validate_text_parameter(parameter)
-            if len(prop['values']) != 1:
-                raise VCardFormatError('{0}: {1:d} (expected 1)'.format(
-                    MSG_INVALID_VALUE_COUNT,
-                    len(prop['values'])),
-                    {})
-            if len(prop['values'][0]) != 1:
-                raise VCardFormatError('{0}: {1:d} (expected 1)'.format(
-                    MSG_INVALID_SUBVALUE_COUNT,
-                    len(prop['values'][0])),
-                    {})
+            _expect_value_count(prop['values'], 1)
+            _expect_subvalue_count(prop['values'][0], 1)
             validate_text_value(prop['values'][0][0])
 
         elif property_name == 'AGENT':
@@ -1092,11 +964,10 @@ def validate_vcard_property(prop):
                                 MSG_INVALID_PARAM_VALUE,
                                 param_values),
                             {})
-                if len(prop['values']) != 1:
-                    raise VCardFormatError('{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                        {})
+                _expect_value_count(prop['values'], 1)
+                # can this be...
+                #   _expect_subvalue_count(prop['values'][0], 1)
+                # ...?
                 for value in prop['values']:
                     if len(value) != 1:
                         raise VCardFormatError(
