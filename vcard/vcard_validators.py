@@ -707,7 +707,7 @@ def validate_vcard_property(prop):
                         MSG_INVALID_VALUE_COUNT,
                         len(prop['values'])),
                     {})
-            if prop['values'][0][0].lower() != '3.0':
+            if prop['values'][0][0] != '3.0':
                 raise VCardFormatError(
                     '{0}: {1} (expected "3.0")'.format(
                         MSG_INVALID_VALUE,
