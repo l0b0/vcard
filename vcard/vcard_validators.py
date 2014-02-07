@@ -44,6 +44,17 @@ from vcard_defs import (
     WARN_MULTIPLE_NAMES
 )
 
+VALID_DATE = re.compile(r'^\d{4}-?\d{2}-?\d{2}$')
+VALID_TZ = re.compile(r'^(Z|[+-]\d{2}:?\d{2})$')
+VALID_TIME_TZ = re.compile(r'^(\d{2}:?\d{2}:?\d{2}(?:,\d+)?)(.*)$')
+VALID_LANG_TAG = re.compile(r'^([a-z]{1,8})(-[a-z]{1,8})*$')
+VALID_X_NAME = re.compile(r'^X-[{0}]+$'.format(re.escape(ID_CHARS)))
+VALID_PTEXT = re.compile(u'^[{0}]*$'.format(re.escape(SAFE_CHARS)))
+VALID_TEXT = re.compile(u'^([{0}:{1}]|(\\\\[{2}]))*$'.format(re.escape(SAFE_CHARS),
+                                                             DQUOTE_CHAR,
+                                                             re.escape(ESCAPED_CHARS)))
+VALID_QUOTED_STRING = re.compile(u'^{0}[{1}]{0}$'.format(DQUOTE_CHAR, re.escape(QSAFE_CHARS)))
+VALID_FLOAT = re.compile(r'^[+-]?\d+(\.\d+)?$')
 
 def _show_warning(
     message,
@@ -191,7 +202,7 @@ def validate_date(text):
     VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: aaaa-bb-cc
     """
-    if re.match(r'^\d{4}-?\d{2}-?\d{2}$', text) is None:
+    if VALID_DATE.match(text) is None:
         raise VCardFormatError(MSG_INVALID_DATE, {'String': text})
 
     try:
@@ -245,7 +256,7 @@ def validate_time_zone(text):
     Traceback (most recent call last):
     VCardFormatError: Invalid time zone ...
     """
-    if not re.match(r'^(Z|[+-]\d{2}:?\d{2})$', text):
+    if not VALID_TZ.match(text):
         raise VCardFormatError(MSG_INVALID_TIME_ZONE, {'String': text})
 
     try:
@@ -283,7 +294,7 @@ def validate_time(text):
     VCardFormatError: Invalid time zone ...
     String: Z+01
     """
-    time_timezone = re.match(r'^(\d{2}:?\d{2}:?\d{2}(?:,\d+)?)(.*)$', text)
+    time_timezone = VALID_TIME_TZ.match(text)
     if time_timezone is None:
         raise VCardFormatError(MSG_INVALID_TIME, {'String': text})
 
@@ -320,7 +331,7 @@ def validate_language_tag(text):
     """
     text = text.lower()  # Case insensitive
 
-    if re.match(r'^([a-z]{1,8})(-[a-z]{1,8})*$', text) is None:
+    if VALID_LANG_TAG.match(text) is None:
         raise VCardFormatError(MSG_INVALID_LANGUAGE_VALUE, {'String': text})
 
     # TODO: Extend to validate according to referenced ISO/RFC standards
@@ -351,7 +362,7 @@ def validate_x_name(text):
     VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: foo
     """
-    if re.match(r'^X-[{0}]+$'.format(re.escape(ID_CHARS)), text) is None:
+    if VALID_X_NAME.match(text) is None:
         raise VCardFormatError(MSG_INVALID_X_NAME, {'String': text})
 
 
@@ -370,7 +381,7 @@ def validate_ptext(text):
     VCardFormatError: Invalid parameter value ...
     String: ...
     """
-    if re.match(u'^[{0}]*$'.format(re.escape(SAFE_CHARS)), text) is None:
+    if VALID_PTEXT.match(text) is None:
         raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
@@ -395,13 +406,7 @@ def validate_text_value(text):
     VCardFormatError: Invalid text value (See RFC 2426 section 4 for details)
     String: ...
     """
-    if re.match(
-        u'^([{0}:{1}]|(\\\\[{2}]))*$'.format(
-            re.escape(SAFE_CHARS),
-            DQUOTE_CHAR,
-            re.escape(ESCAPED_CHARS)),
-        text
-    ) is None:
+    if VALID_TEXT.match(text) is None:
         raise VCardFormatError(MSG_INVALID_TEXT_VALUE, {'String': text})
 
 
@@ -423,7 +428,7 @@ def validate_quoted_string(text):
     VCardFormatError: Invalid parameter value ...
     String: "ÿÿ"
     """
-    if re.match(u'^{0}[{1}]{0}$'.format(DQUOTE_CHAR, re.escape(QSAFE_CHARS)), text) is None:
+    if VALID_QUOTED_STRING.match(text) is None:
         raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
@@ -522,7 +527,7 @@ def validate_float(text):
         ...
     VCardFormatError: Invalid subvalue ...
     """
-    if re.match(r'^[+-]?\d+(\.\d+)?$', text) is None:
+    if VALID_FLOAT.match(text) is None:
         raise VCardFormatError(
             '{0}, expected float value: {1}'.format(
                 MSG_INVALID_SUBVALUE,
