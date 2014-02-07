@@ -93,10 +93,14 @@ $(virtualenv): $(virtualenv_tarball_path) $(system_python) $(virtualenv_tarball_
 $(virtualenv_python): $(system_python) $(virtualenv)
 	$(virtualenv) --python=$(system_python) $(virtualenv_directory)
 
+$(virtualenv_directory)/bin/pep8:
+	. $(virtualenv_directory)/bin/activate && pip install $(notdir $@)
+
 .PHONY: test
-test: $(virtualenv_python)
-	make METHOD=git python-pep8
-	. $(virtualenv_directory)/bin/activate && $(virtualenv_python) $(SETUP) test
+test: $(virtualenv_python) $(virtualenv_directory)/bin/pep8
+	. $(virtualenv_directory)/bin/activate && \
+		$(virtualenv_python) $(SETUP) test && \
+		make METHOD=git python-pep8
 
 .PHONY: compile
 compile: test $(virtualenv_python)
