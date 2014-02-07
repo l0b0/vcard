@@ -95,6 +95,7 @@ $(virtualenv_python): $(system_python) $(virtualenv)
 
 .PHONY: test
 test: $(virtualenv_python)
+	make METHOD=git python-pep8
 	. $(virtualenv_directory)/bin/activate && $(virtualenv_python) $(SETUP) test
 
 .PHONY: compile
