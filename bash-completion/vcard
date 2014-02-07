@@ -1,4 +1,4 @@
-# Autocomplete for filterous command
+# Autocomplete for vcard command
 _vcard()
 {
     local cur prev opts base
