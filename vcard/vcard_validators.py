@@ -56,6 +56,7 @@ VALID_TEXT = re.compile(u'^([{0}:{1}]|(\\\\[{2}]))*$'.format(re.escape(SAFE_CHAR
 VALID_QUOTED_STRING = re.compile(u'^{0}[{1}]{0}$'.format(DQUOTE_CHAR, re.escape(QSAFE_CHARS)))
 VALID_FLOAT = re.compile(r'^[+-]?\d+(\.\d+)?$')
 
+
 def _show_warning(
     message,
     category=UserWarning,
