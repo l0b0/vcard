@@ -2,7 +2,7 @@
 __package__ = 'vcard'
 __author__ = 'Victor Engmark'
 __copyright__ = 'Copyright (C) 2010-2014 Victor Engmark'
-__credits__ = ['Victor Engmark']
+__credits__ = ['Victor Engmark', 'Zearin']
 __maintainer__ = 'Victor Engmark'
 __email__ = 'victor.engmark@gmail.com'
 __license__ = 'GPL v3 or newer'
