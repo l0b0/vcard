@@ -68,6 +68,7 @@ def _show_warning(
     """Custom simple warning."""
     file.write('{0}\n'.format(message))
 
+
 def _stringify(text):
     """
     Get the text as a string representation
@@ -168,15 +169,18 @@ class VCardFormatError(Exception):
 
         return message
 
+
 def _expect_no_params(prop):
     if 'parameters' in prop:
         raise VCardFormatError(
             '{0}: {1[parameters]}'.format(MSG_NON_EMPTY_PARAM, prop),
             {})
 
+
 def _expect_params(prop):
     if not 'parameters' in prop:
         raise VCardFormatError(MSG_MISSING_PARAM, {})
+
 
 def _expect_value_count(values, count):
     if len(values) != count:
@@ -187,6 +191,7 @@ def _expect_value_count(values, count):
                 count),
             {})
 
+
 def _expect_subvalue_count(subvalues, count):
     if len(subvalues) != count:
         raise VCardFormatError(
@@ -195,6 +200,7 @@ def _expect_subvalue_count(subvalues, count):
                 len(subvalues),
                 count),
             {})
+
 
 def validate_date(text):
     """
@@ -599,7 +605,7 @@ def validate_vcard_property(prop):
         if property_name in ('BEGIN', 'END'):
             # <http://tools.ietf.org/html/rfc2426#section-2.1.1>
             _expect_no_params(prop)
-            _expect_value_count(prop['values'], 1) 
+            _expect_value_count(prop['values'], 1)
             _expect_subvalue_count(prop['values'][0], 1)
             if prop['values'][0][0].lower() != 'vcard':
                 raise VCardFormatError(
@@ -675,16 +681,8 @@ def validate_vcard_property(prop):
             validate_text_value(prop['values'][0][0])
 
         elif property_name == 'VERSION':
-            if 'parameters' in prop:
-                raise VCardFormatError(
-                    '{0}: {1[parameters]}'.format(MSG_NON_EMPTY_PARAM, prop),
-                    {})
-            if len(prop['values']) != 1:
-                raise VCardFormatError(
-                    '{0}: {1:d} (expected 1)'.format(
-                        MSG_INVALID_VALUE_COUNT,
-                        len(prop['values'])),
-                    {})
+            _expect_no_params(prop)
+            _expect_value_count(prop['values'], 1)
             if prop['values'][0][0] != '3.0':
                 raise VCardFormatError(
                     '{0}: {1} (expected "3.0")'.format(
