@@ -208,8 +208,7 @@ class TestVCards(unittest.TestCase):
                 try:
                     with warnings.catch_warnings(record=True):
                         vcard.VCard(vcard_text, filename=vcard_file)
-                        self.fail(
-                            'Invalid vCard created:\n{0}'.format(vcard_text))
+                        self.fail('Invalid vCard created:\n{0}'.format(vcard_text))
                 except vcard_validators.VCardFormatError as error:
                     message = str(error).splitlines(False)[0].split(':')[0]
                     error_msg = '\n\n'.join((
