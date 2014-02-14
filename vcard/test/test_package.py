@@ -207,25 +207,20 @@ class TestVCards(unittest.TestCase):
 
                 try:
                     with warnings.catch_warnings(record=True):
-                        vcard.VCard(vcard_text)
+                        vcard.VCard(vcard_text, filename=vcard_file)
                         self.fail(
                             'Invalid vCard created:\n{0}'.format(vcard_text))
                 except vcard_validators.VCardFormatError as error:
                     message = str(error).splitlines(False)[0].split(':')[0]
-                    self.assertEquals(
-                        message,
-                        testgroup['message'],
-                        dedent(
-                            '''
-                            Wrong message for vCard:
-                            {0}
-
-                            Got: {1}
-                            Expected: {2}
-                            '''.format(
-                            vcard_text,
-                            message,
-                            testgroup['message'])))
+                    error_msg = '\n\n'.join((
+                        'Wrong message for vCard {vcard_file!r}:'.format(vcard_file=vcard_file),
+                        'Expected: {expected}'.format(expected=testgroup['message']),
+                        'Got: {got}'.format(got=str(error)),
+                        ))
+                    self.assertTrue(
+                        testgroup['message'] in str(error),
+                        msg=error_msg
+                    )
 
     def test_valid(self):
         """Valid (but not necessarily sane) vCards"""
@@ -236,14 +231,16 @@ class TestVCards(unittest.TestCase):
 
             try:
                 with warnings.catch_warnings(record=True):
-                    vc_obj = vcard.VCard(vcard_text)
+                    vc_obj = vcard.VCard(vcard_text, filename=vcard_file)
                 self.assertNotEqual(vc_obj, None)
             except vcard_validators.VCardFormatError as error:
-                self.fail(dedent(''' Valid vCard not created:
-                                     {0}
-
-                                     {1}
-                                 '''.format(vcard_text, error)))
+                error_msg = '\n\n'.join((
+                    'Expected valid vCard for {vcard_file!r}, but it failed to validate'.format(
+                        vcard_file=vcard_file
+                    ),
+                    str(error)
+                ))
+                self.fail(error_msg)
 
     def test_online(self):
         """vCards in references which are invalid"""
