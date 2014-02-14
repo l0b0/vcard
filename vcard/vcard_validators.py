@@ -978,6 +978,12 @@ def validate_vcard_property(prop):
                 # Inline vCard object
                 pass  # TODO: Un-escape and validate value
 
+        elif property_name == 'URL':
+            # <http://tools.ietf.org/html/rfc2426#section-3.6.8>
+            _expect_no_params(prop)
+            _expect_value_count(prop['values'], 1)
+            validate_uri(prop['values'][0][0])
+
     except VCardFormatError as error:
         error.context['Property'] = property_name
         raise VCardFormatError(error.message, error.context)

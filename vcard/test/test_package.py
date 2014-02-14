@@ -145,7 +145,9 @@ VCARDS_MISSING_VALUE_STRING = {
         'missing_n_value.vcf',)}
 VCARDS_NON_EMPTY_PARAM = {
     'message': vcard_defs.MSG_NON_EMPTY_PARAM,
-    'vcards': tuple()}
+    'vcards': (
+        'http://aspaass.no/kontakt/Aspaas%20Sykler.vcf',
+        'http://www.troywolf.com/articles/php/class_vcard/vcard_example.php')}
 
 VCARDS_WITH_ERROR = (
     VCARDS_CONTINUATION_AT_START,
@@ -188,9 +190,7 @@ VCARDS_REFERENCE_ERRORS = (
 VCARDS_VALID = (
     'minimal.vcf',
     'maximal.vcf',
-    'scrambled_case.vcf',
-    'http://aspaass.no/kontakt/Aspaas%20Sykler.vcf',
-    'http://www.troywolf.com/articles/php/class_vcard/vcard_example.php'
+    'scrambled_case.vcf'
 )
 
 

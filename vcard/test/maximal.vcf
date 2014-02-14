@@ -10,8 +10,8 @@ ORG:Example Organization;Example Department;Example Sub-Department;Example
  Office
 LOGO;VALUE=uri:http://example.org/example.svg
 TITLE:Assistant assessor
-URL;TYPE=WORK:http://example.org/example-department/example-sub-department/
- example-office
+URL:http://example.org/example-department/example-sub-department/example-of
+ fice
 EMAIL;TYPE=INTERNET;TYPE=PREF;TYPE=WORK:jdoe+work-related@example.org
 TEL;TYPE=VOICE;TYPE=PREF;TYPE=MSG;TYPE=WORK:+1234567890
 TEL;TYPE=FAX;TYPE=WORK:+0123456789
