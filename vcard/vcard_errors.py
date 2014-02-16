@@ -69,7 +69,7 @@ def _stringify(text):
     return text
 
 
-def _show_warning(
+def show_warning(
     message,
     category=UserWarning,
     filename='',

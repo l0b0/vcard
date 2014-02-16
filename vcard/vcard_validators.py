@@ -46,7 +46,7 @@ from vcard_errors import (
     WARN_INVALID_EMAIL_TYPE,
     WARN_MULTIPLE_NAMES,
     # Functions
-    _show_warning,
+    show_warning,
     # Classes
     VCardFormatError
 )
@@ -591,7 +591,7 @@ def validate_vcard_property(prop):
             _expect_value_count(prop['values'], 5)
             # Should names be split?
             for names in prop['values']:
-                warnings.showwarning = _show_warning
+                warnings.showwarning = show_warning
                 for name in names:
                     validate_text_value(name)
                     if name.find(SP_CHAR) != -1 and ''.join([''.join(names) for names in prop['values']]) != name:
