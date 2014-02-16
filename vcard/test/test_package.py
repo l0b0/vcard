@@ -19,6 +19,7 @@ from textwrap import dedent
 from vcard import (
     vcard,
     vcard_defs,
+    vcard_errors,
     vcard_utils,
     vcard_validators
 )
@@ -50,88 +51,88 @@ def _get_vcard_file(path):
 
 # vCards with errors
 VCARDS_CONTINUATION_AT_START = {
-    'message': vcard_defs.MSG_CONTINUATION_AT_START,
+    'message': vcard_errors.MSG_CONTINUATION_AT_START,
     'vcards': ('continuation_at_start.vcf',)}
 VCARDS_DOT_AT_LINE_START = {
-    'message': vcard_defs.MSG_DOT_AT_LINE_START,
+    'message': vcard_errors.MSG_DOT_AT_LINE_START,
     'vcards': ('dot_at_line_start.vcf',)}
 VCARDS_EMPTY_VCARD = {
-    'message': vcard_defs.MSG_EMPTY_VCARD,
+    'message': vcard_errors.MSG_EMPTY_VCARD,
     'vcards': (
         '',
         None)}
 VCARDS_INVALID_DATE = {
-    'message': vcard_defs.MSG_INVALID_DATE,
+    'message': vcard_errors.MSG_INVALID_DATE,
     'vcards': tuple()}
 VCARDS_INVALID_LANGUAGE_VALUE = {
-    'message': vcard_defs.MSG_INVALID_LANGUAGE_VALUE,
+    'message': vcard_errors.MSG_INVALID_LANGUAGE_VALUE,
     'vcards': ('invalid_language_value.vcf',)}
 VCARDS_INVALID_LINE_SEPARATOR = {
-    'message': vcard_defs.MSG_INVALID_LINE_SEPARATOR,
+    'message': vcard_errors.MSG_INVALID_LINE_SEPARATOR,
     'vcards': (
         'line_ending_mac.vcf',
         'line_ending_unix.vcf',
         'line_ending_mixed.vcf',)}
 VCARDS_INVALID_PARAM_NAME = {
-    'message': vcard_defs.MSG_INVALID_PARAM_NAME,
+    'message': vcard_errors.MSG_INVALID_PARAM_NAME,
     'vcards': ('invalid_param_name.vcf',)}
 VCARDS_INVALID_PARAM_VALUE = {
-    'message': vcard_defs.MSG_INVALID_PARAM_VALUE,
+    'message': vcard_errors.MSG_INVALID_PARAM_VALUE,
     'vcards': ('invalid_param_value.vcf',)}
 VCARDS_INVALID_PROPERTY_NAME = {
-    'message': vcard_defs.MSG_INVALID_PROPERTY_NAME,
+    'message': vcard_errors.MSG_INVALID_PROPERTY_NAME,
     'vcards': ('invalid_property_foo.vcf',)}
 VCARDS_INVALID_SUBVALUE = {
-    'message': vcard_defs.MSG_INVALID_SUBVALUE,
+    'message': vcard_errors.MSG_INVALID_SUBVALUE,
     'vcards': tuple()}
 VCARDS_INVALID_SUBVALUE_COUNT = {
-    'message': vcard_defs.MSG_INVALID_SUBVALUE_COUNT,
+    'message': vcard_errors.MSG_INVALID_SUBVALUE_COUNT,
     'vcards': tuple()}
 VCARDS_INVALID_TEXT_VALUE = {
-    'message': vcard_defs.MSG_INVALID_TEXT_VALUE,
+    'message': vcard_errors.MSG_INVALID_TEXT_VALUE,
     'vcards': tuple()}
 VCARDS_INVALID_TIME = {
-    'message': vcard_defs.MSG_INVALID_TIME,
+    'message': vcard_errors.MSG_INVALID_TIME,
     'vcards': tuple()}
 VCARDS_INVALID_TIME_ZONE = {
-    'message': vcard_defs.MSG_INVALID_TIME_ZONE,
+    'message': vcard_errors.MSG_INVALID_TIME_ZONE,
     'vcards': tuple()}
 VCARDS_INVALID_URI = {
-    'message': vcard_defs.MSG_INVALID_URI,
+    'message': vcard_errors.MSG_INVALID_URI,
     'vcards': tuple()}
 VCARDS_INVALID_VALUE = {
-    'message': vcard_defs.MSG_INVALID_VALUE,
+    'message': vcard_errors.MSG_INVALID_VALUE,
     'vcards': (
         'invalid_begin.vcf',)}
 VCARDS_INVALID_VALUE_COUNT = {
-    'message': vcard_defs.MSG_INVALID_VALUE_COUNT,
+    'message': vcard_errors.MSG_INVALID_VALUE_COUNT,
     'vcards': (
         # http://en.wikipedia.org/wiki/VCard
         'invalid_value_count_wp.vcf',)}
 VCARDS_INVALID_X_NAME = {
-    'message': vcard_defs.MSG_INVALID_X_NAME,
+    'message': vcard_errors.MSG_INVALID_X_NAME,
     'vcards': tuple()}
 VCARDS_MISMATCH_GROUP = {
-    'message': vcard_defs.MSG_MISMATCH_GROUP,
+    'message': vcard_errors.MSG_MISMATCH_GROUP,
     'vcards': (
         'mismatch_group.vcf',)}
 VCARDS_MISMATCH_PARAM = {
-    'message': vcard_defs.MSG_MISMATCH_PARAM,
+    'message': vcard_errors.MSG_MISMATCH_PARAM,
     'vcards': tuple()}
 VCARDS_MISSING_GROUP = {
-    'message': vcard_defs.MSG_MISSING_GROUP,
+    'message': vcard_errors.MSG_MISSING_GROUP,
     'vcards': (
         'missing_group.vcf',)}
 VCARDS_MISSING_PARAM = {
-    'message': vcard_defs.MSG_MISSING_PARAM,
+    'message': vcard_errors.MSG_MISSING_PARAM,
     'vcards': (
         'missing_photo_param.vcf',)}
 VCARDS_MISSING_PARAM_VALUE = {
-    'message': vcard_defs.MSG_MISSING_PARAM_VALUE,
+    'message': vcard_errors.MSG_MISSING_PARAM_VALUE,
     'vcards': (
         'missing_param_value.vcf',)}
 VCARDS_MISSING_PROPERTY = {
-    'message': vcard_defs.MSG_MISSING_PROPERTY,
+    'message': vcard_errors.MSG_MISSING_PROPERTY,
     'vcards': (
         'missing_properties.vcf',
         'missing_start.vcf',
@@ -140,11 +141,11 @@ VCARDS_MISSING_PROPERTY = {
         'missing_n.vcf',
         'missing_fn.vcf',)}
 VCARDS_MISSING_VALUE_STRING = {
-    'message': vcard_defs.MSG_MISSING_VALUE_STRING,
+    'message': vcard_errors.MSG_MISSING_VALUE_STRING,
     'vcards': (
         'missing_n_value.vcf',)}
 VCARDS_NON_EMPTY_PARAM = {
-    'message': vcard_defs.MSG_NON_EMPTY_PARAM,
+    'message': vcard_errors.MSG_NON_EMPTY_PARAM,
     'vcards': (
         'http://aspaass.no/kontakt/Aspaas%20Sykler.vcf',
         'http://www.troywolf.com/articles/php/class_vcard/vcard_example.php')}
@@ -209,7 +210,7 @@ class TestVCards(unittest.TestCase):
                     with warnings.catch_warnings(record=True):
                         vcard.VCard(vcard_text, filename=vcard_file)
                         self.fail('Invalid vCard created:\n{0}'.format(vcard_text))
-                except vcard_validators.VCardFormatError as error:
+                except vcard_errors.VCardFormatError as error:
                     message = str(error).splitlines(False)[0].split(':')[0]
                     error_msg = '\n\n'.join((
                         'Wrong message for vCard {vcard_file!r}:'.format(vcard_file=vcard_file),
@@ -232,7 +233,7 @@ class TestVCards(unittest.TestCase):
                 with warnings.catch_warnings(record=True):
                     vc_obj = vcard.VCard(vcard_text, filename=vcard_file)
                 self.assertNotEqual(vc_obj, None)
-            except vcard_validators.VCardFormatError as error:
+            except vcard_errors.VCardFormatError as error:
                 error_msg = '\n\n'.join((
                     'Expected valid vCard for {vcard_file!r}, but it failed to validate'.format(
                         vcard_file=vcard_file
@@ -250,7 +251,7 @@ class TestVCards(unittest.TestCase):
 
             with warnings.catch_warnings(record=True):
                 self.assertRaises(
-                    vcard_validators.VCardFormatError,
+                    vcard_errors.VCardFormatError,
                     vcard.VCard,
                     vcard_text)
 
@@ -258,5 +259,6 @@ class TestVCards(unittest.TestCase):
         """Run DocTests"""
         self.assertEqual(doctest.testmod(vcard)[0], 0)
         self.assertEqual(doctest.testmod(vcard_defs)[0], 0)
+        self.assertEqual(doctest.testmod(vcard_errors)[0], 0)
         self.assertEqual(doctest.testmod(vcard_utils)[0], 0)
         self.assertEqual(doctest.testmod(vcard_validators)[0], 0)

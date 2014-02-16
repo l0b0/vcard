@@ -8,7 +8,6 @@ standards.
 """
 
 import re
-import sys
 from urlparse import urlparse
 import warnings
 
@@ -20,6 +19,13 @@ from vcard_defs import (
     DQUOTE_CHAR,
     ID_CHARS,
     ESCAPED_CHARS,
+    QSAFE_CHARS,
+    SAFE_CHARS,
+    SP_CHAR
+)
+
+from vcard_errors import (
+    # Error literals
     MSG_INVALID_DATE,
     MSG_INVALID_LANGUAGE_VALUE,
     MSG_INVALID_PARAM_NAME,
@@ -36,12 +42,13 @@ from vcard_defs import (
     MSG_MISMATCH_PARAM,
     MSG_MISSING_PARAM,
     MSG_NON_EMPTY_PARAM,
-    QSAFE_CHARS,
-    SAFE_CHARS,
-    SP_CHAR,
     WARN_DEFAULT_TYPE_VALUE,
     WARN_INVALID_EMAIL_TYPE,
-    WARN_MULTIPLE_NAMES
+    WARN_MULTIPLE_NAMES,
+    # Functions
+    _show_warning,
+    # Classes
+    VCardFormatError
 )
 
 VALID_DATE = re.compile(r'^\d{4}-?\d{2}-?\d{2}$')
@@ -55,119 +62,6 @@ VALID_TEXT = re.compile(u'^([{0}:{1}]|(\\\\[{2}]))*$'.format(re.escape(SAFE_CHAR
                                                              re.escape(ESCAPED_CHARS)))
 VALID_QUOTED_STRING = re.compile(u'^{0}[{1}]{0}$'.format(DQUOTE_CHAR, re.escape(QSAFE_CHARS)))
 VALID_FLOAT = re.compile(r'^[+-]?\d+(\.\d+)?$')
-
-
-def _show_warning(
-    message,
-    category=UserWarning,
-    filename='',
-    lineno=-1,
-    file=sys.stderr,
-    line=None
-):
-    """Custom simple warning."""
-    file.write('{0}\n'.format(message))
-
-
-def _stringify(text):
-    """
-    Get the text as a string representation
-
-    @param text: Something convertible to str
-    @return: Printable string
-    """
-    try:
-        text = str(text)
-    except UnicodeEncodeError:
-        text = text.encode('utf-8')
-    return text
-
-
-class VCardFormatError(Exception):
-    """Thrown if the text given is not a valid according to RFC 2426."""
-    def __init__(self, message, context):
-        """
-        vCard format error.
-
-        @param message: Error message
-        @param context: Dictionary with context information
-
-        Examples:
-        >>> raise VCardFormatError('test', {})
-        Traceback (most recent call last):
-        VCardFormatError: test
-        >>> raise VCardFormatError(
-        ... 'with path',
-        ... {'File': '/home/user/test.vcf'})
-        Traceback (most recent call last):
-        VCardFormatError: with path
-        File: /home/user/test.vcf
-        >>> raise VCardFormatError('Error with lots of context', {
-        ... 'File': '/home/user/test.vcf',
-        ... 'File line': 120,
-        ... 'vCard line': 5,
-        ... 'Property': 'ADR',
-        ... 'Property line': 2,
-        ... 'String': 'too;few;values;êéè'})
-        Traceback (most recent call last):
-        VCardFormatError: Error with lots of context
-        File: /home/user/test.vcf
-        File line: 120
-        vCard line: 5
-        Property: ADR
-        Property line: 2
-        String: too;few;values;êéè
-        >>> try:
-        ...     raise VCardFormatError('test', {'Property': 'ADR'})
-        ... except VCardFormatError as error:
-        ...     error.context['File'] = '/home/user/test.vcf'
-        ...     raise VCardFormatError(error.message, error.context)
-        Traceback (most recent call last):
-        VCardFormatError: test
-        File: /home/user/test.vcf
-        Property: ADR
-        >>> raise VCardFormatError(
-        ... 'Cöntexte randomisę',
-        ... {'foo': QSAFE_CHARS[-1]*2})
-        Traceback (most recent call last):
-        VCardFormatError: Cöntexte randomisę
-        foo: ÿÿ
-        """
-        Exception.__init__(self)
-        self.message = message
-        self.context = context
-
-    def __str__(self):
-        """
-        Outputs error with ordered context info.
-
-        @return: Printable error message
-        """
-        message = _stringify(self.message)
-
-        # Sort context information
-        keys = [
-            'File',
-            'File line',
-            'vCard line',
-            'Property',
-            'Property line',
-            'String']
-        for key in keys:
-            if key in self.context:
-                message += '\n{0}: {1}'.format(
-                    _stringify(key),
-                    _stringify(self.context.pop(key))
-                )
-
-        # Output other context strings any old way
-        for key in self.context.keys():
-            message += '\n{0}: {1}'.format(
-                _stringify(key),
-                _stringify(self.context.pop(key))
-            )
-
-        return message
 
 
 def _expect_no_params(prop):
