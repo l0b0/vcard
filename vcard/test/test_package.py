@@ -210,7 +210,7 @@ class TestVCards(unittest.TestCase):
                     with warnings.catch_warnings(record=True):
                         vcard.VCard(vcard_text, filename=vcard_file)
                         self.fail('Invalid vCard created:\n{0}'.format(vcard_text))
-                except vcard_errors.VCardFormatError as error:
+                except vcard_errors.VCardError as error:
                     message = str(error).splitlines(False)[0].split(':')[0]
                     error_msg = '\n\n'.join((
                         'Wrong message for vCard {vcard_file!r}:'.format(vcard_file=vcard_file),
@@ -233,7 +233,7 @@ class TestVCards(unittest.TestCase):
                 with warnings.catch_warnings(record=True):
                     vc_obj = vcard.VCard(vcard_text, filename=vcard_file)
                 self.assertNotEqual(vc_obj, None)
-            except vcard_errors.VCardFormatError as error:
+            except vcard_errors.VCardError as error:
                 error_msg = '\n\n'.join((
                     'Expected valid vCard for {vcard_file!r}, but it failed to validate'.format(
                         vcard_file=vcard_file
@@ -251,7 +251,7 @@ class TestVCards(unittest.TestCase):
 
             with warnings.catch_warnings(record=True):
                 self.assertRaises(
-                    vcard_errors.VCardFormatError,
+                    vcard_errors.VCardError,
                     vcard.VCard,
                     vcard_text)
 

@@ -49,7 +49,11 @@ from vcard_errors import (
     MSG_MISSING_PROPERTY,
     MSG_MISSING_VALUE_STRING,
     # Classes
-    VCardFormatError,
+    VCardError,
+    VCardLineError,
+    VCardItemCountError,
+    VCardNameError,
+    VCardValueError,
     UsageError
 )
 import vcard_utils
@@ -67,7 +71,7 @@ def unfold_vcard_lines(lines):
     for index in range(len(lines)):
         line = lines[index]
         if not line.endswith(CRLF_CHARS):
-            raise VCardFormatError(
+            raise VCardLineError(
                 MSG_INVALID_LINE_SEPARATOR,
                 {'File line': index + 1})
 
@@ -77,7 +81,7 @@ def unfold_vcard_lines(lines):
 
         if line.startswith(' '):
             if index == 0:
-                raise VCardFormatError(
+                raise VCardLineError(
                     MSG_CONTINUATION_AT_START,
                     {'File line': index + 1})
             elif len(lines[index - 1]) < VCARD_LINE_MAX_LENGTH_RAW:
@@ -111,17 +115,17 @@ def get_vcard_group(lines):
 
         # Validate
         if len(group) == 0:
-            raise VCardFormatError(MSG_DOT_AT_LINE_START, {})
+            raise VCardLineError(MSG_DOT_AT_LINE_START, {})
 
         for index in range(len(lines)):
             line = lines[index]
             next_match = group_re.match(line)
             if not next_match:
-                raise VCardFormatError(
+                raise VCardLineError(
                     MSG_MISSING_GROUP,
                     {'File line': index + 1})
             if next_match.group(1) != group:
-                raise VCardFormatError(
+                raise VCardNameError(
                     '{0}: {1} != {2}'.format(
                         MSG_MISMATCH_GROUP,
                         next_match.group(1),
@@ -132,7 +136,7 @@ def get_vcard_group(lines):
         for index in range(len(lines)):
             next_match = group_re.match(lines[index])
             if next_match:
-                raise VCardFormatError(
+                raise VCardNameError(
                     '{0}: {1} != {2}'.format(
                         MSG_MISMATCH_GROUP,
                         next_match.group(1), group
@@ -169,7 +173,7 @@ def get_vcard_property_param_values(values_string):
     # Validate
     for value in values:
         if not re.match(u'^[{0}]+$|^"[{1}]+"$'.format(re.escape(SAFE_CHARS), re.escape(QSAFE_CHARS)), value):
-            raise VCardFormatError(
+            raise VCardValueError(
                 '{0}: {1}'.format(MSG_INVALID_VALUE, value),
                 {})
 
@@ -188,7 +192,7 @@ def get_vcard_property_param(param_string):
             param_string,
             '=')
     except ValueError as error:
-        raise VCardFormatError(
+        raise VCardItemCountError(
             '{0}: {1}'.format(MSG_MISSING_PARAM_VALUE, str(error)),
             {})
 
@@ -196,7 +200,7 @@ def get_vcard_property_param(param_string):
 
     # Validate
     if not re.match('^[{0}]+$'.format(re.escape(ID_CHARS)), param_name):
-        raise VCardFormatError(
+        raise VCardNameError(
             '{0}: {1}'.format(
                 MSG_INVALID_PARAM_NAME,
                 param_name),
@@ -243,7 +247,7 @@ def get_vcard_property_subvalues(value_string):
     # Validate string
     for subvalue in subvalues:
         if not re.match(u'^[{0}]*$'.format(re.escape(VALUE_CHARS)), subvalue):
-            raise VCardFormatError(
+            raise VCardValueError(
                 '{0}: {1}'.format(MSG_INVALID_SUBVALUE, subvalue),
                 {})
 
@@ -280,7 +284,7 @@ def get_vcard_property(property_line):
 
     property_parts = vcard_utils.split_unescaped(property_line, ':')
     if len(property_parts) < 2:
-        raise VCardFormatError(
+        raise VCardItemCountError(
             '{0}: {1}'.format(MSG_MISSING_VALUE_STRING, property_line),
             {})
     elif len(property_parts) > 2:
@@ -302,7 +306,7 @@ def get_vcard_property(property_line):
         prop['name'],
         re.IGNORECASE
     ):
-        raise VCardFormatError(
+        raise VCardNameError(
             '{0}: {1[name]}'.format(MSG_INVALID_PROPERTY_NAME, prop),
             {})
 
@@ -314,10 +318,11 @@ def get_vcard_property(property_line):
 
         # Validate
         vcard_validators.validate_vcard_property(prop)
-    except VCardFormatError as error:
+    except VCardError as error:
         # Add parameter name to error
         error.context['Property line'] = property_line
-        raise VCardFormatError(error.message, error.context)
+        err_type = type(error)
+        raise err_type(error.message, error.context)
 
     return prop
 
@@ -337,15 +342,16 @@ def get_vcard_properties(lines):
         if property_line != CRLF_CHARS:
             try:
                 properties.append(get_vcard_property(property_line))
-            except VCardFormatError as error:
+            except VCardError as error:
                 error.context['vCard line'] = index
-                raise VCardFormatError(
+                err_type = type(error)
+                raise err_type(
                     error.message,
                     error.context)
 
     for mandatory_property in MANDATORY_PROPERTIES:
         if mandatory_property not in [prop['name'].upper() for prop in properties]:
-            raise VCardFormatError(
+            raise VCardItemCountError(
                 '{0}: {1}'.format(MSG_MISSING_PROPERTY, mandatory_property),
                 {'Property': mandatory_property})
 
@@ -363,7 +369,7 @@ class VCard():
         @param text: String containing a single vCard
         """
         if text == '' or text is None:
-            raise VCardFormatError(
+            raise VCardError(
                 MSG_EMPTY_VCARD,
                 {'vCard line': 1, 'File line': 1})
 
@@ -412,14 +418,15 @@ def validate_file(filename, verbose=False):
                     vcard_text = ''
                     if verbose:
                         print(vcard)
-                except VCardFormatError as error:
+                except VCardError as error:
                     error.context['File'] = filename
                     error.context['File line'] = index
-                    raise VCardFormatError(
+                    err_type = type(error)
+                    raise err_type(
                         error.message,
                         error.context)
 
-    except VCardFormatError as error:
+    except VCardError as error:
         result += str(error)
 
     if vcard_text != '' and result == '':
