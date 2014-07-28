@@ -48,7 +48,10 @@ from vcard_errors import (
     # Functions
     show_warning,
     # Classes
-    VCardFormatError
+    VCardError,
+    VCardItemCountError,
+    VCardNameError,
+    VCardValueError
 )
 
 VALID_DATE = re.compile(r'^\d{4}-?\d{2}-?\d{2}$')
@@ -66,19 +69,19 @@ VALID_FLOAT = re.compile(r'^[+-]?\d+(\.\d+)?$')
 
 def _expect_no_params(prop):
     if 'parameters' in prop:
-        raise VCardFormatError(
+        raise VCardItemCountError(
             '{0}: {1[parameters]}'.format(MSG_NON_EMPTY_PARAM, prop),
             {})
 
 
 def _expect_params(prop):
     if not 'parameters' in prop:
-        raise VCardFormatError(MSG_MISSING_PARAM, {})
+        raise VCardItemCountError(MSG_MISSING_PARAM, {})
 
 
 def _expect_value_count(values, count):
     if len(values) != count:
-        raise VCardFormatError(
+        raise VCardItemCountError(
             '{0}: {1:d} (expected {2})'.format(
                 MSG_INVALID_VALUE_COUNT,
                 len(values),
@@ -88,7 +91,7 @@ def _expect_value_count(values, count):
 
 def _expect_subvalue_count(subvalues, count):
     if len(subvalues) != count:
-        raise VCardFormatError(
+        raise VCardItemCountError(
             '{0}: {1:d} (expected {2})'.format(
                 MSG_INVALID_SUBVALUE_COUNT,
                 len(subvalues),
@@ -108,34 +111,34 @@ def validate_date(text):
     >>> validate_date('2000-01-01')
     >>> validate_date('2000:01:01') # Wrong separator
     Traceback (most recent call last):
-    VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
+    VCardValueError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: 2000:01:01
     >>> validate_date('2000101') # Too short
     Traceback (most recent call last):
-    VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
+    VCardValueError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: 2000101
     >>> validate_date('20080229')
     >>> validate_date('20100229') # Not a leap year
     Traceback (most recent call last):
-    VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
+    VCardValueError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: 20100229
     >>> validate_date('19000229') # Not a leap year (divisible by 100)
     Traceback (most recent call last):
-    VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
+    VCardValueError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: 19000229
     >>> validate_date('20000229') # Leap year (divisible by 400)
     >>> validate_date('aaaa-bb-cc')
     Traceback (most recent call last):
-    VCardFormatError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
+    VCardValueError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
     String: aaaa-bb-cc
     """
     if VALID_DATE.match(text) is None:
-        raise VCardFormatError(MSG_INVALID_DATE, {'String': text})
+        raise VCardValueError(MSG_INVALID_DATE, {'String': text})
 
     try:
         isodate.parse_date(text)
     except (isodate.ISO8601Error, ValueError):
-        raise VCardFormatError(MSG_INVALID_DATE, {'String': text})
+        raise VCardValueError(MSG_INVALID_DATE, {'String': text})
 
 
 def validate_time_zone(text):
@@ -156,40 +159,40 @@ def validate_time_zone(text):
     >>> validate_time_zone('Z+01:00') # Can't combine Z and offset
     ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone ...
+    VCardValueError: Invalid time zone ...
     String: Z+01:00
     >>> validate_time_zone('+1:00') # Need preceding zero
     ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone ...
+    VCardValueError: Invalid time zone ...
     String: +1:00
     >>> validate_time_zone('0100') # Need + or -
     ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone ...
+    VCardValueError: Invalid time zone ...
     String: 0100
     >>> validate_time_zone('01') # Need colon and minutes
     ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone ...
+    VCardValueError: Invalid time zone ...
     String: 01
     >>> validate_time_zone('01:') # Need minutes
     ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone ...
+    VCardValueError: Invalid time zone ...
     String: 01:
     >>> validate_time_zone('01:1') # Need preceding zero
     ... # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone ...
+    VCardValueError: Invalid time zone ...
     """
     if not VALID_TZ.match(text):
-        raise VCardFormatError(MSG_INVALID_TIME_ZONE, {'String': text})
+        raise VCardValueError(MSG_INVALID_TIME_ZONE, {'String': text})
 
     try:
         isodate.parse_tzinfo(text.replace('+', 'Z+').replace('-', 'Z-'))
     except (isodate.ISO8601Error, ValueError):
-        raise VCardFormatError(MSG_INVALID_TIME_ZONE, {'String': text})
+        raise VCardValueError(MSG_INVALID_TIME_ZONE, {'String': text})
 
 
 def validate_time(text):
@@ -206,30 +209,30 @@ def validate_time(text):
     >>> validate_time('01:02:03+01:30')
     >>> validate_time('01:02:60')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
+    VCardValueError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
     String: 01:02:60
     >>> validate_time('01:60:59')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
+    VCardValueError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
     String: 01:60:59
     >>> validate_time('24:00:00')
     Traceback (most recent call last):
-    VCardFormatError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
+    VCardValueError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
     String: 24:00:00
     >>> validate_time('00:00:00Z+01') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid time zone ...
+    VCardValueError: Invalid time zone ...
     String: Z+01
     """
     time_timezone = VALID_TIME_TZ.match(text)
     if time_timezone is None:
-        raise VCardFormatError(MSG_INVALID_TIME, {'String': text})
+        raise VCardValueError(MSG_INVALID_TIME, {'String': text})
 
     time_str, timezone_str = time_timezone.groups()
     try:
         isodate.parse_time(time_str)
     except (isodate.ISO8601Error, ValueError):
-        raise VCardFormatError(MSG_INVALID_TIME, {'String': text})
+        raise VCardValueError(MSG_INVALID_TIME, {'String': text})
 
     if timezone_str == '':
         return
@@ -247,11 +250,11 @@ def validate_language_tag(text):
     >>> validate_language_tag('en')
     >>> validate_language_tag('-US') # Need primary tag
     Traceback (most recent call last):
-    VCardFormatError: Invalid language (See RFC 1766 section 2 for details)
+    VCardValueError: Invalid language (See RFC 1766 section 2 for details)
     String: -us
     >>> validate_language_tag('en-') # Can't end with dash
     Traceback (most recent call last):
-    VCardFormatError: Invalid language (See RFC 1766 section 2 for details)
+    VCardValueError: Invalid language (See RFC 1766 section 2 for details)
     String: en-
     >>> validate_language_tag('en-US')
 
@@ -259,7 +262,7 @@ def validate_language_tag(text):
     text = text.lower()  # Case insensitive
 
     if VALID_LANG_TAG.match(text) is None:
-        raise VCardFormatError(MSG_INVALID_LANGUAGE_VALUE, {'String': text})
+        raise VCardValueError(MSG_INVALID_LANGUAGE_VALUE, {'String': text})
 
     # TODO: Extend to validate according to referenced ISO/RFC standards
 
@@ -273,24 +276,24 @@ def validate_x_name(text):
     >>> validate_x_name('X-' + ID_CHARS)
     >>> validate_x_name('X-') # Have to have more characters
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
+    VCardNameError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: X-
     >>> validate_x_name('') # Have to start with X- #doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
-    VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
+    VCardNameError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     ...
     >>> validate_x_name('x-abc') # X must be upper case
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
+    VCardNameError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: x-abc
     >>> validate_x_name('foo') # Have to start with X-
     Traceback (most recent call last):
-    VCardFormatError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
+    VCardNameError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: foo
     """
     if VALID_X_NAME.match(text) is None:
-        raise VCardFormatError(MSG_INVALID_X_NAME, {'String': text})
+        raise VCardNameError(MSG_INVALID_X_NAME, {'String': text})
 
 
 def validate_ptext(text):
@@ -305,11 +308,11 @@ def validate_ptext(text):
     >>> validate_ptext(SAFE_CHARS)
     >>> validate_ptext(u'\u000B') #doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value ...
+    VCardValueError: Invalid parameter value ...
     String: ...
     """
     if VALID_PTEXT.match(text) is None:
-        raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
+        raise VCardValueError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
 def validate_text_value(text):
@@ -326,15 +329,15 @@ def validate_text_value(text):
     >>> validate_text_value('\\\\n')
     >>> validate_text_value(';') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid text value (See RFC 2426 section 4 for details)
+    VCardValueError: Invalid text value (See RFC 2426 section 4 for details)
     String: ...
     >>> validate_text_value('\\\\\\\\;') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid text value (See RFC 2426 section 4 for details)
+    VCardValueError: Invalid text value (See RFC 2426 section 4 for details)
     String: ...
     """
     if VALID_TEXT.match(text) is None:
-        raise VCardFormatError(MSG_INVALID_TEXT_VALUE, {'String': text})
+        raise VCardValueError(MSG_INVALID_TEXT_VALUE, {'String': text})
 
 
 def validate_quoted_string(text):
@@ -348,15 +351,15 @@ def validate_quoted_string(text):
     >>> validate_quoted_string(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
     >>> validate_quoted_string(DQUOTE_CHAR + DQUOTE_CHAR) # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value ...
+    VCardValueError: Invalid parameter value ...
     >>> validate_quoted_string(
     ... DQUOTE_CHAR + QSAFE_CHARS[-1]*2 + DQUOTE_CHAR) # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value ...
+    VCardValueError: Invalid parameter value ...
     String: "ÿÿ"
     """
     if VALID_QUOTED_STRING.match(text) is None:
-        raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
+        raise VCardValueError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
 def validate_param_value(text):
@@ -372,16 +375,16 @@ def validate_param_value(text):
     >>> validate_param_value(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
     >>> validate_param_value(DQUOTE_CHAR + DQUOTE_CHAR) # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid parameter value ...
+    VCardValueError: Invalid parameter value ...
     String: ""
     """
     try:
         validate_ptext(text)
-    except VCardFormatError:
+    except VCardValueError:
         try:
             validate_quoted_string(text)
-        except VCardFormatError:
-            raise VCardFormatError(MSG_INVALID_PARAM_VALUE, {'String': text})
+        except VCardValueError:
+            raise VCardValueError(MSG_INVALID_PARAM_VALUE, {'String': text})
 
 
 def validate_text_parameter(parameter):
@@ -399,13 +402,13 @@ def validate_text_parameter(parameter):
 
     if param_name == 'VALUE':
         if param_values != {'ptext'}:
-            raise VCardFormatError(
+            raise VCardValueError(
                 '{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values),
                 {})
         return
     elif param_name == 'LANGUAGE':
         if len(param_values) != 1:
-            raise VCardFormatError(
+            raise VCardValueError(
                 '{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values),
                 {})
         for param_value in param_values:
@@ -413,7 +416,7 @@ def validate_text_parameter(parameter):
     else:
         validate_x_name(param_name)
         if len(param_values) != 1:
-            raise VCardFormatError(
+            raise VCardValueError(
                 '{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values),
                 {})
         validate_param_value(param_values[0])
@@ -432,30 +435,30 @@ def validate_float(text):
     >>> validate_float('12.') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardFormatError: Invalid subvalue ...
+    VCardValueError: Invalid subvalue ...
     >>> validate_float('.12') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardFormatError: Invalid subvalue ...
+    VCardValueError: Invalid subvalue ...
     >>> validate_float('foo') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardFormatError: Invalid subvalue ...
+    VCardValueError: Invalid subvalue ...
     >>> validate_float('++12.345') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardFormatError: Invalid subvalue ...
+    VCardValueError: Invalid subvalue ...
     >>> validate_float('--12.345') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardFormatError: Invalid subvalue ...
+    VCardValueError: Invalid subvalue ...
     >>> validate_float('12.34.5') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardFormatError: Invalid subvalue ...
+    VCardValueError: Invalid subvalue ...
     """
     if VALID_FLOAT.match(text) is None:
-        raise VCardFormatError(
+        raise VCardValueError(
             '{0}, expected float value: {1}'.format(
                 MSG_INVALID_SUBVALUE,
                 text),
@@ -472,16 +475,16 @@ def validate_uri(text):
     >>> validate_uri('http://example.org/')
     >>> validate_uri('http\\://example.org/') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid URI ...
+    VCardValueError: Invalid URI ...
     String: http\\://example.org/
     >>> validate_uri('http:') # doctest: +ELLIPSIS
     Traceback (most recent call last):
-    VCardFormatError: Invalid URI ...
+    VCardValueError: Invalid URI ...
     String: http:
     """
     parts = urlparse(text)
     if parts[0] == '' or (parts[1] == '' and parts[2] == ''):
-        raise VCardFormatError(MSG_INVALID_URI, {'String': text})
+        raise VCardValueError(MSG_INVALID_URI, {'String': text})
 
 
 def validate_vcard_property(prop):
@@ -502,7 +505,7 @@ def validate_vcard_property(prop):
             _expect_value_count(prop['values'], 1)
             _expect_subvalue_count(prop['values'][0], 1)
             if prop['values'][0][0].lower() != 'vcard':
-                raise VCardFormatError(
+                raise VCardValueError(
                     '{0}: {1} (expected "VCARD")'.format(
                         MSG_INVALID_VALUE,
                         prop['values'][0][0]),
@@ -521,7 +524,7 @@ def validate_vcard_property(prop):
             _expect_value_count(prop['values'], 1)
             _expect_subvalue_count(prop['values'][0], 1)
             if prop['values'][0][0].lower() != 'vcard':
-                raise VCardFormatError(
+                raise VCardValueError(
                     '{0}: {1} (expected "VCARD")'.format(
                         MSG_INVALID_VALUE,
                         prop['values'][0][0]),
@@ -534,32 +537,32 @@ def validate_vcard_property(prop):
             for param_name, param_values in prop['parameters'].items():
                 if param_name.upper() == 'VALUE':
                     if param_values != {'uri'}:
-                        raise VCardFormatError(
+                        raise VCardValueError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_VALUE,
                                 param_values),
                             {})
                     if 'CONTEXT' in prop['parameters']:
-                        raise VCardFormatError(
+                        raise VCardValueError(
                             '{0}: {1} and {2}'.format(
                                 MSG_MISMATCH_PARAM,
                                 ('VALUE', 'CONTEXT')),
                             {})
                 elif param_name.upper() == 'CONTEXT':
                     if param_values != {'word'}:
-                        raise VCardFormatError(
+                        raise VCardValueError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_VALUE,
                                 param_values),
                             {})
                     if 'VALUE' in prop['parameters']:
-                        raise VCardFormatError(
+                        raise VCardValueError(
                             '{0}: {1} and {2}'.format(
                                 MSG_MISMATCH_PARAM,
                                 ('VALUE', 'CONTEXT')),
                             {})
                 else:
-                    raise VCardFormatError(
+                    raise VCardNameError(
                         '{0}: {1}'.format(
                             MSG_INVALID_PARAM_NAME,
                             param_name),
@@ -578,7 +581,7 @@ def validate_vcard_property(prop):
             _expect_no_params(prop)
             _expect_value_count(prop['values'], 1)
             if prop['values'][0][0] != '3.0':
-                raise VCardFormatError(
+                raise VCardValueError(
                     '{0}: {1} (expected "3.0")'.format(
                         MSG_INVALID_VALUE,
                         prop['values'][0][0]),
@@ -618,24 +621,24 @@ def validate_vcard_property(prop):
             for param_name, param_values in prop['parameters'].items():
                 if param_name.upper() == 'ENCODING':
                     if param_values != {'b'}:
-                        raise VCardFormatError(
+                        raise VCardValueError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_VALUE,
                                 param_values),
                             {})
                     if 'VALUE' in prop['parameters']:
-                        raise VCardFormatError(
+                        raise VCardValueError(
                             '{0}: {1} and {2}'.format(
                                 MSG_MISMATCH_PARAM,
                                 ('ENCODING', 'VALUE')),
                             {})
                 elif param_name.upper() == 'TYPE' and 'ENCODING' not in prop['parameters']:
-                    raise VCardFormatError(
+                    raise VCardItemCountError(
                         '{0}: {1}'.format(MSG_MISSING_PARAM, 'ENCODING'),
                         {})
                 elif param_name.upper() == 'VALUE':
                     if param_values != {'uri'}:
-                        raise VCardFormatError(
+                        raise VCardValueError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_VALUE,
                                 param_values),
@@ -643,7 +646,7 @@ def validate_vcard_property(prop):
                     else:
                         validate_uri(prop['values'][0][0])
                 elif param_name.upper() not in ['ENCODING', 'TYPE', 'VALUE']:
-                    raise VCardFormatError(
+                    raise VCardNameError(
                         '{0}: {1}'.format(
                             MSG_INVALID_PARAM_NAME,
                             param_name),
@@ -672,7 +675,7 @@ def validate_vcard_property(prop):
                                 'work',
                                 'pref'
                             ]:
-                                raise VCardFormatError(
+                                raise VCardValueError(
                                     '{0}: {1}'.format(
                                         MSG_INVALID_PARAM_VALUE,
                                         param_subvalue),
@@ -700,7 +703,7 @@ def validate_vcard_property(prop):
                                 'work',
                                 'pref'
                             ]:
-                                raise VCardFormatError('{0}: {1}'.format(
+                                raise VCardValueError('{0}: {1}'.format(
                                     MSG_INVALID_PARAM_VALUE,
                                     param_subvalue),
                                     {})
@@ -737,7 +740,7 @@ def validate_vcard_property(prop):
                                 'isdn',
                                 'pcs'
                             ]:
-                                raise VCardFormatError('{0}: {1}'.format(
+                                raise VCardValueError('{0}: {1}'.format(
                                     MSG_INVALID_PARAM_VALUE,
                                     param_subvalue),
                                     {})
@@ -747,7 +750,7 @@ def validate_vcard_property(prop):
                                 prop['values'])
                             )
                     else:
-                        raise VCardFormatError(
+                        raise VCardNameError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_NAME,
                                 param_name),
@@ -783,7 +786,7 @@ def validate_vcard_property(prop):
                                     WARN_DEFAULT_TYPE_VALUE,
                                     prop))
                     else:
-                        raise VCardFormatError(
+                        raise VCardNameError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_NAME,
                                 param_name),
@@ -816,7 +819,7 @@ def validate_vcard_property(prop):
             # ...?
             for value in prop['values']:
                 if len(value) != 1:
-                    raise VCardFormatError(
+                    raise VCardItemCountError(
                         '{0}: {1:d} (expected 1)'.format(
                             MSG_INVALID_SUBVALUE_COUNT,
                             len(prop['values'][0])),
@@ -846,12 +849,12 @@ def validate_vcard_property(prop):
             if 'parameters' in prop:
                 for param_name, param_values in prop['parameters'].items():
                     if param_name.upper() != 'VALUE':
-                        raise VCardFormatError('{0}: {1}'.format(
+                        raise VCardNameError('{0}: {1}'.format(
                             MSG_INVALID_PARAM_NAME,
                             param_values),
                             {})
                     if param_values != {'uri'}:
-                        raise VCardFormatError(
+                        raise VCardValueError(
                             '{0}: {1}'.format(
                                 MSG_INVALID_PARAM_VALUE,
                                 param_values),
@@ -862,7 +865,7 @@ def validate_vcard_property(prop):
                 # ...?
                 for value in prop['values']:
                     if len(value) != 1:
-                        raise VCardFormatError(
+                        raise VCardItemCountError(
                             '{0}: {1:d} (expected 1)'.format(
                                 MSG_INVALID_SUBVALUE_COUNT,
                                 len(prop['values'][0])),
@@ -878,6 +881,7 @@ def validate_vcard_property(prop):
             _expect_value_count(prop['values'], 1)
             validate_uri(prop['values'][0][0])
 
-    except VCardFormatError as error:
+    except VCardError as error:
         error.context['Property'] = property_name
-        raise VCardFormatError(error.message, error.context)
+        err_type = type(error)
+        raise err_type(error.message, error.context)
