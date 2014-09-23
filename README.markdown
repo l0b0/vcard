@@ -3,7 +3,7 @@ vCard module
 
 [![Build Status](https://jenkins.engmark.name:8080/buildStatus/icon?job=vcard)](https://jenkins.engmark.name:8080/job/vcard/)
 
-This program can be used for strict validation and parsing of vCards.
+This program can be used for strict validation and parsing of vCards. It currently supports [vCard 3.0 (RFC 2426)](http://tools.ietf.org/html/rfc2426).
 
 Additional scripts:
 
