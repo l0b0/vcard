@@ -23,8 +23,8 @@ If your system uses Python 3 as the system Python, you'll have to install `pip2`
 Examples
 --------
 
-* [`minimal.vcf`](test/minimal.vcf)
-* [`maximal.vcf`](test/maximal.vcf)
+* [`minimal.vcf`](./vcard/test/minimal.vcf)
+* [`maximal.vcf`](./vcard/test/maximal.vcf)
 
 Development
 -----------
