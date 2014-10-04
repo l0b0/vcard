@@ -24,7 +24,7 @@ build_directory = build
 distribution_directory = dist
 
 .PHONY: all
-all: compile
+all: build
 
 virtualenv/bin/pep8: virtualenv
 	. virtualenv/bin/activate && pip install --requirement python-test-requirements.txt
@@ -36,8 +36,9 @@ test: virtualenv/bin/pep8
 		PYTHONPATH=vcard coverage run $(SETUP) test && \
 		coverage report --include='vcard/*' --fail-under=70
 
-.PHONY: compile
-compile: test virtualenv doc
+.PHONY: build
+build: test virtualenv doc
+	mkdir -p $@
 	. virtualenv/bin/activate && \
 		python $(SETUP) build
 
@@ -65,13 +66,10 @@ register: virtualenv
 	. virtualenv/bin/activate && python $(SETUP) register
 
 .PHONY: release
-release: compile register
+release: build register
 	. virtualenv/bin/activate && python $(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
 	$(GIT_TAG) -m 'PyPI release' v$(shell python version.py)
 	@echo 'Remember to `git push --tags`'
-
-$(build_directory):
-	mkdir -p $@
 
 .PHONY: clean
 clean: clean-build clean-dist clean-doc clean-test
