@@ -8,6 +8,8 @@ gpg_keyring = $(download_directory)/keyring.gpg
 GIT := /usr/bin/git
 GIT_TAG = $(GIT) tag -au $(GPG_ID)
 
+FIND = /usr/bin/find
+
 # Python
 virtualenv_python = $(virtualenv_directory)/bin/python
 python_version_major = 2
