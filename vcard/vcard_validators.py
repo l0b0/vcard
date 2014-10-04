@@ -75,7 +75,7 @@ def _expect_no_params(prop):
 
 
 def _expect_params(prop):
-    if not 'parameters' in prop:
+    if 'parameters' not in prop:
         raise VCardItemCountError(MSG_MISSING_PARAM, {})
 
 
