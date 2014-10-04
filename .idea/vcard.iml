@@ -9,15 +9,15 @@
       <excludeFolder url="file://$MODULE_DIR$/isodate-0.4.9-py2.7.egg" />
       <excludeFolder url="file://$MODULE_DIR$/make-includes" />
       <excludeFolder url="file://$MODULE_DIR$/vcard.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/virtualenv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python virtualenv at ~/dev/vcard/build/virtualenv" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 2.7.6 virtualenv at ~/dev/vcard/virtualenv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="myDocStringFormat" value="Plain" />
   </component>
   <component name="TestRunnerService">
-    <option name="projectConfiguration" value="Unittests" />
     <option name="PROJECT_TEST_RUNNER" value="Unittests" />
   </component>
 </module>
