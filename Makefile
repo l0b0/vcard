@@ -108,6 +108,10 @@ test: $(virtualenv_python) $(virtualenv_directory)/bin/pep8
 compile: test $(virtualenv_python)
 	. $(virtualenv_directory)/bin/activate && $(virtualenv_python) $(SETUP) build
 
+index.html:
+	markdown README.markdown > $@
+	sed -i -e 's# href="\.# href="https://github.com/l0b0/vcard/blob/master#' $@
+
 .PHONY: clean
 clean: distclean
 	-$(RM) -r $(build_directory) isodate-*.egg $(NAME).egg-info
