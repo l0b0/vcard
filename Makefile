@@ -37,9 +37,12 @@ test: virtualenv/bin/pep8
 		coverage report --include='vcard/*' --fail-under=70
 
 .PHONY: compile
-compile: test virtualenv
+compile: test virtualenv doc
 	. virtualenv/bin/activate && \
 		python $(SETUP) build
+
+.PHONY: doc
+doc: index.html
 
 index.html:
 	markdown README.markdown > $@
@@ -71,7 +74,7 @@ $(build_directory):
 	mkdir -p $@
 
 .PHONY: clean
-clean: clean-build clean-dist clean-test
+clean: clean-build clean-dist clean-doc clean-test
 
 .PHONY: clean-build
 clean-build:
@@ -82,6 +85,10 @@ clean-build:
 .PHONY: clean-dist
 clean-dist:
 	-$(RM) -r $(distribution_directory)
+
+.PHONY: clean-doc
+clean-doc:
+	-$(RM) index.html
 
 .PHONY: clean-test
 clean-test:
