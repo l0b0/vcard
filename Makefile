@@ -21,7 +21,6 @@ UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
 RM := /bin/rm -f
 
 build_directory = build
-virtualenv_directory = $(build_directory)/virtualenv
 
 .PHONY: all
 all: compile
