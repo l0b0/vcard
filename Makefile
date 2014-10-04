@@ -76,8 +76,15 @@ release: build register
 clean: clean-build clean-dist clean-doc clean-test
 
 .PHONY: clean-build
-clean-build:
-	-$(RM) -r $(build_directory) isodate-*.egg $(NAME).egg-info
+clean-build: clean-build-third-party clean-build-local
+
+.PHONY: clean-build-third-party
+clean-build-third-party:
+	-$(RM) -r $(build_directory) isodate-*.egg
+
+.PHONY: clean-build-local
+clean-build-local:
+	-$(RM) -r $(NAME).egg-info
 	-$(FIND) . -type d -name '__pycache__' -delete
 	-$(FIND) . -type f -name '*.pyc' -delete
 
