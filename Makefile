@@ -26,11 +26,12 @@ distribution_directory = dist
 .PHONY: all
 all: build
 
-virtualenv/bin/pep8: virtualenv
+.PHONY: test-dependencies
+test-dependencies: virtualenv
 	. virtualenv/bin/activate && pip install --requirement python-test-requirements.txt
 
 .PHONY: test
-test: virtualenv/bin/pep8
+test: test-dependencies
 	. virtualenv/bin/activate && \
 		make METHOD=git python-pep8 && \
 		PYTHONPATH=vcard coverage run $(SETUP) test && \
