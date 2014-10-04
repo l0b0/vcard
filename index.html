@@ -1,0 +1,64 @@
+<h1>vCard module</h1>
+
+<p><a href="https://jenkins.engmark.name:8080/job/vcard/"><img src="https://jenkins.engmark.name:8080/buildStatus/icon?job=vcard" alt="Build Status" title="" /></a></p>
+
+<p>This program can be used for strict validation and parsing of vCards. It currently supports <a href="http://tools.ietf.org/html/rfc2426">vCard 3.0 (RFC 2426)</a>.</p>
+
+<p>Additional scripts:</p>
+
+<ul>
+<li><a href="format-TEL.sh"><code>format-TEL.sh</code></a> - Format phone numbers according to national standards</li>
+<li><a href="split.sh"><code>split.sh</code></a> - Split a multiple vCards file into individual files</li>
+<li><a href="sort-lines.sh"><code>sort-lines.sh</code></a> - Sort vCard property lines according to a custom key</li>
+<li><a href="join-lines.sh"><code>join-lines.sh</code></a> - Join previously split vCard lines</li>
+<li><a href="split-lines.sh"><code>split-lines.sh</code></a> - Split long vCard lines</li>
+</ul>
+
+<h2>Installation / upgrade</h2>
+
+<p>If your system uses Python 3 as the system Python, you'll have to install <code>pip2</code> and use that instead of <code>pip</code> below.</p>
+
+<pre><code>sudo pip install --upgrade vcard
+</code></pre>
+
+<h2>Examples</h2>
+
+<ul>
+<li><a href="test/minimal.vcf"><code>minimal.vcf</code></a></li>
+<li><a href="test/maximal.vcf"><code>maximal.vcf</code></a></li>
+</ul>
+
+<h2>Development</h2>
+
+<p><strong>Download:</strong></p>
+
+<pre><code>git clone --recurse-submodules https://github.com/l0b0/vcard.git
+</code></pre>
+
+<p><strong>Virtualenv setup:</strong></p>
+
+<pre><code>virtualenv --python=python2.7 /path/to/virtualenv
+. /path/to/virtualenv/bin/activate
+</code></pre>
+
+<p><strong>Test:</strong></p>
+
+<pre><code>make test
+</code></pre>
+
+<p>To test a specific Python version:</p>
+
+<pre><code>make python_version_major=2 python_version_minor=7 python_version_patch=5 test
+</code></pre>
+
+<p>Test requirements:</p>
+
+<ul>
+<li><code>gcc</code></li>
+<li><code>gpg</code></li>
+<li><code>tar</code></li>
+<li><code>make</code></li>
+<li><code>openssl</code> development headers/libraries</li>
+<li><code>wget</code></li>
+<li><code>zlib</code> development headers/libraries</li>
+</ul>
