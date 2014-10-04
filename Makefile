@@ -44,14 +44,6 @@ index.html:
 	markdown README.markdown > $@
 	sed -i -e 's# href="\.# href="https://github.com/l0b0/vcard/blob/master#' $@
 
-.PHONY: clean
-clean:
-	-$(RM) -r $(build_directory) isodate-*.egg $(NAME).egg-info
-	-$(FIND) . -type d -name '__pycache__' -delete
-	-$(FIND) . -type f -name '*.pyc' -delete
-	-$(RM) .coverage
-	-$(RM) virtualenv
-
 .PHONY: install
 install: virtualenv
 	. virtualenv/bin/activate && python $(SETUP) install $(INSTALL_OPTIONS)
@@ -76,6 +68,20 @@ release: compile register
 
 $(build_directory):
 	mkdir -p $@
+
+.PHONY: clean
+clean: clean-build clean-test
+
+.PHONY: clean-build
+clean-build:
+	-$(RM) -r $(build_directory) isodate-*.egg $(NAME).egg-info
+	-$(FIND) . -type d -name '__pycache__' -delete
+	-$(FIND) . -type f -name '*.pyc' -delete
+
+.PHONY: clean-test
+clean-test:
+	-$(RM) .coverage
+	-$(RM) virtualenv
 
 include make-includes/python.mk
 include make-includes/variables.mk
