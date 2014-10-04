@@ -21,6 +21,7 @@ UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
 RM := /bin/rm -f
 
 build_directory = build
+distribution_directory = dist
 
 .PHONY: all
 all: compile
@@ -70,13 +71,17 @@ $(build_directory):
 	mkdir -p $@
 
 .PHONY: clean
-clean: clean-build clean-test
+clean: clean-build clean-dist clean-test
 
 .PHONY: clean-build
 clean-build:
 	-$(RM) -r $(build_directory) isodate-*.egg $(NAME).egg-info
 	-$(FIND) . -type d -name '__pycache__' -delete
 	-$(FIND) . -type f -name '*.pyc' -delete
+
+.PHONY: clean-dist
+clean-dist:
+	-$(RM) -r $(distribution_directory)
 
 .PHONY: clean-test
 clean-test:
