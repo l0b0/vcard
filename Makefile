@@ -34,8 +34,9 @@ virtualenv/bin/pep8: virtualenv
 .PHONY: test
 test: virtualenv/bin/pep8
 	. virtualenv/bin/activate && \
-		python $(SETUP) test && \
-		make METHOD=git python-pep8
+		make METHOD=git python-pep8 && \
+		PYTHONPATH=vcard coverage run $(SETUP) test && \
+		coverage report --include='vcard/*' --fail-under=70
 
 .PHONY: compile
 compile: test virtualenv
@@ -51,6 +52,7 @@ clean: distclean
 	-$(RM) -r $(build_directory) isodate-*.egg $(NAME).egg-info
 	-$(FIND) . -type d -name '__pycache__' -delete
 	-$(FIND) . -type f -name '*.pyc' -delete
+	-$(RM) .coverage
 
 .PHONY: install
 install: virtualenv
