@@ -29,7 +29,7 @@ virtualenv_directory = $(build_directory)/virtualenv
 all: compile
 
 virtualenv/bin/pep8: virtualenv
-	. virtualenv/bin/activate && pip install $(notdir $@)
+	. virtualenv/bin/activate && pip install --requirement python-test-requirements.txt
 
 .PHONY: test
 test: virtualenv/bin/pep8
