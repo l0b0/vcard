@@ -50,6 +50,7 @@ clean:
 	-$(FIND) . -type d -name '__pycache__' -delete
 	-$(FIND) . -type f -name '*.pyc' -delete
 	-$(RM) .coverage
+	-$(RM) virtualenv
 
 .PHONY: install
 install: virtualenv
