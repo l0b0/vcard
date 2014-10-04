@@ -2,7 +2,6 @@ NAME = $(notdir $(CURDIR))
 
 # Release
 GPG_ID ?= 92126B54
-gpg_keyring = $(download_directory)/keyring.gpg
 
 # Git
 GIT := /usr/bin/git
@@ -22,7 +21,6 @@ UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
 RM := /bin/rm -f
 
 build_directory = build
-download_directory = download
 virtualenv_directory = $(build_directory)/virtualenv
 
 .PHONY: all
@@ -48,7 +46,7 @@ index.html:
 	sed -i -e 's# href="\.# href="https://github.com/l0b0/vcard/blob/master#' $@
 
 .PHONY: clean
-clean: distclean
+clean:
 	-$(RM) -r $(build_directory) isodate-*.egg $(NAME).egg-info
 	-$(FIND) . -type d -name '__pycache__' -delete
 	-$(FIND) . -type f -name '*.pyc' -delete
@@ -70,20 +68,13 @@ install: virtualenv
 register: virtualenv
 	. virtualenv/bin/activate && python $(SETUP) register
 
-.PHONY: distclean
-distclean:
-	-$(RM) -r dist
-
-.PHONY: download-clean
-	-$(RM) r $(download_directory)
-
 .PHONY: release
 release: compile register
 	. virtualenv/bin/activate && python $(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
 	$(GIT_TAG) -m 'PyPI release' v$(shell python version.py)
 	@echo 'Remember to `git push --tags`'
 
-$(build_directory) $(download_directory):
+$(build_directory):
 	mkdir -p $@
 
 include make-includes/python.mk
