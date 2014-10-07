@@ -211,7 +211,6 @@ class TestVCards(unittest.TestCase):
                         vcard.VCard(vcard_text, filename=vcard_file)
                         self.fail('Invalid vCard created:\n{0}'.format(vcard_text))
                 except vcard_errors.VCardError as error:
-                    message = str(error).splitlines(False)[0].split(':')[0]
                     error_msg = '\n\n'.join((
                         'Wrong message for vCard {vcard_file!r}:'.format(vcard_file=vcard_file),
                         'Expected: {expected}'.format(expected=testgroup['message']),
