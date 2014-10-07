@@ -22,40 +22,14 @@ import sys
 import warnings
 
 # Local modules
-from vcard_definitions import (
-    ALL_PROPERTIES,
-    CRLF_CHARS,
-    ID_CHARS,
-    MANDATORY_PROPERTIES,
-    QSAFE_CHARS,
-    SAFE_CHARS,
-    SP_CHAR,
-    VALUE_CHARS,
+from vcard_definitions import \
+    ALL_PROPERTIES, CRLF_CHARS, ID_CHARS, MANDATORY_PROPERTIES, QSAFE_CHARS, SAFE_CHARS, SP_CHAR, VALUE_CHARS, \
     VCARD_LINE_MAX_LENGTH_RAW
-)
-from vcard_errors import (
-    # Error literals
-    MSG_CONTINUATION_AT_START,
-    MSG_DOT_AT_LINE_START,
-    MSG_EMPTY_VCARD,
-    MSG_INVALID_LINE_SEPARATOR,
-    MSG_INVALID_PARAM_NAME,
-    MSG_INVALID_PROPERTY_NAME,
-    MSG_INVALID_SUBVALUE,
-    MSG_INVALID_VALUE,
-    MSG_MISMATCH_GROUP,
-    MSG_MISSING_GROUP,
-    MSG_MISSING_PARAM_VALUE,
-    MSG_MISSING_PROPERTY,
-    MSG_MISSING_VALUE_STRING,
-    # Classes
-    VCardError,
-    VCardLineError,
-    VCardItemCountError,
-    VCardNameError,
-    VCardValueError,
-    UsageError
-)
+from vcard_errors import \
+    MSG_CONTINUATION_AT_START, MSG_DOT_AT_LINE_START, MSG_EMPTY_VCARD, MSG_INVALID_LINE_SEPARATOR, \
+    MSG_INVALID_PARAM_NAME, MSG_INVALID_PROPERTY_NAME, MSG_INVALID_SUBVALUE, MSG_INVALID_VALUE, MSG_MISMATCH_GROUP, \
+    MSG_MISSING_GROUP, MSG_MISSING_PARAM_VALUE, MSG_MISSING_PROPERTY, MSG_MISSING_VALUE_STRING, VCardError, \
+    VCardLineError, VCardItemCountError, VCardNameError, VCardValueError, UsageError
 import vcard_utils
 import vcard_validators
 
@@ -71,23 +45,16 @@ def unfold_vcard_lines(lines):
     for index in range(len(lines)):
         line = lines[index]
         if not line.endswith(CRLF_CHARS):
-            raise VCardLineError(
-                MSG_INVALID_LINE_SEPARATOR,
-                {'File line': index + 1})
+            raise VCardLineError(MSG_INVALID_LINE_SEPARATOR, {'File line': index + 1})
 
         if len(line) > VCARD_LINE_MAX_LENGTH_RAW:
-            warnings.warn('Long line in vCard: {0}'.format(
-                line.encode('utf-8')))
+            warnings.warn('Long line in vCard: {0}'.format(line.encode('utf-8')))
 
         if line.startswith(' '):
             if index == 0:
-                raise VCardLineError(
-                    MSG_CONTINUATION_AT_START,
-                    {'File line': index + 1})
+                raise VCardLineError(MSG_CONTINUATION_AT_START, {'File line': index + 1})
             elif len(lines[index - 1]) < VCARD_LINE_MAX_LENGTH_RAW:
-                warnings.warn(
-                    'Short folded line at line {0:d}'.format(index - 1)
-                )
+                warnings.warn('Short folded line at line {0:d}'.format(index - 1))
             elif line == SP_CHAR + CRLF_CHARS:
                 warnings.warn('Empty folded line at line {0:d}'.format(index))
             property_lines[-1] = \
@@ -121,27 +88,17 @@ def get_vcard_group(lines):
             line = lines[index]
             next_match = group_re.match(line)
             if not next_match:
-                raise VCardLineError(
-                    MSG_MISSING_GROUP,
-                    {'File line': index + 1})
+                raise VCardLineError(MSG_MISSING_GROUP, {'File line': index + 1})
             if next_match.group(1) != group:
                 raise VCardNameError(
-                    '{0}: {1} != {2}'.format(
-                        MSG_MISMATCH_GROUP,
-                        next_match.group(1),
-                        group),
-                    {'File line': index + 1})
+                    '{0}: {1} != {2}'.format(MSG_MISMATCH_GROUP, next_match.group(1), group), {'File line': index + 1})
     else:
         # Make sure there are no groups elsewhere
         for index in range(len(lines)):
             next_match = group_re.match(lines[index])
             if next_match:
                 raise VCardNameError(
-                    '{0}: {1} != {2}'.format(
-                        MSG_MISMATCH_GROUP,
-                        next_match.group(1), group
-                    ),
-                    {'File line': index + 1})
+                    '{0}: {1} != {2}'.format(MSG_MISMATCH_GROUP, next_match.group(1), group), {'File line': index + 1})
 
     return group
 
@@ -173,9 +130,7 @@ def get_vcard_property_param_values(values_string):
     # Validate
     for value in values:
         if not re.match(u'^[{0}]+$|^"[{1}]+"$'.format(re.escape(SAFE_CHARS), re.escape(QSAFE_CHARS)), value):
-            raise VCardValueError(
-                '{0}: {1}'.format(MSG_INVALID_VALUE, value),
-                {})
+            raise VCardValueError('{0}: {1}'.format(MSG_INVALID_VALUE, value), {})
 
     return values
 
@@ -188,23 +143,15 @@ def get_vcard_property_param(param_string):
     @return: Dictionary with a parameter name and values
     """
     try:
-        param_name, values_string = vcard_utils.split_unescaped(
-            param_string,
-            '=')
+        param_name, values_string = vcard_utils.split_unescaped(param_string, '=')
     except ValueError as error:
-        raise VCardItemCountError(
-            '{0}: {1}'.format(MSG_MISSING_PARAM_VALUE, str(error)),
-            {})
+        raise VCardItemCountError('{0}: {1}'.format(MSG_MISSING_PARAM_VALUE, str(error)), {})
 
     values = get_vcard_property_param_values(values_string)
 
     # Validate
     if not re.match('^[{0}]+$'.format(re.escape(ID_CHARS)), param_name):
-        raise VCardNameError(
-            '{0}: {1}'.format(
-                MSG_INVALID_PARAM_NAME,
-                param_name),
-            {})
+        raise VCardNameError('{0}: {1}'.format(MSG_INVALID_PARAM_NAME, param_name), {})
 
     return {'name': param_name, 'values': values}
 
@@ -229,8 +176,7 @@ def get_vcard_property_params(params_string):
             params[param_name] = param['values']
         else:
             # Merge
-            params[param_name] = params[param_name].union(
-                param['values'])
+            params[param_name] = params[param_name].union(param['values'])
 
     return params
 
@@ -247,9 +193,7 @@ def get_vcard_property_subvalues(value_string):
     # Validate string
     for subvalue in subvalues:
         if not re.match(u'^[{0}]*$'.format(re.escape(VALUE_CHARS)), subvalue):
-            raise VCardValueError(
-                '{0}: {1}'.format(MSG_INVALID_SUBVALUE, subvalue),
-                {})
+            raise VCardValueError('{0}: {1}'.format(MSG_INVALID_SUBVALUE, subvalue), {})
 
     return subvalues
 
@@ -284,9 +228,7 @@ def get_vcard_property(property_line):
 
     property_parts = vcard_utils.split_unescaped(property_line, ':')
     if len(property_parts) < 2:
-        raise VCardItemCountError(
-            '{0}: {1}'.format(MSG_MISSING_VALUE_STRING, property_line),
-            {})
+        raise VCardItemCountError('{0}: {1}'.format(MSG_MISSING_VALUE_STRING, property_line), {})
     elif len(property_parts) > 2:
         # Merge - Colon doesn't have to be escaped in values
         property_parts[1] = ':'.join(property_parts[1:])
@@ -294,26 +236,18 @@ def get_vcard_property(property_line):
     property_string, values_string = property_parts
 
     # Split property name and property parameters
-    property_name_and_params = vcard_utils.split_unescaped(
-        property_string,
-        ';')
+    property_name_and_params = vcard_utils.split_unescaped(property_string, ';')
 
     prop['name'] = property_name_and_params.pop(0)
 
     # String validation
     if not prop['name'].upper() in ALL_PROPERTIES and not re.match(
-        '^X-[{0}]+$'.format(re.escape(ID_CHARS)),
-        prop['name'],
-        re.IGNORECASE
-    ):
-        raise VCardNameError(
-            '{0}: {1[name]}'.format(MSG_INVALID_PROPERTY_NAME, prop),
-            {})
+            '^X-[{0}]+$'.format(re.escape(ID_CHARS)), prop['name'], re.IGNORECASE):
+        raise VCardNameError('{0}: {1[name]}'.format(MSG_INVALID_PROPERTY_NAME, prop), {})
 
     try:
         if len(property_name_and_params) != 0:
-            prop['parameters'] = get_vcard_property_params(
-                ';'.join(property_name_and_params))
+            prop['parameters'] = get_vcard_property_params(';'.join(property_name_and_params))
         prop['values'] = get_vcard_property_values(values_string)
 
         # Validate
@@ -352,8 +286,7 @@ def get_vcard_properties(lines):
     for mandatory_property in MANDATORY_PROPERTIES:
         if mandatory_property not in [prop['name'].upper() for prop in properties]:
             raise VCardItemCountError(
-                '{0}: {1}'.format(MSG_MISSING_PROPERTY, mandatory_property),
-                {'Property': mandatory_property})
+                '{0}: {1}'.format(MSG_MISSING_PROPERTY, mandatory_property), {'Property': mandatory_property})
 
     return properties
 
@@ -369,9 +302,7 @@ class VCard():
         @param text: String containing a single vCard
         """
         if text == '' or text is None:
-            raise VCardError(
-                MSG_EMPTY_VCARD,
-                {'vCard line': 1, 'File line': 1})
+            raise VCardError(MSG_EMPTY_VCARD, {'vCard line': 1, 'File line': 1})
 
         self.text = text
 
@@ -422,17 +353,13 @@ def validate_file(filename, verbose=False):
                     error.context['File'] = filename
                     error.context['File line'] = index
                     err_type = type(error)
-                    raise err_type(
-                        error.message,
-                        error.context)
+                    raise err_type(error.message, error.context)
 
     except VCardError as error:
         result += str(error)
 
     if vcard_text != '' and result == '':
-        result += 'Could not process entire %s - %i lines remain' % (
-            filename,
-            len(vcard_text.splitlines(False)))
+        result += 'Could not process entire %s - %i lines remain' % (filename, len(vcard_text.splitlines(False)))
 
     if result == '':
         return None
@@ -450,10 +377,7 @@ def main(argv=None):
 
     try:
         try:
-            opts, args = getopt.getopt(
-                argv[1:],
-                'v',
-                ['verbose'])
+            opts, args = getopt.getopt(argv[1:], 'v', ['verbose'])
         except getopt.GetoptError as err:
             raise UsageError(str(err))
 

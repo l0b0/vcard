@@ -23,10 +23,7 @@ setup(
     packages=[__package__],
     setup_requires=['isodate'],
     install_requires=['isodate'],
-    entry_points={
-        'console_scripts': [
-            '%(package)s=%(package)s.%(package)s:main' % {
-                'package': __package__}]},
+    entry_points={'console_scripts': ['%(package)s=%(package)s.%(package)s:main' % {'package': __package__}]},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',

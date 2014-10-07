@@ -59,9 +59,7 @@ VCARDS_DOT_AT_LINE_START = {
     'vcards': ('dot_at_line_start.vcf',)}
 VCARDS_EMPTY_VCARD = {
     'message': vcard_errors.MSG_EMPTY_VCARD,
-    'vcards': (
-        '',
-        None)}
+    'vcards': ('', None)}
 VCARDS_INVALID_DATE = {
     'message': vcard_errors.MSG_INVALID_DATE,
     'vcards': tuple()}
@@ -70,10 +68,7 @@ VCARDS_INVALID_LANGUAGE_VALUE = {
     'vcards': ('invalid_language_value.vcf',)}
 VCARDS_INVALID_LINE_SEPARATOR = {
     'message': vcard_errors.MSG_INVALID_LINE_SEPARATOR,
-    'vcards': (
-        'line_ending_mac.vcf',
-        'line_ending_unix.vcf',
-        'line_ending_mixed.vcf',)}
+    'vcards': ('line_ending_mac.vcf', 'line_ending_unix.vcf', 'line_ending_mixed.vcf',)}
 VCARDS_INVALID_PARAM_NAME = {
     'message': vcard_errors.MSG_INVALID_PARAM_NAME,
     'vcards': ('invalid_param_name.vcf',)}
@@ -103,48 +98,36 @@ VCARDS_INVALID_URI = {
     'vcards': tuple()}
 VCARDS_INVALID_VALUE = {
     'message': vcard_errors.MSG_INVALID_VALUE,
-    'vcards': (
-        'invalid_begin.vcf',)}
+    'vcards': ('invalid_begin.vcf',)}
 VCARDS_INVALID_VALUE_COUNT = {
     'message': vcard_errors.MSG_INVALID_VALUE_COUNT,
-    'vcards': (
-        # http://en.wikipedia.org/wiki/VCard
-        'invalid_value_count_wp.vcf',)}
+    'vcards': ('invalid_value_count_wp.vcf',)}
 VCARDS_INVALID_X_NAME = {
     'message': vcard_errors.MSG_INVALID_X_NAME,
     'vcards': tuple()}
 VCARDS_MISMATCH_GROUP = {
     'message': vcard_errors.MSG_MISMATCH_GROUP,
-    'vcards': (
-        'mismatch_group.vcf',)}
+    'vcards': ('mismatch_group.vcf',)}
 VCARDS_MISMATCH_PARAM = {
     'message': vcard_errors.MSG_MISMATCH_PARAM,
     'vcards': tuple()}
 VCARDS_MISSING_GROUP = {
     'message': vcard_errors.MSG_MISSING_GROUP,
-    'vcards': (
-        'missing_group.vcf',)}
+    'vcards': ('missing_group.vcf',)}
 VCARDS_MISSING_PARAM = {
     'message': vcard_errors.MSG_MISSING_PARAM,
-    'vcards': (
-        'missing_photo_param.vcf',)}
+    'vcards': ('missing_photo_param.vcf',)}
 VCARDS_MISSING_PARAM_VALUE = {
     'message': vcard_errors.MSG_MISSING_PARAM_VALUE,
-    'vcards': (
-        'missing_param_value.vcf',)}
+    'vcards': ('missing_param_value.vcf',)}
 VCARDS_MISSING_PROPERTY = {
     'message': vcard_errors.MSG_MISSING_PROPERTY,
     'vcards': (
-        'missing_properties.vcf',
-        'missing_start.vcf',
-        'missing_end.vcf',
-        'missing_version.vcf',
-        'missing_n.vcf',
+        'missing_properties.vcf', 'missing_start.vcf', 'missing_end.vcf', 'missing_version.vcf', 'missing_n.vcf',
         'missing_fn.vcf',)}
 VCARDS_MISSING_VALUE_STRING = {
     'message': vcard_errors.MSG_MISSING_VALUE_STRING,
-    'vcards': (
-        'missing_n_value.vcf',)}
+    'vcards': ('missing_n_value.vcf',)}
 VCARDS_NON_EMPTY_PARAM = {
     'message': vcard_errors.MSG_NON_EMPTY_PARAM,
     'vcards': (
