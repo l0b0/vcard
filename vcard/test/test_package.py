@@ -34,7 +34,8 @@ def _get_vcard_file(path):
     """
     if path in ('', None):
         return ''
-    elif path.startswith('http'):
+
+    if path.startswith('http'):
         try:
             filename = urllib.urlretrieve(path)[0]
         except IOError:
