@@ -41,10 +41,10 @@ declare -r dir
 
 # Working directory
 TMPDIR="${TMPDIR:-/tmp}"
+trap 'rm -rf -- "$temporary_dir"' EXIT
 temporary_dir="$(mktemp -d "$TMPDIR/XXXXXXXXXXXXXXXXXXXXXXXXXXXXX")"
 declare -r temporary_dir
-trap 'rm -rf -- "$temporary_dir"' 0
-trap 'exit 2' 1 2 3 15
+trap 'exit 2' HUP INT QUIT TERM
 
 # Ensure two DOS newlines only at the end
 for path
