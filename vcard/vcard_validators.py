@@ -15,7 +15,7 @@ import warnings
 import isodate
 
 # Local modules
-from vcard_defs import (
+from vcard_definitions import (
     DQUOTE_CHAR,
     ID_CHARS,
     ESCAPED_CHARS,

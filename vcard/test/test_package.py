@@ -18,7 +18,7 @@ from textwrap import dedent
 
 from vcard import (
     vcard,
-    vcard_defs,
+    vcard_definitions,
     vcard_errors,
     vcard_utils,
     vcard_validators
@@ -257,7 +257,7 @@ class TestVCards(unittest.TestCase):
     def test_doc(self):
         """Run DocTests"""
         self.assertEqual(doctest.testmod(vcard)[0], 0)
-        self.assertEqual(doctest.testmod(vcard_defs)[0], 0)
+        self.assertEqual(doctest.testmod(vcard_definitions)[0], 0)
         self.assertEqual(doctest.testmod(vcard_errors)[0], 0)
         self.assertEqual(doctest.testmod(vcard_utils)[0], 0)
         self.assertEqual(doctest.testmod(vcard_validators)[0], 0)

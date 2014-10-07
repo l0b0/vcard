@@ -141,10 +141,10 @@ class VCardError(Exception):
         VCardError: test
         File: /home/user/test.vcf
         Property: ADR
-        >>> import vcard_defs
+        >>> import vcard_definitions
         >>> raise VCardError(
         ... 'Cöntexte randomisę',
-        ... {'foo': vcard_defs.QSAFE_CHARS[-1]*2})
+        ... {'foo': vcard_definitions.QSAFE_CHARS[-1]*2})
         Traceback (most recent call last):
         VCardError: Cöntexte randomisę
         foo: ÿÿ
