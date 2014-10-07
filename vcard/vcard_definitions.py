@@ -8,7 +8,6 @@ def character_range(start, end):
 
 # Literals, RFC 2426 pages 27, 28
 ALPHA_CHARS = character_range(0x41, 0x5A) + character_range(0x61, 0x7A)
-CHAR_CHARS = character_range(0x01, 0x7F)
 CR_CHAR = unichr(0x0D)
 LF_CHAR = unichr(0x0A)
 CRLF_CHARS = CR_CHAR + LF_CHAR
