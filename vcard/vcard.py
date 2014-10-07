@@ -23,20 +23,21 @@ import warnings
 
 # Local modules
 from vcard_definitions import \
-    ALL_PROPERTIES, CRLF_CHARS, ID_CHARS, MANDATORY_PROPERTIES, QSAFE_CHARS, SAFE_CHARS, SP_CHAR, VALUE_CHARS, \
+    ALL_PROPERTIES, NEWLINE_CHARACTERS, ID_CHARACTERS, MANDATORY_PROPERTIES, QUOTE_SAFE_CHARACTERS, SAFE_CHARACTERS, SPACE_CHARACTER, VALUE_CHARACTERS, \
     VCARD_LINE_MAX_LENGTH_RAW
 from vcard_errors import \
-    MSG_CONTINUATION_AT_START, MSG_DOT_AT_LINE_START, MSG_EMPTY_VCARD, MSG_INVALID_LINE_SEPARATOR, \
-    MSG_INVALID_PARAM_NAME, MSG_INVALID_PROPERTY_NAME, MSG_INVALID_SUBVALUE, MSG_INVALID_VALUE, MSG_MISMATCH_GROUP, \
-    MSG_MISSING_GROUP, MSG_MISSING_PARAM_VALUE, MSG_MISSING_PROPERTY, MSG_MISSING_VALUE_STRING, VCardError, \
-    VCardLineError, VCardItemCountError, VCardNameError, VCardValueError, UsageError
+    NOTE_CONTINUATION_AT_START, NOTE_DOT_AT_LINE_START, NOTE_EMPTY_VCARD, NOTE_INVALID_LINE_SEPARATOR, \
+    NOTE_INVALID_PARAMETER_NAME, NOTE_INVALID_PROPERTY_NAME, NOTE_INVALID_SUB_VALUE, NOTE_INVALID_VALUE, \
+    NOTE_MISMATCH_GROUP, NOTE_MISSING_GROUP, NOTE_MISSING_PARAM_VALUE, NOTE_MISSING_PROPERTY, \
+    NOTE_MISSING_VALUE_STRING, VCardError, VCardLineError, VCardItemCountError, VCardNameError, VCardValueError, \
+    UsageError
 import vcard_utils
 import vcard_validators
 
 
 def unfold_vcard_lines(lines):
     """
-    Unsplit lines in vCard, warning about short lines. RFC 2426 page 8.
+    Un-split lines in vCard, warning about short lines. RFC 2426 page 8.
 
     @param lines: List of potentially folded vCard lines
     @return: List of lines, one per property
@@ -44,21 +45,21 @@ def unfold_vcard_lines(lines):
     property_lines = []
     for index in range(len(lines)):
         line = lines[index]
-        if not line.endswith(CRLF_CHARS):
-            raise VCardLineError(MSG_INVALID_LINE_SEPARATOR, {'File line': index + 1})
+        if not line.endswith(NEWLINE_CHARACTERS):
+            raise VCardLineError(NOTE_INVALID_LINE_SEPARATOR, {'File line': index + 1})
 
         if len(line) > VCARD_LINE_MAX_LENGTH_RAW:
             warnings.warn('Long line in vCard: {0}'.format(line.encode('utf-8')))
 
         if line.startswith(' '):
             if index == 0:
-                raise VCardLineError(MSG_CONTINUATION_AT_START, {'File line': index + 1})
+                raise VCardLineError(NOTE_CONTINUATION_AT_START, {'File line': index + 1})
             elif len(lines[index - 1]) < VCARD_LINE_MAX_LENGTH_RAW:
                 warnings.warn('Short folded line at line {0:d}'.format(index - 1))
-            elif line == SP_CHAR + CRLF_CHARS:
+            elif line == SPACE_CHARACTER + NEWLINE_CHARACTERS:
                 warnings.warn('Empty folded line at line {0:d}'.format(index))
             property_lines[-1] = \
-                property_lines[-1][:-len(CRLF_CHARS)] + line[1:]
+                property_lines[-1][:-len(NEWLINE_CHARACTERS)] + line[1:]
         else:
             property_lines.append(line)
 
@@ -74,7 +75,7 @@ def get_vcard_group(lines):
     """
     group = None
 
-    group_re = re.compile('^([{0}]*)\.'.format(re.escape(ID_CHARS)))
+    group_re = re.compile('^([{0}]*)\.'.format(re.escape(ID_CHARACTERS)))
 
     group_match = group_re.match(lines[0])
     if group_match is not None:
@@ -82,23 +83,23 @@ def get_vcard_group(lines):
 
         # Validate
         if len(group) == 0:
-            raise VCardLineError(MSG_DOT_AT_LINE_START, {})
+            raise VCardLineError(NOTE_DOT_AT_LINE_START, {})
 
         for index in range(len(lines)):
             line = lines[index]
             next_match = group_re.match(line)
             if not next_match:
-                raise VCardLineError(MSG_MISSING_GROUP, {'File line': index + 1})
+                raise VCardLineError(NOTE_MISSING_GROUP, {'File line': index + 1})
             if next_match.group(1) != group:
                 raise VCardNameError(
-                    '{0}: {1} != {2}'.format(MSG_MISMATCH_GROUP, next_match.group(1), group), {'File line': index + 1})
+                    '{0}: {1} != {2}'.format(NOTE_MISMATCH_GROUP, next_match.group(1), group), {'File line': index + 1})
     else:
         # Make sure there are no groups elsewhere
         for index in range(len(lines)):
             next_match = group_re.match(lines[index])
             if next_match:
                 raise VCardNameError(
-                    '{0}: {1} != {2}'.format(MSG_MISMATCH_GROUP, next_match.group(1), group), {'File line': index + 1})
+                    '{0}: {1} != {2}'.format(NOTE_MISMATCH_GROUP, next_match.group(1), group), {'File line': index + 1})
 
     return group
 
@@ -129,13 +130,14 @@ def get_vcard_property_param_values(values_string):
 
     # Validate
     for value in values:
-        if not re.match(u'^[{0}]+$|^"[{1}]+"$'.format(re.escape(SAFE_CHARS), re.escape(QSAFE_CHARS)), value):
-            raise VCardValueError('{0}: {1}'.format(MSG_INVALID_VALUE, value), {})
+        if not re.match(u'^[{0}]+$|^"[{1}]+"$'.format(
+                re.escape(SAFE_CHARACTERS), re.escape(QUOTE_SAFE_CHARACTERS)), value):
+            raise VCardValueError('{0}: {1}'.format(NOTE_INVALID_VALUE, value), {})
 
     return values
 
 
-def get_vcard_property_param(param_string):
+def get_vcard_property_parameter(param_string):
     """
     Get the parameter name and value(s). RFC 2426 page 29.
 
@@ -145,13 +147,13 @@ def get_vcard_property_param(param_string):
     try:
         param_name, values_string = vcard_utils.split_unescaped(param_string, '=')
     except ValueError as error:
-        raise VCardItemCountError('{0}: {1}'.format(MSG_MISSING_PARAM_VALUE, str(error)), {})
+        raise VCardItemCountError('{0}: {1}'.format(NOTE_MISSING_PARAM_VALUE, str(error)), {})
 
     values = get_vcard_property_param_values(values_string)
 
     # Validate
-    if not re.match('^[{0}]+$'.format(re.escape(ID_CHARS)), param_name):
-        raise VCardNameError('{0}: {1}'.format(MSG_INVALID_PARAM_NAME, param_name), {})
+    if not re.match('^[{0}]+$'.format(re.escape(ID_CHARACTERS)), param_name):
+        raise VCardNameError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_NAME, param_name), {})
 
     return {'name': param_name, 'values': values}
 
@@ -169,33 +171,33 @@ def get_vcard_property_params(params_string):
     if not params_string:
         return params
 
-    for param_string in vcard_utils.split_unescaped(params_string, ';'):
-        param = get_vcard_property_param(param_string)
-        param_name = param['name'].upper()  # To be able to merge TYPE & type
+    for parameter_string in vcard_utils.split_unescaped(params_string, ';'):
+        parameter = get_vcard_property_parameter(parameter_string)
+        param_name = parameter['name'].upper()  # To be able to merge TYPE & type
         if param_name not in params:
-            params[param_name] = param['values']
+            params[param_name] = parameter['values']
         else:
             # Merge
-            params[param_name] = params[param_name].union(param['values'])
+            params[param_name] = params[param_name].union(parameter['values'])
 
     return params
 
 
-def get_vcard_property_subvalues(value_string):
+def get_vcard_property_sub_values(value_string):
     """
     Get the parts of the value.
 
     @param value_string: Single value string
     @return: List of values (RFC 2426 page 9)
     """
-    subvalues = vcard_utils.split_unescaped(value_string, ',')
+    sub_values = vcard_utils.split_unescaped(value_string, ',')
 
     # Validate string
-    for subvalue in subvalues:
-        if not re.match(u'^[{0}]*$'.format(re.escape(VALUE_CHARS)), subvalue):
-            raise VCardValueError('{0}: {1}'.format(MSG_INVALID_SUBVALUE, subvalue), {})
+    for sub_value in sub_values:
+        if not re.match(u'^[{0}]*$'.format(re.escape(VALUE_CHARACTERS)), sub_value):
+            raise VCardValueError('{0}: {1}'.format(NOTE_INVALID_SUB_VALUE, sub_value), {})
 
-    return subvalues
+    return sub_values
 
 
 def get_vcard_property_values(values_string):
@@ -208,11 +210,11 @@ def get_vcard_property_values(values_string):
     values = []
 
     # Strip line ending
-    values_string = values_string[:-len(CRLF_CHARS)]
+    values_string = values_string[:-len(NEWLINE_CHARACTERS)]
 
-    subvalue_strings = vcard_utils.split_unescaped(values_string, ';')
-    for sub in subvalue_strings:
-        values.append(get_vcard_property_subvalues(sub))
+    sub_value_strings = vcard_utils.split_unescaped(values_string, ';')
+    for sub in sub_value_strings:
+        values.append(get_vcard_property_sub_values(sub))
 
     return values
 
@@ -224,11 +226,11 @@ def get_vcard_property(property_line):
     @param property_line: Single unfolded vCard line
     @return: Dictionary with name, parameters and values
     """
-    prop = {}
+    property_ = {}
 
     property_parts = vcard_utils.split_unescaped(property_line, ':')
     if len(property_parts) < 2:
-        raise VCardItemCountError('{0}: {1}'.format(MSG_MISSING_VALUE_STRING, property_line), {})
+        raise VCardItemCountError('{0}: {1}'.format(NOTE_MISSING_VALUE_STRING, property_line), {})
     elif len(property_parts) > 2:
         # Merge - Colon doesn't have to be escaped in values
         property_parts[1] = ':'.join(property_parts[1:])
@@ -238,27 +240,27 @@ def get_vcard_property(property_line):
     # Split property name and property parameters
     property_name_and_params = vcard_utils.split_unescaped(property_string, ';')
 
-    prop['name'] = property_name_and_params.pop(0)
+    property_['name'] = property_name_and_params.pop(0)
 
     # String validation
-    if not prop['name'].upper() in ALL_PROPERTIES and not re.match(
-            '^X-[{0}]+$'.format(re.escape(ID_CHARS)), prop['name'], re.IGNORECASE):
-        raise VCardNameError('{0}: {1[name]}'.format(MSG_INVALID_PROPERTY_NAME, prop), {})
+    if not property_['name'].upper() in ALL_PROPERTIES and not re.match(
+            '^X-[{0}]+$'.format(re.escape(ID_CHARACTERS)), property_['name'], re.IGNORECASE):
+        raise VCardNameError('{0}: {1[name]}'.format(NOTE_INVALID_PROPERTY_NAME, property_), {})
 
     try:
         if len(property_name_and_params) != 0:
-            prop['parameters'] = get_vcard_property_params(';'.join(property_name_and_params))
-        prop['values'] = get_vcard_property_values(values_string)
+            property_['parameters'] = get_vcard_property_params(';'.join(property_name_and_params))
+        property_['values'] = get_vcard_property_values(values_string)
 
         # Validate
-        vcard_validators.validate_vcard_property(prop)
+        vcard_validators.validate_vcard_property(property_)
     except VCardError as error:
         # Add parameter name to error
         error.context['Property line'] = property_line
         err_type = type(error)
         raise err_type(error.message, error.context)
 
-    return prop
+    return property_
 
 
 def get_vcard_properties(lines):
@@ -273,7 +275,7 @@ def get_vcard_properties(lines):
     properties = []
     for index in range(len(lines)):
         property_line = lines[index]
-        if property_line != CRLF_CHARS:
+        if property_line != NEWLINE_CHARACTERS:
             try:
                 properties.append(get_vcard_property(property_line))
             except VCardError as error:
@@ -284,9 +286,9 @@ def get_vcard_properties(lines):
                     error.context)
 
     for mandatory_property in MANDATORY_PROPERTIES:
-        if mandatory_property not in [prop['name'].upper() for prop in properties]:
+        if mandatory_property not in [property_['name'].upper() for property_ in properties]:
             raise VCardItemCountError(
-                '{0}: {1}'.format(MSG_MISSING_PROPERTY, mandatory_property), {'Property': mandatory_property})
+                '{0}: {1}'.format(NOTE_MISSING_PROPERTY, mandatory_property), {'Property': mandatory_property})
 
     return properties
 
@@ -302,7 +304,7 @@ class VCard():
         @param text: String containing a single vCard
         """
         if text == '' or text is None:
-            raise VCardError(MSG_EMPTY_VCARD, {'vCard line': 1, 'File line': 1})
+            raise VCardError(NOTE_EMPTY_VCARD, {'vCard line': 1, 'File line': 1})
 
         self.text = text
 
@@ -343,7 +345,7 @@ def validate_file(filename, verbose=False):
             line = contents[index]
             vcard_text += line
 
-            if line == CRLF_CHARS:
+            if line == NEWLINE_CHARACTERS:
                 try:
                     vcard = VCard(vcard_text, filename)
                     vcard_text = ''

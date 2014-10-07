@@ -15,26 +15,27 @@ import warnings
 import isodate
 
 # Local modules
-from vcard_definitions import DQUOTE_CHAR, ID_CHARS, ESCAPED_CHARS, QSAFE_CHARS, SAFE_CHARS, SP_CHAR
+from vcard_definitions import \
+    DOUBLE_QUOTE_CHARACTER, ID_CHARACTERS, ESCAPED_CHARACTERS, QUOTE_SAFE_CHARACTERS, SAFE_CHARACTERS, SPACE_CHARACTER
 
 from vcard_errors import (
     # Error literals
-    MSG_INVALID_DATE,
-    MSG_INVALID_LANGUAGE_VALUE,
-    MSG_INVALID_PARAM_NAME,
-    MSG_INVALID_PARAM_VALUE,
-    MSG_INVALID_SUBVALUE,
-    MSG_INVALID_SUBVALUE_COUNT,
-    MSG_INVALID_TEXT_VALUE,
-    MSG_INVALID_TIME,
-    MSG_INVALID_TIME_ZONE,
-    MSG_INVALID_URI,
-    MSG_INVALID_VALUE,
-    MSG_INVALID_VALUE_COUNT,
-    MSG_INVALID_X_NAME,
-    MSG_MISMATCH_PARAM,
-    MSG_MISSING_PARAM,
-    MSG_NON_EMPTY_PARAM,
+    NOTE_INVALID_DATE,
+    NOTE_INVALID_LANGUAGE_VALUE,
+    NOTE_INVALID_PARAMETER_NAME,
+    NOTE_INVALID_PARAMETER_VALUE,
+    NOTE_INVALID_SUB_VALUE,
+    NOTE_INVALID_SUB_VALUE_COUNT,
+    NOTE_INVALID_TEXT_VALUE,
+    NOTE_INVALID_TIME,
+    NOTE_INVALID_TIME_ZONE,
+    NOTE_INVALID_URI,
+    NOTE_INVALID_VALUE,
+    NOTE_INVALID_VALUE_COUNT,
+    NOTE_INVALID_X_NAME,
+    NOTE_MISMATCH_PARAMETER,
+    NOTE_MISSING_PARAMETER,
+    NOTE_NON_EMPTY_PARAMETER,
     WARN_DEFAULT_TYPE_VALUE,
     WARN_INVALID_EMAIL_TYPE,
     WARN_MULTIPLE_NAMES,
@@ -48,14 +49,14 @@ from vcard_errors import (
 )
 
 VALID_DATE = re.compile(r'^\d{4}-?\d{2}-?\d{2}$')
-VALID_TZ = re.compile(r'^(Z|[+-]\d{2}:?\d{2})$')
-VALID_TIME_TZ = re.compile(r'^(\d{2}:?\d{2}:?\d{2}(?:,\d+)?)(.*)$')
-VALID_LANG_TAG = re.compile(r'^([a-z]{1,8})(-[a-z]{1,8})*$')
-VALID_X_NAME = re.compile(r'^X-[{0}]+$'.format(re.escape(ID_CHARS)))
-VALID_PTEXT = re.compile(u'^[{0}]*$'.format(re.escape(SAFE_CHARS)))
+VALID_TIMEZONE = re.compile(r'^(Z|[+-]\d{2}:?\d{2})$')
+VALID_TIME_WITH_TIMEZONE = re.compile(r'^(\d{2}:?\d{2}:?\d{2}(?:,\d+)?)(.*)$')
+VALID_LANGUAGE_TAG = re.compile(r'^([a-z]{1,8})(-[a-z]{1,8})*$')
+VALID_X_NAME = re.compile(r'^X-[{0}]+$'.format(re.escape(ID_CHARACTERS)))
+VALID_PRESENTATION_TEXT = re.compile(u'^[{0}]*$'.format(re.escape(SAFE_CHARACTERS)))
 VALID_TEXT = re.compile(u'^([{0}:{1}]|(\\\\[{2}]))*$'.format(
-    re.escape(SAFE_CHARS), DQUOTE_CHAR, re.escape(ESCAPED_CHARS)))
-VALID_QUOTED_STRING = re.compile(u'^{0}[{1}]{0}$'.format(DQUOTE_CHAR, re.escape(QSAFE_CHARS)))
+    re.escape(SAFE_CHARACTERS), DOUBLE_QUOTE_CHARACTER, re.escape(ESCAPED_CHARACTERS)))
+VALID_QUOTED_STRING = re.compile(u'^{0}[{1}]{0}$'.format(DOUBLE_QUOTE_CHARACTER, re.escape(QUOTE_SAFE_CHARACTERS)))
 VALID_FLOAT = re.compile(r'^[+-]?\d+(\.\d+)?$')
 
 LABEL_TYPE_VALUES = ('dom', 'intl', 'postal', 'parcel', 'home', 'work', 'pref')
@@ -64,25 +65,25 @@ TELEPHONE_TYPE_VALUES = (
 EMAIL_TYPE_VALUES = ('internet', 'x400', 'pref', 'dom', 'intl', 'postal', 'parcel', 'home', 'work')
 
 
-def _expect_no_params(prop):
-    if 'parameters' in prop:
-        raise VCardItemCountError('{0}: {1[parameters]}'.format(MSG_NON_EMPTY_PARAM, prop), {})
+def _expect_no_parameters(property_):
+    if 'parameters' in property_:
+        raise VCardItemCountError('{0}: {1[parameters]}'.format(NOTE_NON_EMPTY_PARAMETER, property_), {})
 
 
-def _expect_params(prop):
-    if 'parameters' not in prop:
-        raise VCardItemCountError(MSG_MISSING_PARAM, {})
+def _expect_parameters(property_):
+    if 'parameters' not in property_:
+        raise VCardItemCountError(NOTE_MISSING_PARAMETER, {})
 
 
 def _expect_value_count(values, count):
     if len(values) != count:
-        raise VCardItemCountError('{0}: {1:d} (expected {2})'.format(MSG_INVALID_VALUE_COUNT, len(values), count), {})
+        raise VCardItemCountError('{0}: {1:d} (expected {2})'.format(NOTE_INVALID_VALUE_COUNT, len(values), count), {})
 
 
-def _expect_subvalue_count(subvalues, count):
-    if len(subvalues) != count:
+def _expect_sub_value_count(sub_values, count):
+    if len(sub_values) != count:
         raise VCardItemCountError(
-            '{0}: {1:d} (expected {2})'.format(MSG_INVALID_SUBVALUE_COUNT, len(subvalues), count), {})
+            '{0}: {1:d} (expected {2})'.format(NOTE_INVALID_SUB_VALUE_COUNT, len(sub_values), count), {})
 
 
 def validate_date(text):
@@ -119,12 +120,12 @@ def validate_date(text):
     String: aaaa-bb-cc
     """
     if VALID_DATE.match(text) is None:
-        raise VCardValueError(MSG_INVALID_DATE, {'String': text})
+        raise VCardValueError(NOTE_INVALID_DATE, {'String': text})
 
     try:
         isodate.parse_date(text)
     except (isodate.ISO8601Error, ValueError):
-        raise VCardValueError(MSG_INVALID_DATE, {'String': text})
+        raise VCardValueError(NOTE_INVALID_DATE, {'String': text})
 
 
 def validate_time_zone(text):
@@ -172,13 +173,13 @@ def validate_time_zone(text):
     Traceback (most recent call last):
     VCardValueError: Invalid time zone ...
     """
-    if not VALID_TZ.match(text):
-        raise VCardValueError(MSG_INVALID_TIME_ZONE, {'String': text})
+    if not VALID_TIMEZONE.match(text):
+        raise VCardValueError(NOTE_INVALID_TIME_ZONE, {'String': text})
 
     try:
         isodate.parse_tzinfo(text.replace('+', 'Z+').replace('-', 'Z-'))
     except (isodate.ISO8601Error, ValueError):
-        raise VCardValueError(MSG_INVALID_TIME_ZONE, {'String': text})
+        raise VCardValueError(NOTE_INVALID_TIME_ZONE, {'String': text})
 
 
 def validate_time(text):
@@ -210,15 +211,15 @@ def validate_time(text):
     VCardValueError: Invalid time zone ...
     String: Z+01
     """
-    time_timezone = VALID_TIME_TZ.match(text)
+    time_timezone = VALID_TIME_WITH_TIMEZONE.match(text)
     if time_timezone is None:
-        raise VCardValueError(MSG_INVALID_TIME, {'String': text})
+        raise VCardValueError(NOTE_INVALID_TIME, {'String': text})
 
     time_str, timezone_str = time_timezone.groups()
     try:
         isodate.parse_time(time_str)
     except (isodate.ISO8601Error, ValueError):
-        raise VCardValueError(MSG_INVALID_TIME, {'String': text})
+        raise VCardValueError(NOTE_INVALID_TIME, {'String': text})
 
     if timezone_str == '':
         return
@@ -247,8 +248,8 @@ def validate_language_tag(text):
     """
     text = text.lower()  # Case insensitive
 
-    if VALID_LANG_TAG.match(text) is None:
-        raise VCardValueError(MSG_INVALID_LANGUAGE_VALUE, {'String': text})
+    if VALID_LANGUAGE_TAG.match(text) is None:
+        raise VCardValueError(NOTE_INVALID_LANGUAGE_VALUE, {'String': text})
 
     # TODO: Extend to validate according to referenced ISO/RFC standards
 
@@ -259,7 +260,7 @@ def validate_x_name(text):
 
     Examples:
     >>> validate_x_name('X-abc')
-    >>> validate_x_name('X-' + ID_CHARS)
+    >>> validate_x_name('X-' + ID_CHARACTERS)
     >>> validate_x_name('X-') # Have to have more characters
     Traceback (most recent call last):
     VCardNameError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
@@ -279,10 +280,10 @@ def validate_x_name(text):
     String: foo
     """
     if VALID_X_NAME.match(text) is None:
-        raise VCardNameError(MSG_INVALID_X_NAME, {'String': text})
+        raise VCardNameError(NOTE_INVALID_X_NAME, {'String': text})
 
 
-def validate_ptext(text):
+def validate_presentation_text(text):
     """
     ptext, as described on page 28
     <http://tools.ietf.org/html/rfc2426#section-4>
@@ -290,15 +291,15 @@ def validate_ptext(text):
     @param text: String
 
     Examples:
-    >>> validate_ptext('')
-    >>> validate_ptext(SAFE_CHARS)
-    >>> validate_ptext(u'\u000B') #doctest: +ELLIPSIS
+    >>> validate_presentation_text('')
+    >>> validate_presentation_text(SAFE_CHARACTERS)
+    >>> validate_presentation_text(u'\u000B') #doctest: +ELLIPSIS
     Traceback (most recent call last):
     VCardValueError: Invalid parameter value ...
     String: ...
     """
-    if VALID_PTEXT.match(text) is None:
-        raise VCardValueError(MSG_INVALID_PARAM_VALUE, {'String': text})
+    if VALID_PRESENTATION_TEXT.match(text) is None:
+        raise VCardValueError(NOTE_INVALID_PARAMETER_VALUE, {'String': text})
 
 
 def validate_text_value(text):
@@ -311,7 +312,7 @@ def validate_text_value(text):
     Examples:
     >>> validate_text_value('')
     >>> validate_text_value('\\\\,')
-    >>> validate_text_value(SAFE_CHARS)
+    >>> validate_text_value(SAFE_CHARACTERS)
     >>> validate_text_value('\\\\n')
     >>> validate_text_value(';') # doctest: +ELLIPSIS
     Traceback (most recent call last):
@@ -323,7 +324,7 @@ def validate_text_value(text):
     String: ...
     """
     if VALID_TEXT.match(text) is None:
-        raise VCardValueError(MSG_INVALID_TEXT_VALUE, {'String': text})
+        raise VCardValueError(NOTE_INVALID_TEXT_VALUE, {'String': text})
 
 
 def validate_quoted_string(text):
@@ -334,18 +335,18 @@ def validate_quoted_string(text):
     @param text: String
 
     Examples:
-    >>> validate_quoted_string(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
-    >>> validate_quoted_string(DQUOTE_CHAR + DQUOTE_CHAR) # doctest: +ELLIPSIS
+    >>> validate_quoted_string(DOUBLE_QUOTE_CHARACTER + QUOTE_SAFE_CHARACTERS[0] + DOUBLE_QUOTE_CHARACTER)
+    >>> validate_quoted_string(DOUBLE_QUOTE_CHARACTER + DOUBLE_QUOTE_CHARACTER) # doctest: +ELLIPSIS
     Traceback (most recent call last):
     VCardValueError: Invalid parameter value ...
     >>> validate_quoted_string(
-    ... DQUOTE_CHAR + QSAFE_CHARS[-1]*2 + DQUOTE_CHAR) # doctest: +ELLIPSIS
+    ... DOUBLE_QUOTE_CHARACTER + QUOTE_SAFE_CHARACTERS[-1]*2 + DOUBLE_QUOTE_CHARACTER) # doctest: +ELLIPSIS
     Traceback (most recent call last):
     VCardValueError: Invalid parameter value ...
     String: "ÿÿ"
     """
     if VALID_QUOTED_STRING.match(text) is None:
-        raise VCardValueError(MSG_INVALID_PARAM_VALUE, {'String': text})
+        raise VCardValueError(NOTE_INVALID_PARAMETER_VALUE, {'String': text})
 
 
 def validate_param_value(text):
@@ -357,20 +358,20 @@ def validate_param_value(text):
 
     Examples:
     >>> validate_param_value('')
-    >>> validate_param_value(SAFE_CHARS)
-    >>> validate_param_value(DQUOTE_CHAR + QSAFE_CHARS[0] + DQUOTE_CHAR)
-    >>> validate_param_value(DQUOTE_CHAR + DQUOTE_CHAR) # doctest: +ELLIPSIS
+    >>> validate_param_value(SAFE_CHARACTERS)
+    >>> validate_param_value(DOUBLE_QUOTE_CHARACTER + QUOTE_SAFE_CHARACTERS[0] + DOUBLE_QUOTE_CHARACTER)
+    >>> validate_param_value(DOUBLE_QUOTE_CHARACTER + DOUBLE_QUOTE_CHARACTER) # doctest: +ELLIPSIS
     Traceback (most recent call last):
     VCardValueError: Invalid parameter value ...
     String: ""
     """
     try:
-        validate_ptext(text)
+        validate_presentation_text(text)
     except VCardValueError:
         try:
             validate_quoted_string(text)
         except VCardValueError:
-            raise VCardValueError(MSG_INVALID_PARAM_VALUE, {'String': text})
+            raise VCardValueError(NOTE_INVALID_PARAMETER_VALUE, {'String': text})
 
 
 def validate_text_parameter(parameter):
@@ -388,17 +389,17 @@ def validate_text_parameter(parameter):
 
     if param_name == 'VALUE':
         if param_values != {'ptext'}:
-            raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values), {})
+            raise VCardValueError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_values), {})
         return
     elif param_name == 'LANGUAGE':
         if len(param_values) != 1:
-            raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values), {})
+            raise VCardValueError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_values), {})
         for param_value in param_values:
             validate_language_tag(param_value)
     else:
         validate_x_name(param_name)
         if len(param_values) != 1:
-            raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values), {})
+            raise VCardValueError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_values), {})
         validate_param_value(param_values[0])
 
 
@@ -415,30 +416,30 @@ def validate_float(text):
     >>> validate_float('12.') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardValueError: Invalid subvalue ...
+    VCardValueError: Invalid sub-value ...
     >>> validate_float('.12') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardValueError: Invalid subvalue ...
+    VCardValueError: Invalid sub-value ...
     >>> validate_float('foo') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardValueError: Invalid subvalue ...
+    VCardValueError: Invalid sub-value ...
     >>> validate_float('++12.345') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardValueError: Invalid subvalue ...
+    VCardValueError: Invalid sub-value ...
     >>> validate_float('--12.345') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardValueError: Invalid subvalue ...
+    VCardValueError: Invalid sub-value ...
     >>> validate_float('12.34.5') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    VCardValueError: Invalid subvalue ...
+    VCardValueError: Invalid sub-value ...
     """
     if VALID_FLOAT.match(text) is None:
-        raise VCardValueError('{0}, expected float value: {1}'.format(MSG_INVALID_SUBVALUE, text), {})
+        raise VCardValueError('{0}, expected float value: {1}'.format(NOTE_INVALID_SUB_VALUE, text), {})
 
 
 def validate_uri(text):
@@ -460,251 +461,262 @@ def validate_uri(text):
     """
     parts = urlparse(text)
     if parts[0] == '' or (parts[1] == '' and parts[2] == ''):
-        raise VCardValueError(MSG_INVALID_URI, {'String': text})
+        raise VCardValueError(NOTE_INVALID_URI, {'String': text})
 
 
-def validate_vcard_property(prop):
+def validate_vcard_property(property_):
     """
     Checks any property according to
     <http://tools.ietf.org/html/rfc2426#section-3> and
     <http://tools.ietf.org/html/rfc2426#section-4>. Checks are grouped by
     property to allow easy overview rather than a short function.
 
-    @param prop: Formatted property
+    @param property_: Formatted property
     """
-    property_name = prop['name'].upper()
+    property_name = property_['name'].upper()
 
     try:
         if property_name in ('BEGIN', 'END'):
             # <http://tools.ietf.org/html/rfc2426#section-2.1.1>
-            _expect_no_params(prop)
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            if prop['values'][0][0].lower() != 'vcard':
-                raise VCardValueError('{0}: {1} (expected "VCARD")'.format(MSG_INVALID_VALUE, prop['values'][0][0]), {})
+            _expect_no_parameters(property_)
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            if property_['values'][0][0].lower() != 'vcard':
+                raise VCardValueError(
+                    '{0}: {1} (expected "VCARD")'.format(NOTE_INVALID_VALUE, property_['values'][0][0]), {})
 
         if property_name == 'NAME':
             # <http://tools.ietf.org/html/rfc2426#section-2.1.2>
-            _expect_no_params(prop)
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            validate_text_value(prop['values'][0][0])
+            _expect_no_parameters(property_)
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            validate_text_value(property_['values'][0][0])
 
         if property_name == 'PROFILE':
             # <http://tools.ietf.org/html/rfc2426#section-2.1.3>
-            _expect_no_params(prop)
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            if prop['values'][0][0].lower() != 'vcard':
-                raise VCardValueError('{0}: {1} (expected "VCARD")'.format(MSG_INVALID_VALUE, prop['values'][0][0]), {})
-            validate_text_value(prop['values'][0][0])
+            _expect_no_parameters(property_)
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            if property_['values'][0][0].lower() != 'vcard':
+                raise VCardValueError(
+                    '{0}: {1} (expected "VCARD")'.format(NOTE_INVALID_VALUE, property_['values'][0][0]), {})
+            validate_text_value(property_['values'][0][0])
 
         if property_name == 'SOURCE':
             # <http://tools.ietf.org/html/rfc2426#section-2.1.4>
-            _expect_params(prop)
-            for param_name, param_values in prop['parameters'].items():
-                if param_name.upper() == 'VALUE':
+            _expect_parameters(property_)
+            for parameter_name, param_values in property_['parameters'].items():
+                if parameter_name.upper() == 'VALUE':
                     if param_values != {'uri'}:
-                        raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values), {})
-                    if 'CONTEXT' in prop['parameters']:
-                        raise VCardValueError('{0}: {1} and {2}'.format(MSG_MISMATCH_PARAM, ('VALUE', 'CONTEXT')), {})
-                elif param_name.upper() == 'CONTEXT':
+                        raise VCardValueError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_values), {})
+                    if 'CONTEXT' in property_['parameters']:
+                        raise VCardValueError(
+                            '{0}: {1} and {2}'.format(NOTE_MISMATCH_PARAMETER, ('VALUE', 'CONTEXT')), {})
+                elif parameter_name.upper() == 'CONTEXT':
                     if param_values != {'word'}:
-                        raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values), {})
-                    if 'VALUE' in prop['parameters']:
-                        raise VCardValueError('{0}: {1} and {2}'.format(MSG_MISMATCH_PARAM, ('VALUE', 'CONTEXT')), {})
+                        raise VCardValueError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_values), {})
+                    if 'VALUE' in property_['parameters']:
+                        raise VCardValueError(
+                            '{0}: {1} and {2}'.format(NOTE_MISMATCH_PARAMETER, ('VALUE', 'CONTEXT')), {})
                 else:
-                    raise VCardNameError('{0}: {1}'.format(MSG_INVALID_PARAM_NAME, param_name), {})
+                    raise VCardNameError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_NAME, parameter_name), {})
 
         if property_name == 'FN':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.1>
-            if 'parameters' in prop:
-                for parameter in prop['parameters'].items():
+            if 'parameters' in property_:
+                for parameter in property_['parameters'].items():
                     validate_text_parameter(parameter)
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            validate_text_value(prop['values'][0][0])
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            validate_text_value(property_['values'][0][0])
 
         elif property_name == 'VERSION':
-            _expect_no_params(prop)
-            _expect_value_count(prop['values'], 1)
-            if prop['values'][0][0] != '3.0':
-                raise VCardValueError('{0}: {1} (expected "3.0")'.format(MSG_INVALID_VALUE, prop['values'][0][0]), {})
+            _expect_no_parameters(property_)
+            _expect_value_count(property_['values'], 1)
+            if property_['values'][0][0] != '3.0':
+                raise VCardValueError(
+                    '{0}: {1} (expected "3.0")'.format(NOTE_INVALID_VALUE, property_['values'][0][0]), {})
         elif property_name == 'N':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.2>
-            if 'parameters' in prop:
-                for parameter in prop['parameters'].items():
+            if 'parameters' in property_:
+                for parameter in property_['parameters'].items():
                     validate_text_parameter(parameter)
-            _expect_value_count(prop['values'], 5)
+            _expect_value_count(property_['values'], 5)
             # Should names be split?
-            for names in prop['values']:
+            for names in property_['values']:
                 warnings.showwarning = show_warning
                 for name in names:
                     validate_text_value(name)
-                    if name.find(SP_CHAR) != -1 and ''.join([''.join(names) for names in prop['values']]) != name:
+                    if name.find(SPACE_CHARACTER) != -1 and \
+                            ''.join([''.join(names) for names in property_['values']]) != name:
                         # Space in name
                         # Not just a single name
                         warnings.warn('{0}: {1}'.format(WARN_MULTIPLE_NAMES, name.encode('utf-8')))
 
         elif property_name == 'NICKNAME':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.3>
-            if 'parameters' in prop:
-                for parameter in prop['parameters'].items():
+            if 'parameters' in property_:
+                for parameter in property_['parameters'].items():
                     validate_text_parameter(parameter)
-            _expect_value_count(prop['values'], 1)
+            _expect_value_count(property_['values'], 1)
 
         elif property_name in ['PHOTO', 'LOGO']:
             # <http://tools.ietf.org/html/rfc2426#section-3.1.4>
             # <http://tools.ietf.org/html/rfc2426#section-3.5.4>
-            _expect_params(prop)
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            for param_name, param_values in prop['parameters'].items():
-                if param_name.upper() == 'ENCODING':
+            _expect_parameters(property_)
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            for parameter_name, param_values in property_['parameters'].items():
+                if parameter_name.upper() == 'ENCODING':
                     if param_values != {'b'}:
-                        raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values), {})
-                    if 'VALUE' in prop['parameters']:
-                        raise VCardValueError('{0}: {1} and {2}'.format(MSG_MISMATCH_PARAM, ('ENCODING', 'VALUE')), {})
-                elif param_name.upper() == 'TYPE' and 'ENCODING' not in prop['parameters']:
-                    raise VCardItemCountError('{0}: {1}'.format(MSG_MISSING_PARAM, 'ENCODING'), {})
-                elif param_name.upper() == 'VALUE':
+                        raise VCardValueError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_values), {})
+                    if 'VALUE' in property_['parameters']:
+                        raise VCardValueError(
+                            '{0}: {1} and {2}'.format(NOTE_MISMATCH_PARAMETER, ('ENCODING', 'VALUE')), {})
+                elif parameter_name.upper() == 'TYPE' and 'ENCODING' not in property_['parameters']:
+                    raise VCardItemCountError('{0}: {1}'.format(NOTE_MISSING_PARAMETER, 'ENCODING'), {})
+                elif parameter_name.upper() == 'VALUE':
                     if param_values != {'uri'}:
-                        raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values), {})
+                        raise VCardValueError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_values), {})
                     else:
-                        validate_uri(prop['values'][0][0])
-                elif param_name.upper() not in ['ENCODING', 'TYPE', 'VALUE']:
-                    raise VCardNameError('{0}: {1}'.format(MSG_INVALID_PARAM_NAME, param_name), {})
+                        validate_uri(property_['values'][0][0])
+                elif parameter_name.upper() not in ['ENCODING', 'TYPE', 'VALUE']:
+                    raise VCardNameError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_NAME, parameter_name), {})
 
         elif property_name == 'BDAY':
             # <http://tools.ietf.org/html/rfc2426#section-3.1.5>
-            _expect_no_params(prop)
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            validate_date(prop['values'][0][0])
+            _expect_no_parameters(property_)
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            validate_date(property_['values'][0][0])
 
         elif property_name == 'ADR':
             # <http://tools.ietf.org/html/rfc2426#section-3.2.1>
-            _expect_value_count(prop['values'], 7)
-            if 'parameters' in prop:
-                for param_name, param_values in prop['parameters'].items():
-                    if param_name.upper() == 'TYPE':
-                        for param_subvalue in param_values:
-                            if param_subvalue not in LABEL_TYPE_VALUES:
-                                raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_subvalue), {})
+            _expect_value_count(property_['values'], 7)
+            if 'parameters' in property_:
+                for parameter_name, param_values in property_['parameters'].items():
+                    if parameter_name.upper() == 'TYPE':
+                        for param_sub_value in param_values:
+                            if param_sub_value not in LABEL_TYPE_VALUES:
+                                raise VCardValueError(
+                                    '{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_sub_value), {})
                         if param_values == {'intl', 'postal', 'parcel', 'work'}:
-                            warnings.warn('{0}: {1}'.format(WARN_DEFAULT_TYPE_VALUE, prop['values']))
+                            warnings.warn('{0}: {1}'.format(WARN_DEFAULT_TYPE_VALUE, property_['values']))
                     else:
-                        validate_text_parameter(prop)
+                        validate_text_parameter(property_)
 
         elif property_name == 'LABEL':
             # <http://tools.ietf.org/html/rfc2426#section-3.2.2>
-            if 'parameters' in prop:
-                for param_name, param_values in prop['parameters'].items():
-                    if param_name.upper() == 'TYPE':
-                        for param_subvalue in param_values:
-                            if param_subvalue not in LABEL_TYPE_VALUES:
-                                raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_subvalue), {})
+            if 'parameters' in property_:
+                for parameter_name, param_values in property_['parameters'].items():
+                    if parameter_name.upper() == 'TYPE':
+                        for param_sub_value in param_values:
+                            if param_sub_value not in LABEL_TYPE_VALUES:
+                                raise VCardValueError(
+                                    '{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_sub_value), {})
                         if param_values == {'intl', 'postal', 'parcel', 'work'}:
-                            warnings.warn('{0}: {1}'.format(WARN_DEFAULT_TYPE_VALUE, prop['values']))
+                            warnings.warn('{0}: {1}'.format(WARN_DEFAULT_TYPE_VALUE, property_['values']))
                     else:
-                        validate_text_parameter(prop)
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            validate_text_value(prop['values'][0][0])
+                        validate_text_parameter(property_)
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            validate_text_value(property_['values'][0][0])
 
         elif property_name == 'TEL':
             # <http://tools.ietf.org/html/rfc2426#section-3.3.1>
-            if 'parameters' in prop:
-                for param_name, param_values in prop['parameters'].items():
-                    if param_name.upper() == 'TYPE':
-                        for param_subvalue in param_values:
-                            if param_subvalue.lower() not in TELEPHONE_TYPE_VALUES:
-                                raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_subvalue), {})
+            if 'parameters' in property_:
+                for parameter_name, param_values in property_['parameters'].items():
+                    if parameter_name.upper() == 'TYPE':
+                        for param_sub_value in param_values:
+                            if param_sub_value.lower() not in TELEPHONE_TYPE_VALUES:
+                                raise VCardValueError(
+                                    '{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_sub_value), {})
                         if set([value.lower() for value in param_values]) == {'voice'}:
-                            warnings.warn('{0}: {1}'.format(WARN_DEFAULT_TYPE_VALUE, prop['values']))
+                            warnings.warn('{0}: {1}'.format(WARN_DEFAULT_TYPE_VALUE, property_['values']))
                     else:
-                        raise VCardNameError('{0}: {1}'.format(MSG_INVALID_PARAM_NAME, param_name), {})
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
+                        raise VCardNameError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_NAME, parameter_name), {})
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
 
         elif property_name == 'EMAIL':
             # <http://tools.ietf.org/html/rfc2426#section-3.3.2>
-            if 'parameters' in prop:
-                for param_name, param_values in prop['parameters'].items():
-                    if param_name.upper() == 'TYPE':
-                        for param_subvalue in param_values:
-                            if param_subvalue.lower() not in EMAIL_TYPE_VALUES:
-                                warnings.warn('{0}: {1}'.format(WARN_INVALID_EMAIL_TYPE, param_subvalue))
+            if 'parameters' in property_:
+                for parameter_name, param_values in property_['parameters'].items():
+                    if parameter_name.upper() == 'TYPE':
+                        for param_sub_value in param_values:
+                            if param_sub_value.lower() not in EMAIL_TYPE_VALUES:
+                                warnings.warn('{0}: {1}'.format(WARN_INVALID_EMAIL_TYPE, param_sub_value))
                         if set([value.lower() for value in param_values]) == {'internet'}:
-                            warnings.warn('{0}: {1[values]}'.format(WARN_DEFAULT_TYPE_VALUE, prop))
+                            warnings.warn('{0}: {1[values]}'.format(WARN_DEFAULT_TYPE_VALUE, property_))
                     else:
-                        raise VCardNameError('{0}: {1}'.format(MSG_INVALID_PARAM_NAME, param_name), {})
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            validate_text_value(prop['values'][0][0])
+                        raise VCardNameError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_NAME, parameter_name), {})
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            validate_text_value(property_['values'][0][0])
 
         elif property_name == 'MAILER':
             # <http://tools.ietf.org/html/rfc2426#section-3.3.3>
-            _expect_no_params(prop)
-            _expect_value_count(prop['values'], 1)
-            _expect_value_count(prop['values'][0], 1)
-            validate_text_value(prop['values'][0][0])
+            _expect_no_parameters(property_)
+            _expect_value_count(property_['values'], 1)
+            _expect_value_count(property_['values'][0], 1)
+            validate_text_value(property_['values'][0][0])
 
         elif property_name == 'TZ':
             # <http://tools.ietf.org/html/rfc2426#section-3.4.1>
-            _expect_no_params(prop)
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            value = prop['values'][0][0]
+            _expect_no_parameters(property_)
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            value = property_['values'][0][0]
             validate_time_zone(value)
 
         elif property_name == 'GEO':
             # <http://tools.ietf.org/html/rfc2426#section-3.4.2>
-            _expect_no_params(prop)
-            _expect_value_count(prop['values'], 2)
+            _expect_no_parameters(property_)
+            _expect_value_count(property_['values'], 2)
             # can the following be...
-            #   _expect_subvalue_count(prop['values'][0], 2)
+            #   _expect_sub_value_count(property_['values'][0], 2)
             # ...?
-            for value in prop['values']:
+            for value in property_['values']:
                 if len(value) != 1:
                     raise VCardItemCountError(
-                        '{0}: {1:d} (expected 1)'.format(MSG_INVALID_SUBVALUE_COUNT, len(prop['values'][0])), {})
+                        '{0}: {1:d} (expected 1)'.format(NOTE_INVALID_SUB_VALUE_COUNT, len(property_['values'][0])), {})
                 validate_float(value[0])
 
         elif property_name == 'TITLE':
             # <http://tools.ietf.org/html/rfc2426#section-3.5.1>
-            if 'parameters' in prop:
-                for parameter in prop['parameters'].items():
+            if 'parameters' in property_:
+                for parameter in property_['parameters'].items():
                     validate_text_parameter(parameter)
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            validate_text_value(prop['values'][0][0])
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            validate_text_value(property_['values'][0][0])
 
         elif property_name == 'ROLE':
             # <http://tools.ietf.org/html/rfc2426#section-3.5.2>
-            if 'parameters' in prop:
-                for parameter in prop['parameters'].items():
+            if 'parameters' in property_:
+                for parameter in property_['parameters'].items():
                     validate_text_parameter(parameter)
-            _expect_value_count(prop['values'], 1)
-            _expect_subvalue_count(prop['values'][0], 1)
-            validate_text_value(prop['values'][0][0])
+            _expect_value_count(property_['values'], 1)
+            _expect_sub_value_count(property_['values'][0], 1)
+            validate_text_value(property_['values'][0][0])
 
         elif property_name == 'AGENT':
             # <http://tools.ietf.org/html/rfc2426#section-3.5.4>
-            if 'parameters' in prop:
-                for param_name, param_values in prop['parameters'].items():
-                    if param_name.upper() != 'VALUE':
-                        raise VCardNameError('{0}: {1}'.format(MSG_INVALID_PARAM_NAME, param_values), {})
+            if 'parameters' in property_:
+                for parameter_name, param_values in property_['parameters'].items():
+                    if parameter_name.upper() != 'VALUE':
+                        raise VCardNameError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_NAME, param_values), {})
                     if param_values != {'uri'}:
-                        raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_values), {})
-                _expect_value_count(prop['values'], 1)
+                        raise VCardValueError('{0}: {1}'.format(NOTE_INVALID_PARAMETER_VALUE, param_values), {})
+                _expect_value_count(property_['values'], 1)
                 # can this be...
-                #   _expect_subvalue_count(prop['values'][0], 1)
+                #   _expect_sub_value_count(property_['values'][0], 1)
                 # ...?
-                for value in prop['values']:
+                for value in property_['values']:
                     if len(value) != 1:
                         raise VCardItemCountError(
-                            '{0}: {1:d} (expected 1)'.format(MSG_INVALID_SUBVALUE_COUNT, len(prop['values'][0])), {})
+                            '{0}: {1:d} (expected 1)'.format(
+                                NOTE_INVALID_SUB_VALUE_COUNT, len(property_['values'][0])), {})
                     validate_uri(value[0])
             else:
                 # Inline vCard object
@@ -712,9 +724,9 @@ def validate_vcard_property(prop):
 
         elif property_name == 'URL':
             # <http://tools.ietf.org/html/rfc2426#section-3.6.8>
-            _expect_no_params(prop)
-            _expect_value_count(prop['values'], 1)
-            validate_uri(prop['values'][0][0])
+            _expect_no_parameters(property_)
+            _expect_value_count(property_['values'], 1)
+            validate_uri(property_['values'][0][0])
 
     except VCardError as error:
         error.context['Property'] = property_name
