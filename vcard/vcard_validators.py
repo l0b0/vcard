@@ -58,6 +58,11 @@ VALID_TEXT = re.compile(u'^([{0}:{1}]|(\\\\[{2}]))*$'.format(
 VALID_QUOTED_STRING = re.compile(u'^{0}[{1}]{0}$'.format(DQUOTE_CHAR, re.escape(QSAFE_CHARS)))
 VALID_FLOAT = re.compile(r'^[+-]?\d+(\.\d+)?$')
 
+LABEL_TYPE_VALUES = ('dom', 'intl', 'postal', 'parcel', 'home', 'work', 'pref')
+TELEPHONE_TYPE_VALUES = (
+    'home', 'msg', 'work', 'pref', 'voice', 'fax', 'cell', 'video', 'pager', 'bbs', 'modem', 'car', 'isdn', 'pcs')
+EMAIL_TYPE_VALUES = ('internet', 'x400', 'pref', 'dom', 'intl', 'postal', 'parcel', 'home', 'work')
+
 
 def _expect_no_params(prop):
     if 'parameters' in prop:
@@ -584,7 +589,7 @@ def validate_vcard_property(prop):
                 for param_name, param_values in prop['parameters'].items():
                     if param_name.upper() == 'TYPE':
                         for param_subvalue in param_values:
-                            if param_subvalue not in ['dom', 'intl', 'postal', 'parcel', 'home', 'work', 'pref']:
+                            if param_subvalue not in LABEL_TYPE_VALUES:
                                 raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_subvalue), {})
                         if param_values == {'intl', 'postal', 'parcel', 'work'}:
                             warnings.warn('{0}: {1}'.format(WARN_DEFAULT_TYPE_VALUE, prop['values']))
@@ -597,7 +602,7 @@ def validate_vcard_property(prop):
                 for param_name, param_values in prop['parameters'].items():
                     if param_name.upper() == 'TYPE':
                         for param_subvalue in param_values:
-                            if param_subvalue not in ['dom', 'intl', 'postal', 'parcel', 'home', 'work', 'pref']:
+                            if param_subvalue not in LABEL_TYPE_VALUES:
                                 raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_subvalue), {})
                         if param_values == {'intl', 'postal', 'parcel', 'work'}:
                             warnings.warn('{0}: {1}'.format(WARN_DEFAULT_TYPE_VALUE, prop['values']))
@@ -613,9 +618,7 @@ def validate_vcard_property(prop):
                 for param_name, param_values in prop['parameters'].items():
                     if param_name.upper() == 'TYPE':
                         for param_subvalue in param_values:
-                            if param_subvalue.lower() not in [
-                                    'home', 'msg', 'work', 'pref', 'voice', 'fax', 'cell', 'video', 'pager', 'bbs',
-                                    'modem', 'car', 'isdn', 'pcs']:
+                            if param_subvalue.lower() not in TELEPHONE_TYPE_VALUES:
                                 raise VCardValueError('{0}: {1}'.format(MSG_INVALID_PARAM_VALUE, param_subvalue), {})
                         if set([value.lower() for value in param_values]) == {'voice'}:
                             warnings.warn('{0}: {1}'.format(WARN_DEFAULT_TYPE_VALUE, prop['values']))
@@ -630,17 +633,7 @@ def validate_vcard_property(prop):
                 for param_name, param_values in prop['parameters'].items():
                     if param_name.upper() == 'TYPE':
                         for param_subvalue in param_values:
-                            if param_subvalue.lower() not in [
-                                'internet',
-                                'x400',
-                                'pref',
-                                'dom',  # IANA registered address types?
-                                'intl',
-                                'postal',
-                                'parcel',
-                                'home',
-                                'work'
-                            ]:
+                            if param_subvalue.lower() not in EMAIL_TYPE_VALUES:
                                 warnings.warn('{0}: {1}'.format(WARN_INVALID_EMAIL_TYPE, param_subvalue))
                         if set([value.lower() for value in param_values]) == {'internet'}:
                             warnings.warn('{0}: {1[values]}'.format(WARN_DEFAULT_TYPE_VALUE, prop))
