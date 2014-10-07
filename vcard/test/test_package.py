@@ -22,6 +22,8 @@ from vcard import (
     vcard_validators
 )
 
+TEST_DIRECTORY = os.path.dirname(__file__)
+
 
 def _get_vcard_file(path):
     """
@@ -39,7 +41,7 @@ def _get_vcard_file(path):
             print('No internet connection; skipping {}\n'.format(path))
             return
     else:
-        filename = os.path.join(os.path.dirname(__file__), path)
+        filename = os.path.join(TEST_DIRECTORY, path)
 
     with codecs.open(filename, 'r', 'utf-8') as file_pointer:
         contents = file_pointer.read()
