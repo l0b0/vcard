@@ -201,8 +201,8 @@ class TestVCards(unittest.TestCase):
 
     def test_failing(self):
         """vCards with errors"""
-        for testgroup in VCARDS_WITH_ERROR:
-            for vcard_file in testgroup['vcards']:
+        for test_group in VCARDS_WITH_ERROR:
+            for vcard_file in test_group['vcards']:
                 vcard_text = _get_vcard_file(vcard_file)
                 if vcard_text is None:
                     continue
@@ -214,11 +214,11 @@ class TestVCards(unittest.TestCase):
                 except vcard_errors.VCardError as error:
                     error_msg = '\n\n'.join((
                         'Wrong message for vCard {vcard_file!r}:'.format(vcard_file=vcard_file),
-                        'Expected: {expected}'.format(expected=testgroup['message']),
+                        'Expected: {expected}'.format(expected=test_group['message']),
                         'Got: {got}'.format(got=str(error)),
                         ))
                     self.assertTrue(
-                        testgroup['message'] in str(error),
+                        test_group['message'] in str(error),
                         msg=error_msg
                     )
 
