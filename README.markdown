@@ -33,11 +33,6 @@ Development
 
     git clone --recurse-submodules https://github.com/l0b0/vcard.git
 
-**Virtualenv setup:**
-
-    virtualenv --python=python2.7 /path/to/virtualenv
-    . /path/to/virtualenv/bin/activate
-
 **Test:**
 
     make test
