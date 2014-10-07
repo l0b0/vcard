@@ -14,8 +14,6 @@ import unittest
 import urllib
 import warnings
 
-from textwrap import dedent
-
 from vcard import (
     vcard,
     vcard_definitions,
