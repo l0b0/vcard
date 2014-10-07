@@ -20,6 +20,8 @@ UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
 # System
 RM := /bin/rm -f
 
+ONLINE = true
+
 build_directory = build
 distribution_directory = dist
 
@@ -28,7 +30,9 @@ all: build
 
 .PHONY: test-dependencies
 test-dependencies: virtualenv
-	. virtualenv/bin/activate && pip install --requirement python-test-requirements.txt
+	if $(ONLINE); then \
+		. virtualenv/bin/activate && pip install --requirement python-test-requirements.txt || exit $$?; \
+	fi
 
 .PHONY: test
 test: test-dependencies
