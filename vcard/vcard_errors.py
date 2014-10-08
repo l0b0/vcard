@@ -114,11 +114,6 @@ class VCardError(Exception):
         VCardError: test
         File: /home/user/test.vcf
         Property: ADR
-        >>> import vcard_definitions
-        >>> raise VCardError('Cöntexte randomisę', {'foo': vcard_definitions.QUOTE_SAFE_CHARACTERS[-1]*2})
-        Traceback (most recent call last):
-        VCardError: Cöntexte randomisę
-        foo: ÿÿ
         """
         Exception.__init__(self)
         self.message = message
@@ -137,10 +132,6 @@ class VCardError(Exception):
         for key in keys:
             if key in self.context:
                 message += '\n{0}: {1}'.format(_stringify(key), _stringify(self.context.pop(key)))
-
-        # Output other context strings any old way
-        for key in self.context.keys():
-            message += '\n{0}: {1}'.format(_stringify(key), _stringify(self.context.pop(key)))
 
         return message
 
