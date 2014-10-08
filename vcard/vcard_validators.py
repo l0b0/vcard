@@ -66,12 +66,13 @@ EMAIL_TYPE_VALUES = ('internet', 'x400', 'pref', 'dom', 'intl', 'postal', 'parce
 
 
 def _expect_no_parameters(property_):
-    if 'parameters' in property_:
-        raise VCardItemCountError('{0}: {1[parameters]}'.format(NOTE_NON_EMPTY_PARAMETER, property_), {})
+    parameters = __get_parameters(property_)
+    if parameters is not None:
+        raise VCardItemCountError('{0}: {1}'.format(NOTE_NON_EMPTY_PARAMETER, parameters), {})
 
 
 def _expect_parameters(property_):
-    if 'parameters' not in property_:
+    if __get_parameters(property_) is None:
         raise VCardItemCountError(NOTE_MISSING_PARAMETER, {})
 
 
@@ -732,3 +733,7 @@ def validate_vcard_property(property_):
         error.context['Property'] = property_name
         err_type = type(error)
         raise err_type(error.message, error.context)
+
+
+def __get_parameters(property_):
+    return property_.get('parameters')
