@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""vCards v3.0 (RFC 2426) definitions and message strings"""
+"""vCard v3.0 (RFC 2426) definitions and message strings"""
 
 
 def character_range(start, end):

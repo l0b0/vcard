@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-vCards v3.0 (RFC 2426) validating functions
+vCard v3.0 (RFC 2426) validating functions
 
 Should contain all the general purpose validation code extracted from
 standards.
