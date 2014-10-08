@@ -2,11 +2,6 @@
 # -*- coding: utf-8 -*-
 """Test suite for vcard <https://github.com/l0b0/vcard>"""
 
-__author__ = 'Victor Engmark'
-__email__ = 'victor.engmark@gmail.com'
-__copyright__ = 'Copyright (C) 2010-2012 Victor Engmark'
-__license__ = 'GPLv3'
-
 import codecs
 import doctest
 import os
