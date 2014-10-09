@@ -35,7 +35,7 @@ setup(
         'Topic :: Text Processing',
         'Topic :: Utilities',
     ],
-    test_suite='vcard.test.test_package',
+    test_suite='tests.test_package',
     author=__author__,
     author_email=__email__,
     maintainer=__maintainer__,
