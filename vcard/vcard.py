@@ -17,7 +17,6 @@ vcard *.vcf
 import argparse
 
 import codecs
-import getopt
 import re
 import sys
 import warnings
