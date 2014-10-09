@@ -325,7 +325,7 @@ class VCard():
         return self.text.encode('utf-8')
 
 
-def validate_file(filename, verbose=False):
+def validate_file(filename, verbose):
     """
     Create object for each vCard in a file, and show the error output.
 
