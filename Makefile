@@ -39,7 +39,7 @@ test: test-dependencies
 	. virtualenv/bin/activate && \
 		make METHOD=git python-pep8 && \
 		PYTHONPATH=vcard coverage run $(SETUP) test && \
-		coverage report --include='vcard/*' --fail-under=70
+		coverage report --include='vcard/*' --fail-under=77
 
 .PHONY: build
 build: test virtualenv doc
