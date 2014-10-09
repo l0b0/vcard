@@ -369,7 +369,7 @@ def validate_file(filename, verbose=False):
 
 def main():
     try:
-        arguments = __parse_arguments()
+        arguments = parse_arguments(sys.argv[1:])
     except UsageError as error:
         sys.stderr.write('{0}\n'.format(str(error)))
         return 2
@@ -380,15 +380,15 @@ def main():
             print('{0}\n'.format(result))
 
 
-def __parse_arguments():
+def parse_arguments(arguments):
     argument_parser = argparse.ArgumentParser()
     argument_parser.add_argument('--verbose', default=False, action='store_true')
     argument_parser.add_argument('paths', metavar='path', nargs='+')
     try:
-        arguments = argument_parser.parse_args()
+        parsed_arguments = argument_parser.parse_args(args=arguments)
     except argparse.ArgumentError as error:
         raise UsageError(str(error))
-    return arguments
+    return parsed_arguments
 
 
 if __name__ == '__main__':
