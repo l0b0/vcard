@@ -25,6 +25,9 @@ class TestVcard(TestCase):
     def test_parse_arguments_fails_without_path(self):
         self.assertRaises(SystemExit, vcard.parse_arguments, [])
 
+    def test_parse_arguments_fails_with_invalid_argument(self):
+        self.assertRaises(SystemExit, vcard.parse_arguments, ['--foo'])
+
     def test_parse_arguments_verbose_off_by_default(self):
         path = '/some/path'
 
