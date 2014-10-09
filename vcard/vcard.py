@@ -14,6 +14,7 @@ Example:
 vcard *.vcf
     Validate all .vcf files in the current directory
 """
+import argparse
 
 import codecs
 import getopt
@@ -367,38 +368,28 @@ def validate_file(filename, verbose=False):
     return result
 
 
-def main(argv=None):
-    """Argument handling."""
-
-    if argv is None:
-        argv = sys.argv
-
-    # Defaults
-    verbose = False
-
+def main():
     try:
-        try:
-            opts, args = getopt.getopt(argv[1:], 'v', ['verbose'])
-        except getopt.GetoptError as err:
-            raise UsageError(str(err))
-
-        for option, value in opts:
-            if option in ('-v', '--verbose'):
-                verbose = True
-            else:
-                raise UsageError('Unhandled option {0}'.format(option))
-
-        if not args:
-            raise UsageError(__doc__)
-
-    except UsageError as err:
-        sys.stderr.write('{0}\n'.format(str(err)))
+        arguments = __parse_arguments()
+    except UsageError as error:
+        sys.stderr.write('{0}\n'.format(str(error)))
         return 2
 
-    for filename in args:
-        result = validate_file(filename, verbose)
+    for filename in arguments.paths:
+        result = validate_file(filename, arguments.verbose)
         if result is not None:
             print('{0}\n'.format(result))
+
+
+def __parse_arguments():
+    argument_parser = argparse.ArgumentParser()
+    argument_parser.add_argument('--verbose', default=False, action='store_true')
+    argument_parser.add_argument('paths', metavar='path', nargs='+')
+    try:
+        arguments = argument_parser.parse_args()
+    except argparse.ArgumentError as error:
+        raise UsageError(str(error))
+    return arguments
 
 
 if __name__ == '__main__':
