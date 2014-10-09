@@ -14,6 +14,7 @@ from vcard import (
     vcard_definitions,
     vcard_errors,
     vcard_utils,
+    vcard_validator,
     vcard_validators
 )
 
@@ -187,7 +188,7 @@ class TestVCards(unittest.TestCase):
 
                 try:
                     with warnings.catch_warnings(record=True):
-                        vcard.VCard(vcard_text, filename=vcard_file)
+                        vcard_validator.VCard(vcard_text, filename=vcard_file)
                         self.fail('Invalid vCard created:\n{0}'.format(vcard_text))
                 except vcard_errors.VCardError as error:
                     error_message = '\n\n'.join((
@@ -209,7 +210,7 @@ class TestVCards(unittest.TestCase):
 
             try:
                 with warnings.catch_warnings(record=True):
-                    vc_obj = vcard.VCard(vcard_text, filename=vcard_file)
+                    vc_obj = vcard_validator.VCard(vcard_text, filename=vcard_file)
                 self.assertNotEqual(vc_obj, None)
             except vcard_errors.VCardError as error:
                 error_message = '\n\n'.join((
@@ -230,7 +231,7 @@ class TestVCards(unittest.TestCase):
             with warnings.catch_warnings(record=True):
                 self.assertRaises(
                     vcard_errors.VCardError,
-                    vcard.VCard,
+                    vcard_validator.VCard,
                     vcard_text)
 
     def test_doc(self):
