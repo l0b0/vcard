@@ -35,6 +35,9 @@ from vcard_errors import \
 import vcard_utils
 import vcard_validators
 
+PATH_ARGUMENT_HELP = "The files to validate. Use '-' for standard input"
+VERBOSE_OPTION_HELP = 'Enable verbose output'
+
 
 def unfold_vcard_lines(lines):
     """
@@ -382,8 +385,8 @@ def main():
 
 def parse_arguments(arguments):
     argument_parser = argparse.ArgumentParser()
-    argument_parser.add_argument('--verbose', default=False, action='store_true')
-    argument_parser.add_argument('paths', metavar='path', nargs='+')
+    argument_parser.add_argument('--verbose', default=False, action='store_true', help=VERBOSE_OPTION_HELP)
+    argument_parser.add_argument('paths', metavar='path', nargs='+', help=PATH_ARGUMENT_HELP)
     try:
         parsed_arguments = argument_parser.parse_args(args=arguments)
     except argparse.ArgumentError as error:
