@@ -22,9 +22,10 @@ import sys
 import warnings
 
 # Local modules
+from vcard_property import VcardProperty
 from vcard_definitions import \
-    ALL_PROPERTIES, NEWLINE_CHARACTERS, ID_CHARACTERS, MANDATORY_PROPERTIES, QUOTE_SAFE_CHARACTERS, SAFE_CHARACTERS, SPACE_CHARACTER, VALUE_CHARACTERS, \
-    VCARD_LINE_MAX_LENGTH_RAW
+    ALL_PROPERTIES, NEWLINE_CHARACTERS, ID_CHARACTERS, MANDATORY_PROPERTIES, QUOTE_SAFE_CHARACTERS, SAFE_CHARACTERS, \
+    SPACE_CHARACTER, VALUE_CHARACTERS, VCARD_LINE_MAX_LENGTH_RAW
 from vcard_errors import \
     NOTE_CONTINUATION_AT_START, NOTE_DOT_AT_LINE_START, NOTE_EMPTY_VCARD, NOTE_INVALID_LINE_SEPARATOR, \
     NOTE_INVALID_PARAMETER_NAME, NOTE_INVALID_PROPERTY_NAME, NOTE_INVALID_SUB_VALUE, NOTE_INVALID_VALUE, \
@@ -226,8 +227,6 @@ def get_vcard_property(property_line):
     @param property_line: Single unfolded vCard line
     @return: Dictionary with name, parameters and values
     """
-    property_ = {}
-
     property_parts = vcard_utils.split_unescaped(property_line, ':')
     if len(property_parts) < 2:
         raise VCardItemCountError('{0}: {1}'.format(NOTE_MISSING_VALUE_STRING, property_line), {})
@@ -240,17 +239,17 @@ def get_vcard_property(property_line):
     # Split property name and property parameters
     property_name_and_params = vcard_utils.split_unescaped(property_string, ';')
 
-    property_['name'] = property_name_and_params.pop(0)
+    property_ = VcardProperty(property_name_and_params.pop(0))
 
     # String validation
-    if not property_['name'].upper() in ALL_PROPERTIES and not re.match(
-            '^X-[{0}]+$'.format(re.escape(ID_CHARACTERS)), property_['name'], re.IGNORECASE):
-        raise VCardNameError('{0}: {1[name]}'.format(NOTE_INVALID_PROPERTY_NAME, property_), {})
+    if not property_.name.upper() in ALL_PROPERTIES and not re.match(
+            '^X-[{0}]+$'.format(re.escape(ID_CHARACTERS)), property_.name, re.IGNORECASE):
+        raise VCardNameError('{0}: {1}'.format(NOTE_INVALID_PROPERTY_NAME, property_.name), {})
 
     try:
         if len(property_name_and_params) != 0:
-            property_['parameters'] = get_vcard_property_params(';'.join(property_name_and_params))
-        property_['values'] = get_vcard_property_values(values_string)
+            property_.parameters = get_vcard_property_params(';'.join(property_name_and_params))
+        property_.values = get_vcard_property_values(values_string)
 
         # Validate
         vcard_validators.validate_vcard_property(property_)
@@ -286,7 +285,7 @@ def get_vcard_properties(lines):
                     error.context)
 
     for mandatory_property in MANDATORY_PROPERTIES:
-        if mandatory_property not in [property_['name'].upper() for property_ in properties]:
+        if mandatory_property not in [property_.name.upper() for property_ in properties]:
             raise VCardItemCountError(
                 '{0}: {1}'.format(NOTE_MISSING_PROPERTY, mandatory_property), {'Property': mandatory_property})
 
