@@ -11,6 +11,7 @@ FIND = /usr/bin/find
 
 # Python
 PYTHON_VERSION = 2.7.6
+PIP = pip
 PEP8_OPTIONS = --max-line-length=120
 
 SETUP = setup.py
@@ -31,7 +32,7 @@ all: build
 .PHONY: test-dependencies
 test-dependencies: virtualenv
 	if $(ONLINE); then \
-		. virtualenv/bin/activate && pip install --requirement python-test-requirements.txt || exit $$?; \
+		. virtualenv/bin/activate && $(PIP) install --requirement python-test-requirements.txt || exit $$?; \
 	fi
 
 .PHONY: test
