@@ -17,8 +17,14 @@ def main():
         sys.stderr.write('{0}\n'.format(str(error)))
         return 2
 
+    return_code = 0
     for filename in arguments.paths:
-        print VcardValidator(filename, arguments.verbose).result
+        result = VcardValidator(filename, arguments.verbose).result
+        if result is not None:
+            print result
+            return_code = 1
+
+    return return_code
 
 
 def parse_arguments(arguments):

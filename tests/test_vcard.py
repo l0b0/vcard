@@ -1,9 +1,42 @@
+import argparse
 from unittest import TestCase
+import mock
 
 from vcard import vcard
 
+ARGUMENTS_WITH_PATH = argparse.Namespace(paths=['any'], verbose=False)
+ARGUMENTS_WITH_PATHS = argparse.Namespace(paths=['any', 'another'], verbose=False)
+
 
 class TestVcard(TestCase):
+    @mock.patch('vcard.vcard.parse_arguments')
+    @mock.patch('vcard.vcard.VcardValidator', spec=vcard.VcardValidator)
+    def test_main_succeeds_when_vcard_validator_returns_nothing(self, vcard_validator_mock, parse_arguments_mock):
+        parse_arguments_mock.return_value = ARGUMENTS_WITH_PATH
+        vcard_validator_mock.return_value.result = None
+        self.assertEqual(0, vcard.main())
+
+    @mock.patch('vcard.vcard.parse_arguments')
+    @mock.patch('vcard.vcard.VcardValidator', spec=vcard.VcardValidator)
+    def test_main_fails_when_vcard_validator_fails(self, vcard_validator_mock, parse_arguments_mock):
+        parse_arguments_mock.return_value = ARGUMENTS_WITH_PATH
+        vcard_validator_mock.return_value.result = 'non-empty'
+        self.assertEqual(1, vcard.main())
+
+    @mock.patch('vcard.vcard.parse_arguments')
+    @mock.patch('vcard.vcard.VcardValidator')
+    def test_main_fails_when_vcard_validator_fails_on_first_file(self, vcard_validator_mock, parse_arguments_mock):
+        parse_arguments_mock.return_value = ARGUMENTS_WITH_PATHS
+        vcard_validator_mock.side_effect = [
+            mock.Mock(spec=vcard.VcardValidator, result='non-empty'),
+            mock.Mock(spec=vcard.VcardValidator, result=None)]
+        self.assertEqual(1, vcard.main())
+
+    @mock.patch('vcard.vcard.parse_arguments')
+    def test_main_fails_when_argument_parsing_fails(self, parse_arguments_mock):
+        parse_arguments_mock.side_effect = vcard.UsageError('error')
+        self.assertEqual(2, vcard.main())
+
     def test_parse_arguments_succeeds_with_single_path(self):
         path = '/some/path'
         expected_paths = [path]
