@@ -10,6 +10,7 @@ GIT_TAG = $(GIT) tag -au $(GPG_ID)
 FIND = /usr/bin/find
 
 # Python
+SYSTEM_PYTHON = /usr/bin/python2
 PYTHON_VERSION = 2.7.6
 PIP = pip
 PEP8_OPTIONS = --max-line-length=120
@@ -57,7 +58,7 @@ index.html:
 
 .PHONY: install
 install: virtualenv
-	. virtualenv/bin/activate && python $(SETUP) install $(INSTALL_OPTIONS)
+	$(SYSTEM_PYTHON) $(SETUP) install $(INSTALL_OPTIONS)
 	for dir in /etc/bash_completion.d /usr/share/bash-completion/completions; \
 	do \
 		if [ -d "$$dir" ]; \
