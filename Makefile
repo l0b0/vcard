@@ -74,8 +74,9 @@ register: virtualenv
 
 .PHONY: release
 release: build register
-	. virtualenv/bin/activate && python $(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS)
-	$(GIT_TAG) -m 'PyPI release' v$(shell python version.py)
+	. virtualenv/bin/activate && \
+		python $(SETUP) sdist bdist_egg upload $(UPLOAD_OPTIONS) && \
+		$(GIT_TAG) -m 'PyPI release' v$(shell python version.py)
 	@echo 'Remember to `git push --tags`'
 
 .PHONY: clean
