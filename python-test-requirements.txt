@@ -2,4 +2,3 @@ coverage==3.7.1
 isodate==0.5.0
 mock==1.0.1
 pep8==1.5.7
-wsgiref==0.1.2
