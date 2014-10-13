@@ -6,7 +6,7 @@ import codecs
 import doctest
 import os
 import unittest
-import urllib
+import six
 import warnings
 
 from vcard import (
@@ -33,7 +33,7 @@ def _get_vcard_file(path):
 
     if path.startswith('http'):
         try:
-            filename = urllib.urlretrieve(path)[0]
+            filename = six.Module_six_moves_urllib.request.urlretrieve(path)[0]
         except IOError:
             print('No internet connection; skipping {}\n'.format(path))
             return

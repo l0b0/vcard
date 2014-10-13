@@ -3,15 +3,14 @@ import re
 import sys
 import warnings
 
-import vcard_utils
-import vcard_validators
-from vcard_property import VcardProperty
-from vcard_definitions import ALL_PROPERTIES, ID_CHARACTERS, MANDATORY_PROPERTIES, NEWLINE_CHARACTERS, \
+from . import vcard_utils, vcard_validators
+from .vcard_property import VcardProperty
+from .vcard_definitions import ALL_PROPERTIES, ID_CHARACTERS, MANDATORY_PROPERTIES, NEWLINE_CHARACTERS, \
     QUOTE_SAFE_CHARACTERS, SAFE_CHARACTERS, SPACE_CHARACTER, VALUE_CHARACTERS, VCARD_LINE_MAX_LENGTH_RAW
-from vcard_errors import NOTE_CONTINUATION_AT_START, NOTE_DOT_AT_LINE_START, NOTE_EMPTY_VCARD, \
+from .vcard_errors import NOTE_CONTINUATION_AT_START, NOTE_DOT_AT_LINE_START, NOTE_EMPTY_VCARD, \
     NOTE_INVALID_LINE_SEPARATOR, NOTE_INVALID_PARAMETER_NAME, NOTE_INVALID_PROPERTY_NAME, NOTE_INVALID_SUB_VALUE, \
     NOTE_INVALID_VALUE, NOTE_MISMATCH_GROUP, NOTE_MISSING_GROUP, NOTE_MISSING_PARAM_VALUE, NOTE_MISSING_PROPERTY, \
-    NOTE_MISSING_VALUE_STRING, VCardError, VCardItemCountError, VCardLineError, VCardNameError, VCardValueError
+    NOTE_MISSING_VALUE_STRING, VCardItemCountError, VCardLineError, VCardNameError, VCardValueError, VCardError
 
 
 class VcardValidator(object):

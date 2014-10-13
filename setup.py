@@ -22,7 +22,7 @@ setup(
     keywords='vCard vCards RFC 2426 RFC2426 validator',
     packages=[__package__],
     setup_requires=['isodate'],
-    install_requires=['isodate'],
+    install_requires=['isodate', 'six'],
     entry_points={'console_scripts': ['%(package)s=%(package)s.%(package)s:main' % {'package': __package__}]},
     classifiers=[
         'Development Status :: 3 - Alpha',

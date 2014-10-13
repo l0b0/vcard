@@ -8,15 +8,15 @@ standards.
 """
 
 import re
-from urlparse import urlparse
+import six
 import warnings
 
 # Third party modules
 import isodate
 
 # Local modules
-from vcard_definitions import \
-    DOUBLE_QUOTE_CHARACTER, ID_CHARACTERS, ESCAPED_CHARACTERS, QUOTE_SAFE_CHARACTERS, SAFE_CHARACTERS, SPACE_CHARACTER
+from vcard_definitions import (
+    DOUBLE_QUOTE_CHARACTER, ID_CHARACTERS, ESCAPED_CHARACTERS, QUOTE_SAFE_CHARACTERS, SAFE_CHARACTERS, SPACE_CHARACTER)
 
 from vcard_errors import (
     # Error literals
@@ -434,7 +434,7 @@ def validate_uri(text):
     VCardValueError: Invalid URI ...
     String: http:
     """
-    parts = urlparse(text)
+    parts = six.Module_six_moves_urllib.parse.urlparse(text)
     if parts[0] == '' or (parts[1] == '' and parts[2] == ''):
         raise VCardValueError(NOTE_INVALID_URI, {'String': text})
 

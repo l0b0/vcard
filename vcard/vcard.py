@@ -3,8 +3,8 @@ import argparse
 
 import sys
 
-from vcard_validator import VcardValidator
-from vcard_errors import UsageError
+from . vcard_validator import VcardValidator
+from .vcard_errors import UsageError
 
 PATH_ARGUMENT_HELP = "The files to validate. Use '-' for standard input"
 VERBOSE_OPTION_HELP = 'Enable verbose output'
@@ -21,7 +21,7 @@ def main():
     for filename in arguments.paths:
         result = VcardValidator(filename, arguments.verbose).result
         if result is not None:
-            print result
+            print(result)
             return_code = 1
 
     return return_code
