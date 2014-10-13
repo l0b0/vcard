@@ -11,7 +11,7 @@ FIND = /usr/bin/find
 
 # Python
 SYSTEM_PYTHON = /usr/bin/python2
-PYTHON_VERSION = 2.7.6
+PYTHON_VERSION = 2.7.8
 PIP = pip
 PEP8_OPTIONS = --max-line-length=120
 
