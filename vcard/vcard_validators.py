@@ -93,32 +93,6 @@ def validate_date(text):
     that it specifies a subset of ISO 8601.
 
     @param text: String
-
-    Examples:
-    >>> validate_date('20000101')
-    >>> validate_date('2000-01-01')
-    >>> validate_date('2000:01:01') # Wrong separator
-    Traceback (most recent call last):
-    VCardValueError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
-    String: 2000:01:01
-    >>> validate_date('2000101') # Too short
-    Traceback (most recent call last):
-    VCardValueError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
-    String: 2000101
-    >>> validate_date('20080229')
-    >>> validate_date('20100229') # Not a leap year
-    Traceback (most recent call last):
-    VCardValueError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
-    String: 20100229
-    >>> validate_date('19000229') # Not a leap year (divisible by 100)
-    Traceback (most recent call last):
-    VCardValueError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
-    String: 19000229
-    >>> validate_date('20000229') # Leap year (divisible by 400)
-    >>> validate_date('aaaa-bb-cc')
-    Traceback (most recent call last):
-    VCardValueError: Invalid date (See RFC 2425 section 5.8.4 for date syntax)
-    String: aaaa-bb-cc
     """
     if VALID_DATE.match(text) is None:
         raise VCardValueError(NOTE_INVALID_DATE, {'String': text})
