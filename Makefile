@@ -92,7 +92,7 @@ clean-build-third-party:
 .PHONY: clean-build-local
 clean-build-local:
 	-$(RM) -r $(NAME).egg-info
-	-$(FIND) . -type d -name '__pycache__' -delete
+	-$(FIND) . -type d -name '__pycache__' -exec $(RM) -r {} +
 	-$(FIND) . -type f -name '*.pyc' -delete
 
 .PHONY: clean-dist
