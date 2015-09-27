@@ -14,6 +14,7 @@ SYSTEM_PYTHON = /usr/bin/python2
 PYTHON_VERSION = 2.7.8
 PIP = pip
 PEP8_OPTIONS = --max-line-length=120
+VIRTUALENV_VERSION = 13.1.2
 
 SETUP = setup.py
 INSTALL_OPTIONS := -O2
