@@ -1,2 +1,2 @@
 language: python
-script: make test
+script: make MKDIR=/bin/mkdir test
