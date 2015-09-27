@@ -1,7 +1,7 @@
 vCard module
 ============
 
-[![Build Status](https://jenkins.engmark.name:8080/buildStatus/icon?job=vcard)](https://jenkins.engmark.name:8080/job/vcard/)
+[![Build Status](https://travis-ci.org/l0b0/vcard.svg?branch=master)](https://travis-ci.org/l0b0/vcard)
 
 This program can be used for strict validation and parsing of vCards. It currently supports [vCard 3.0 (RFC 2426)](http://tools.ietf.org/html/rfc2426).
 
