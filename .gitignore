@@ -3,6 +3,7 @@ build/
 dist/
 *.egg
 *.egg-info/
+.eggs/
 index.html
 *.pyc
 virtualenv
