@@ -44,6 +44,11 @@ test: test-dependencies
 		PYTHONPATH=vcard coverage run $(SETUP) test && \
 		coverage report --include='vcard/*' --fail-under=80
 
+.PHONY: test-clean
+test-clean:
+	# Run after `make clean`
+	test -z "$$($(GIT) clean --dry-run -dx)"
+
 .PHONY: build
 build: test virtualenv doc
 	mkdir -p $@
@@ -81,7 +86,7 @@ release: build register
 	@echo 'Remember to `git push --tags`'
 
 .PHONY: clean
-clean: clean-build clean-dist clean-doc clean-test
+clean: clean-build clean-dist clean-doc clean-ide clean-test
 
 .PHONY: clean-build
 clean-build: clean-build-third-party clean-build-local
@@ -103,6 +108,10 @@ clean-dist:
 .PHONY: clean-doc
 clean-doc:
 	-$(RM) index.html
+
+.PHONY: clean-ide
+clean-ide:
+	-$(RM) -r .idea/copyright
 
 .PHONY: clean-test
 clean-test:
