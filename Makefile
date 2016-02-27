@@ -34,7 +34,7 @@ all: build
 .PHONY: test-dependencies
 test-dependencies: virtualenv
 	if $(ONLINE); then \
-		. virtualenv/bin/activate && $(PIP) install --requirement python-test-requirements.txt || exit $$?; \
+		. virtualenv/bin/activate && $(PIP) install --requirement requirements.txt || exit $$?; \
 	fi
 
 .PHONY: test
