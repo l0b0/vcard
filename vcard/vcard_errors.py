@@ -81,39 +81,6 @@ class VCardError(Exception):
 
         @param message: Error message
         @param context: Dictionary with context information
-
-        Examples:
-        >>> raise VCardError('test', {})
-        Traceback (most recent call last):
-        VCardError: test
-        >>> raise VCardError('with path', {'File': '/home/user/test.vcf'})
-        Traceback (most recent call last):
-        VCardError: with path
-        File: /home/user/test.vcf
-        >>> raise VCardError('Error with lots of context', {
-        ... 'File': '/home/user/test.vcf',
-        ... 'File line': 120,
-        ... 'vCard line': 5,
-        ... 'Property': 'ADR',
-        ... 'Property line': 2,
-        ... 'String': 'too;few;values;êéè'})
-        Traceback (most recent call last):
-        VCardError: Error with lots of context
-        File: /home/user/test.vcf
-        File line: 120
-        vCard line: 5
-        Property: ADR
-        Property line: 2
-        String: too;few;values;êéè
-        >>> try:
-        ...     raise VCardError('test', {'Property': 'ADR'})
-        ... except VCardError as error:
-        ...     error.context['File'] = '/home/user/test.vcf'
-        ...     raise VCardError(error.message, error.context)
-        Traceback (most recent call last):
-        VCardError: test
-        File: /home/user/test.vcf
-        Property: ADR
         """
         Exception.__init__(self)
         self.message = message
