@@ -1,2 +1,2 @@
 language: python
-script: make LN=/bin/ln MKDIR=/bin/mkdir TAR=/bin/tar test
+script: make LN=/bin/ln MKDIR=/bin/mkdir TAR=/bin/tar VENV=/usr/local/bin/virtualenv test
