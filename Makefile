@@ -1,7 +1,7 @@
 NAME = $(notdir $(CURDIR))
 
 # Release
-GPG_ID ?= 92126B54
+GPG_ID ?= 260D3194
 
 # Git
 GIT := /usr/bin/git
@@ -11,10 +11,10 @@ FIND = /usr/bin/find
 
 # Python
 SYSTEM_PYTHON = /usr/bin/python2
-PYTHON_VERSION = 2.7.8
+PYTHON_VERSION = 3.5.1
 PIP = pip
 PEP8_OPTIONS = --max-line-length=120
-VIRTUALENV_VERSION = 13.1.2
+VIRTUALENV_VERSION = 14.0.6
 
 SETUP = setup.py
 INSTALL_OPTIONS := -O2

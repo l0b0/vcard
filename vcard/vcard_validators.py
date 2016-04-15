@@ -15,10 +15,10 @@ import warnings
 import isodate
 
 # Local modules
-from vcard_definitions import (
+from .vcard_definitions import (
     DOUBLE_QUOTE_CHARACTER, ID_CHARACTERS, ESCAPED_CHARACTERS, QUOTE_SAFE_CHARACTERS, SAFE_CHARACTERS, SPACE_CHARACTER)
 
-from vcard_errors import (
+from .vcard_errors import (
     # Error literals
     NOTE_INVALID_DATE,
     NOTE_INVALID_LANGUAGE_VALUE,
@@ -119,32 +119,32 @@ def validate_time_zone(text):
     >>> validate_time_zone('-00:30')
     >>> validate_time_zone('+00:30')
     >>> validate_time_zone('Z+01:00') # Can't combine Z and offset
-    ... # doctest: +ELLIPSIS
+    ... # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid time zone ...
     String: Z+01:00
     >>> validate_time_zone('+1:00') # Need preceding zero
-    ... # doctest: +ELLIPSIS
+    ... # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid time zone ...
     String: +1:00
     >>> validate_time_zone('0100') # Need + or -
-    ... # doctest: +ELLIPSIS
+    ... # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid time zone ...
     String: 0100
     >>> validate_time_zone('01') # Need colon and minutes
-    ... # doctest: +ELLIPSIS
+    ... # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid time zone ...
     String: 01
     >>> validate_time_zone('01:') # Need minutes
-    ... # doctest: +ELLIPSIS
+    ... # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid time zone ...
     String: 01:
     >>> validate_time_zone('01:1') # Need preceding zero
-    ... # doctest: +ELLIPSIS
+    ... # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid time zone ...
     """
@@ -169,19 +169,19 @@ def validate_time(text):
     >>> validate_time('000000')
     >>> validate_time('01:02:03Z')
     >>> validate_time('01:02:03+01:30')
-    >>> validate_time('01:02:60')
+    >>> validate_time('01:02:60') # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
     String: 01:02:60
-    >>> validate_time('01:60:59')
+    >>> validate_time('01:60:59') # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
     String: 01:60:59
-    >>> validate_time('24:00:00')
+    >>> validate_time('24:00:00') # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid time (See RFC 2425 section 5.8.4 for time syntax)
     String: 24:00:00
-    >>> validate_time('00:00:00Z+01') # doctest: +ELLIPSIS
+    >>> validate_time('00:00:00Z+01') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid time zone ...
     String: Z+01
@@ -210,11 +210,11 @@ def validate_language_tag(text):
 
     Examples:
     >>> validate_language_tag('en')
-    >>> validate_language_tag('-US') # Need primary tag
+    >>> validate_language_tag('-US') # Need primary tag # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid language (See RFC 1766 section 2 for details)
     String: -us
-    >>> validate_language_tag('en-') # Can't end with dash
+    >>> validate_language_tag('en-') # Can't end with dash # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid language (See RFC 1766 section 2 for details)
     String: en-
@@ -236,20 +236,20 @@ def validate_x_name(text):
     Examples:
     >>> validate_x_name('X-abc')
     >>> validate_x_name('X-' + ID_CHARACTERS)
-    >>> validate_x_name('X-') # Have to have more characters
+    >>> validate_x_name('X-') # Have to have more characters # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardNameError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: X-
-    >>> validate_x_name('') # Have to start with X- #doctest: +ELLIPSIS
+    >>> validate_x_name('') # Have to start with X- #doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     VCardNameError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     ...
-    >>> validate_x_name('x-abc') # X must be upper case
+    >>> validate_x_name('x-abc') # X must be upper case # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardNameError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: x-abc
-    >>> validate_x_name('foo') # Have to start with X-
+    >>> validate_x_name('foo') # Have to start with X- # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardNameError: Invalid X-name (See RFC 2426 section 4 for x-name syntax)
     String: foo
@@ -268,7 +268,7 @@ def validate_presentation_text(text):
     Examples:
     >>> validate_presentation_text('')
     >>> validate_presentation_text(SAFE_CHARACTERS)
-    >>> validate_presentation_text(u'\u000B') #doctest: +ELLIPSIS
+    >>> validate_presentation_text(u'\u000B') #doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid parameter value ...
     String: ...
@@ -289,11 +289,11 @@ def validate_text_value(text):
     >>> validate_text_value('\\\\,')
     >>> validate_text_value(SAFE_CHARACTERS)
     >>> validate_text_value('\\\\n')
-    >>> validate_text_value(';') # doctest: +ELLIPSIS
+    >>> validate_text_value(';') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid text value (See RFC 2426 section 4 for details)
     String: ...
-    >>> validate_text_value('\\\\\\\\;') # doctest: +ELLIPSIS
+    >>> validate_text_value('\\\\\\\\;') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid text value (See RFC 2426 section 4 for details)
     String: ...
@@ -311,11 +311,13 @@ def validate_quoted_string(text):
 
     Examples:
     >>> validate_quoted_string(DOUBLE_QUOTE_CHARACTER + QUOTE_SAFE_CHARACTERS[0] + DOUBLE_QUOTE_CHARACTER)
-    >>> validate_quoted_string(DOUBLE_QUOTE_CHARACTER + DOUBLE_QUOTE_CHARACTER) # doctest: +ELLIPSIS
+    >>> validate_quoted_string(
+    ... DOUBLE_QUOTE_CHARACTER + DOUBLE_QUOTE_CHARACTER) # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid parameter value ...
     >>> validate_quoted_string(
-    ... DOUBLE_QUOTE_CHARACTER + QUOTE_SAFE_CHARACTERS[-1]*2 + DOUBLE_QUOTE_CHARACTER) # doctest: +ELLIPSIS
+    ... DOUBLE_QUOTE_CHARACTER + QUOTE_SAFE_CHARACTERS[-1]*2 + DOUBLE_QUOTE_CHARACTER
+    ... ) # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid parameter value ...
     String: "ÿÿ"
@@ -335,7 +337,8 @@ def validate_param_value(text):
     >>> validate_param_value('')
     >>> validate_param_value(SAFE_CHARACTERS)
     >>> validate_param_value(DOUBLE_QUOTE_CHARACTER + QUOTE_SAFE_CHARACTERS[0] + DOUBLE_QUOTE_CHARACTER)
-    >>> validate_param_value(DOUBLE_QUOTE_CHARACTER + DOUBLE_QUOTE_CHARACTER) # doctest: +ELLIPSIS
+    >>> validate_param_value(
+    ... DOUBLE_QUOTE_CHARACTER + DOUBLE_QUOTE_CHARACTER) # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid parameter value ...
     String: ""
@@ -388,27 +391,27 @@ def validate_float(text):
     >>> validate_float('12.345')
     >>> validate_float('+12.345')
     >>> validate_float('-12.345')
-    >>> validate_float('12.') # doctest: +ELLIPSIS
+    >>> validate_float('12.') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
     VCardValueError: Invalid sub-value ...
-    >>> validate_float('.12') # doctest: +ELLIPSIS
+    >>> validate_float('.12') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
     VCardValueError: Invalid sub-value ...
-    >>> validate_float('foo') # doctest: +ELLIPSIS
+    >>> validate_float('foo') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
     VCardValueError: Invalid sub-value ...
-    >>> validate_float('++12.345') # doctest: +ELLIPSIS
+    >>> validate_float('++12.345') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
     VCardValueError: Invalid sub-value ...
-    >>> validate_float('--12.345') # doctest: +ELLIPSIS
+    >>> validate_float('--12.345') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
     VCardValueError: Invalid sub-value ...
-    >>> validate_float('12.34.5') # doctest: +ELLIPSIS
+    >>> validate_float('12.34.5') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
         ...
     VCardValueError: Invalid sub-value ...
@@ -425,11 +428,11 @@ def validate_uri(text):
 
     Examples:
     >>> validate_uri('http://example.org/')
-    >>> validate_uri('http\\://example.org/') # doctest: +ELLIPSIS
+    >>> validate_uri('http\\://example.org/') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid URI ...
     String: http\\://example.org/
-    >>> validate_uri('http:') # doctest: +ELLIPSIS
+    >>> validate_uri('http:') # doctest: +ELLIPSIS +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     VCardValueError: Invalid URI ...
     String: http:
