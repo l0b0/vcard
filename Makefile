@@ -10,7 +10,6 @@ GIT_TAG = $(GIT) tag -au $(GPG_ID)
 FIND = /usr/bin/find
 
 # Python
-SYSTEM_PYTHON = /usr/bin/python2
 PYTHON_VERSION = 3.5.1
 PIP = pip
 PEP8_OPTIONS = --max-line-length=120

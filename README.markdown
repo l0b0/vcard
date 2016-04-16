@@ -16,8 +16,6 @@ Additional scripts:
 Installation / upgrade
 ----------------------
 
-If your system uses Python 3 as the system Python, you'll have to install `pip2` and use that instead of `pip` below.
-
     sudo pip install --upgrade vcard
 
 Examples
@@ -39,7 +37,7 @@ Development
 
 To test a specific Python version:
 
-    make python_version_major=2 python_version_minor=7 python_version_patch=5 test
+    make PYTHON_VERSION=3.5.1 test
 
 Test requirements:
 
