@@ -48,5 +48,6 @@ Test requirements:
 - `tar`
 - `make`
 - `openssl` development headers/libraries
+- `pip`
 - `wget`
 - `zlib` development headers/libraries
