@@ -1,0 +1,29 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "1.2.4"
+}
+
+version '0.1'
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile(
+            'junit:junit:4.11',
+    )
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'name.engmark.vcard.Application',
+        )
+    }
+}
+
+shadowJar {
+    mergeServiceFiles()
+}

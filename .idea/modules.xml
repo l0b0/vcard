@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/javcard.iml" filepath="$PROJECT_DIR$/.idea/modules/javcard.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/javcard_main.iml" filepath="$PROJECT_DIR$/.idea/modules/javcard_main.iml" group="javcard" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/javcard_test.iml" filepath="$PROJECT_DIR$/.idea/modules/javcard_test.iml" group="javcard" />
       <module fileurl="file://$PROJECT_DIR$/.idea/vcard.iml" filepath="$PROJECT_DIR$/.idea/vcard.iml" />
     </modules>
   </component>
