@@ -22,7 +22,7 @@ public class VcardParserTest {
 
         Vcard vcard = parser.parse(content);
 
-        assertThat(vcard.originalContent(), is(equalTo(content)));
+        assertThat(vcard.getContent(), is(equalTo(content)));
     }
 
     @Test
@@ -32,7 +32,7 @@ public class VcardParserTest {
 
         Vcard vcard = parser.parse(content);
 
-        assertThat(vcard.originalContent(), is(equalTo(content)));
+        assertThat(vcard.getContent(), is(equalTo(content)));
     }
 
     @Test
