@@ -5,6 +5,6 @@ public class VcardParser {
         if (!content.startsWith("BEGIN:VCARD")) {
             return new Vcard(null, "Missing ‘BEGIN:VCARD’ line at line 1, character 1");
         }
-        return null;
+        return new Vcard(content, null);
     }
 }
