@@ -1,5 +1,7 @@
 package name.engmark.vcard;
 
+import java.util.Optional;
+
 public class Vcard {
     private final String content;
     private final String error;
@@ -13,7 +15,7 @@ public class Vcard {
         return content;
     }
 
-    public String getError() {
-        return error;
+    public Optional<String> getError() {
+        return Optional.ofNullable(error);
     }
 }

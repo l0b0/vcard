@@ -2,6 +2,8 @@ package name.engmark.vcard;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -12,7 +14,8 @@ public class VcardParserTest {
         VcardParser parser = new VcardParser();
         String content = "BEGIN:VCARD\r\nVERSION:3.0\r\nFN:\r\nN:;;;;\r\nEND:VCARD\r\n";
 
-        parser.parse(content);
+        Vcard vcard = parser.parse(content);
+        assertThat(vcard.getError(), is(equalTo(Optional.empty())));
     }
 
     @Test
@@ -42,6 +45,6 @@ public class VcardParserTest {
 
         Vcard vcard = parser.parse(content);
 
-        assertThat(vcard.getError(), is(equalTo("Missing ‘BEGIN:VCARD’ line at line 1, character 1")));
+        assertThat(vcard.getError(), is(equalTo(Optional.of("Missing ‘BEGIN:VCARD’ line at line 1, character 1"))));
     }
 }
