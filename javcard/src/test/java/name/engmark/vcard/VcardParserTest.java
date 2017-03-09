@@ -26,6 +26,16 @@ public class VcardParserTest {
     }
 
     @Test
+    public void shouldSaveOriginalContentToVcardOnFailure() {
+        VcardParser parser = new VcardParser();
+        String content = "invalid";
+
+        Vcard vcard = parser.parse(content);
+
+        assertThat(vcard.originalContent(), is(equalTo(content)));
+    }
+
+    @Test
     public void shouldFailWithoutBeginProperty() {
         VcardParser parser = new VcardParser();
         String content = "VERSION:3.0\r\nFN:\r\nN:;;;;\r\nEND:VCARD\r\n";
