@@ -1,2 +1,5 @@
 language: python
 script: make LN=/bin/ln MKDIR=/bin/mkdir TAR=/bin/tar VENV=/usr/local/bin/virtualenv test
+sudo: required
+services:
+  - docker
