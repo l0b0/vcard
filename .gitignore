@@ -1,9 +1,3 @@
 build/
-.coverage
 dist/
-*.egg
 *.egg-info/
-.eggs/
-index.html
-*.pyc
-virtualenv
