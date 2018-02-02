@@ -47,7 +47,7 @@ build: $(build_directory) docker doc test
 doc: $(build_directory)/index.html
 
 $(build_directory)/index.html: $(build_directory)
-	markdown README.markdown > $@
+	markdown README.md > $@
 	sed -i -e 's# href="\.# href="https://github.com/l0b0/vcard/blob/master#' $@
 
 .PHONY: install
