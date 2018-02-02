@@ -31,8 +31,8 @@ docker:
 
 .PHONY: test
 test: docker
-	docker run --rm --user $$UID $(docker_image) pep8 --max-line-length=120 vcard/*.py tests/*.py setup.py version.py
-	docker run --rm --user $$UID $(docker_image) ./test.sh
+	docker run --rm --user $(shell id --user) $(docker_image) pep8 --max-line-length=120 vcard/*.py tests/*.py setup.py version.py
+	docker run --rm --user $(shell id --user) $(docker_image) ./test.sh
 
 .PHONY: test-clean
 test-clean:
@@ -41,7 +41,7 @@ test-clean:
 
 .PHONY: build
 build: $(build_directory) docker doc test
-	docker run --rm --user $$UID --volume $(build_directory):/build $(docker_image) python setup.py build --build-base /build
+	docker run --rm --user $(shell id --user) --volume $(build_directory):/build $(docker_image) python setup.py build --build-base /build
 
 .PHONY: doc
 doc: $(build_directory)/index.html
